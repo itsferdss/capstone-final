@@ -6,7 +6,7 @@
 
       <div class="login-form-container">
             <div id="login">
-              <h1 class="title">Login as Admin</h1>
+              <h1 class="title">Login to Continue</h1>
               <p class="subtitle">Sign in to continue</p>
               <div class="input-group">
                 <label class="inputTitle" for="username">Name</label>
@@ -40,9 +40,9 @@
             console.log("Username:", this.username);
             console.log("Password:", this.password);
             
-            if (this.username === 'admin' && this.password === '123') {
-                console.log("Redirecting to /viewusers");
-                this.$router.push('/viewusers'); // Use router.push to navigate
+            if (this.username === 'ferdinand' && this.password === '123') {
+                console.log("Redirecting to /home");
+                this.$router.push('/home'); // Use router.push to navigate
             } else {
                 console.log("Invalid username or password");
                 this.errorMessage = 'Invalid username or password';
