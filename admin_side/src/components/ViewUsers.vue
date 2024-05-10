@@ -98,7 +98,7 @@
         </td>
       </tr>
 
-              <!--Add Prescription Bellow the name-->
+        <!--Add Prescription Bellow the name-->
           <tr v-if="item.showPrescriptions">
           <td :colspan="headers.length + 1">
             <v-row justify="space-between">
@@ -121,10 +121,10 @@
           </td>
         </tr>
 
-
+        <!--DIALOG FOR DELETE USER-->
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this schedule?</v-card-title>
+          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this user?</v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color=#35623D variant="text" @click="closeDelete">Cancel</v-btn>
@@ -134,7 +134,7 @@
         </v-card>
       </v-dialog>
 
-
+      <!--DIalog for Add Prescription-->
       <v-dialog v-model="dialogAddPrescription" max-width="800px">
         <v-card>
           <v-card-title class="text-h5">Add Prescription</v-card-title>
@@ -162,6 +162,7 @@
       </v-dialog>
 
 
+      <!--Dialog for prescription-->
       <v-dialog v-model="dialogOpenPrescription" max-width="800px">
         <v-card>
           <v-card-title class="text-h5">Past Prescriptions</v-card-title>
@@ -172,6 +173,7 @@
                 <v-list-item-content>
                   <div>{{ prescription.title }}</div>
                   <div>{{ prescription.description }}</div>
+                  <div>{{ prescription.date }}</div>
                 </v-list-item-content>
                 <!-- Optionally, add a delete button for each prescription -->
                 <v-list-item-action>
@@ -190,6 +192,42 @@
         </v-card>
       </v-dialog>
 
+
+
+      <!--DIALOG FOR CHILD UPDATE-->
+      <v-dialog v-model="childUpdateDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            Update Child Information
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-container>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field v-model="updatedWeight" label="Weight (kg)" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field v-model="updatedHeight" label="Height (cm)" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field v-model="updatedAge" label="Age (years)" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                   <v-text-field v-model="dateUpdated" label="Date Updated" outlined readonly></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="updateChildInfo">Update</v-btn>
+            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+
     </template>
   </v-data-table>
 </template>
@@ -199,6 +237,7 @@ export default {
     return {
     
       dialogOpenPrescription: false,
+      childUpdateDialog: false,
 
       dialog: false,
       editedItem: {
@@ -235,6 +274,8 @@ export default {
           address: 'San Narciso, Zambales',
           child_name: 'Ferdinand C. Espiritu II',
           child_age: '20',
+          child_weight: '50.5kg',
+          child_height: '3.5ft',
 
 
           email: 'sample@example.com',
@@ -251,7 +292,19 @@ export default {
           region: '',
           zip_code: '',
           full_name: 'Ferdinand A. Espiritu',
-          prescriptions: [
+      child:[
+          {
+             childUpdateDialog: false,
+             updatedWeight: null,
+             updatedHeight: null,
+             updatedAge: null,
+          }
+
+          ],
+      prescriptions: [
+            { id: 1, 
+              title: 'Take this 3 times a day',
+              date: '2024-04-30', description: 'Ammoxicilin 1', editing: false },
             { id: 1, title: 'Prescription History', date: '2024-04-30', description: 'Ammoxicilin 1', editing: false },
           ],
         },
@@ -326,6 +379,35 @@ export default {
     closePrescriptionDialog() {
       this.dialogOpenPrescription = false; // Close the dialog
     },
+
+    openChildUpdateDialog(item) {
+       item.showPrescriptions = true;
+      // Set the values for the child update dialog
+      this.updatedWeight = parseFloat(item.child_weight); // Convert to float if necessary
+      this.updatedHeight = parseFloat(item.child_height); // Convert to float if necessary
+      this.updatedAge = parseInt(item.child_age); // Convert to integer if necessary
+      this.childUpdateDialog = true;// Convert to integer if necessary
+      this.dateUpdated = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    },
+
+     closeChildUpdateDialog() {
+      this.updatedWeight = null;
+      this.updatedHeight = null;
+      this.updatedAge = null;
+      this.dateUpdated = '';
+      this.childUpdateDialog = false;
+    },
+
+    updateChildInfo() {
+      // Perform validation and update child information
+      // You can emit an event to parent component or make an API call here
+      // For now, just closing the dialog
+      this.closeChildUpdateDialog();
+    },
+
+
+
+
 
 
     saveNewPrescription() {
