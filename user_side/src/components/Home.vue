@@ -35,15 +35,17 @@ html, body {
   }
 
 .background-container {
-    position: absolute;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-image: url("/src/assets/Background-pic.png");
-    background-size: cover;
-    background-position: center;
-    }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-image: url("/src/assets/backround.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 .word{
     margin-top: 13%;
