@@ -1,19 +1,19 @@
 <template>
     <main>
         <div class="main-content">
-            <div class="home">
-                <Home/>
+            <div class="Profile">
+                <Profile/>
             </div>
         </div>
     </main>
 </template>
 
 <script>
-import Home from '../components/Home.vue';
+import Profile from '../components/Profile.vue';
 
 export default {
   components: {
-    Home
+    Profile
   }
 };
 </script>
@@ -23,7 +23,7 @@ export default {
     display: flex;
     flex-direction: column;
 
-    .Home {
+    .Profile {
         border-radius: 10px;
         background-color: #f0f0f0;
         padding: 0.5rem;
@@ -31,7 +31,7 @@ export default {
     }
 }
 
-.Home {
+.Profile {
     flex: 1;
 
     .material-icons {

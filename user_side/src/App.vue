@@ -59,7 +59,9 @@ export default {
 }
 
 body {
-    background: #e2e2e2;
+    background: none; /* Remove the background color */
+    margin: 0; /* Remove default margin */
+    padding: 0
 }
 
 button {

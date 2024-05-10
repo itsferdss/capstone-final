@@ -21,12 +21,27 @@
       </div>
 
       <div class="menu">
-          <router-link class="button" to="/schedule">
-              <span class="material-icons">calendar_month</span>
-              <span class="text">Schedules</span>
+          <router-link class="button" to="/profile">
+              <span class="material-icons">person</span>
+              <span class="text">Profile</span>
           </router-link>
-          
       </div>
+
+      <div class="menu">
+          <router-link class="button" to="/schedule">
+              <span class="material-icons">book</span>
+              <span class="text">Book an Appointment</span>
+          </router-link>
+      </div>
+
+      <div class="menu">
+          <router-link class="button" to="/schedule">
+              <span class="material-icons">medication</span>
+              <span class="text">Prescriptions</span>
+          </router-link>
+      </div>
+
+      
   
       <div class="menu-logout">
           <router-link class="button" to="/">
@@ -59,6 +74,7 @@
       padding: 1rem;
       background-color: var(--dark);
       color: var(--light);
+      
   
       transition: 0.2s ease-out;
 
@@ -213,6 +229,5 @@
       @media (max-width: 768px) {
           z-index: 99;
       }
-
   }
   </style>

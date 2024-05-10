@@ -93,29 +93,47 @@
         <td>{{ item.child_name }}</td>
         <td>{{ item.child_age }}</td>
         <td>
-          <v-icon class="me-2" size="small" style="color: #2F3F64" @click="openAddPrescriptioDialog(item)">mdi-plus</v-icon>
           <v-icon class="me-2" size="small" style="color: #2F3F64" @click="viewPrescriptions(item)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
         </td>
       </tr>
-       
-      <tr v-if="item.showPrescriptions">
-        <td :colspan="headers.length + 1">
-          <v-card class="mb-4" v-for="(prescription, index) in item.prescriptions" :key="index" elevation="2" color="--light">
-            <v-card-title class="d-flex align-center justify-space-between cursor-pointer" @click="togglePrescriptionEdit(item, prescription)">
-              <div>{{ prescription.title }}</div>
-              <v-icon @click.stop="deletePrescription(item, index)" class="mx-2">mdi-delete</v-icon>
-            </v-card-title>
-            <v-expand-transition>
-              <div v-if="prescription.editing" class="px-4 pb-4" style="max-height: 300px; overflow-y: auto;">
-                <v-text-field v-model="prescription.title" label="Title"></v-text-field>
-                <v-textarea v-model="prescription.description" label="Description"></v-textarea>
-                <v-btn @click="savePrescription(item, prescription)" color=#2F3F64>Save</v-btn>
-              </div>
-            </v-expand-transition>
-          </v-card>
-        </td>
-      </tr>
+
+              <!--Add Prescription Bellow the name-->
+          <tr v-if="item.showPrescriptions">
+          <td :colspan="headers.length + 1">
+            <v-row justify="space-between">
+              <v-col cols="4">
+                <v-btn @click="openPrescriptionDialog(item)" block>
+                  Prescription
+                </v-btn>
+              </v-col>
+              <v-col cols="4">
+                <v-btn @click="openChildUpdateDialog(item)" block>
+                  Child Update
+                </v-btn>
+              </v-col>
+              <v-col cols="4">
+                <v-btn @click="openVaccinationDialog(item)" block>
+                  Vaccination
+                </v-btn>
+              </v-col>
+            </v-row>
+          </td>
+        </tr>
+
+
+      <v-dialog v-model="dialogDelete" max-width="500px">
+        <v-card>
+          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this schedule?</v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color=#35623D variant="text" @click="closeDelete">Cancel</v-btn>
+            <v-btn color=#35623D variant="text" @click="deleteUserConfirm">OK</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
 
       <v-dialog v-model="dialogAddPrescription" max-width="800px">
         <v-card>
@@ -144,14 +162,30 @@
       </v-dialog>
 
 
-      <v-dialog v-model="dialogDelete" max-width="500px">
+      <v-dialog v-model="dialogOpenPrescription" max-width="800px">
         <v-card>
-          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this user?</v-card-title>
+          <v-card-title class="text-h5">Past Prescriptions</v-card-title>
+          <v-card-text>
+            <!-- List of past prescriptions -->
+            <v-list>
+              <v-list-item v-for="(prescription, index) in selectedItem.prescriptions" :key="index">
+                <v-list-item-content>
+                  <div>{{ prescription.title }}</div>
+                  <div>{{ prescription.description }}</div>
+                </v-list-item-content>
+                <!-- Optionally, add a delete button for each prescription -->
+                <v-list-item-action>
+                  <v-btn icon @click="deletePrescription(selectedItem, index)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
           <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color=#35623D variant="text" @click="closeDelete">Cancel</v-btn>
-            <v-btn color=#35623D variant="text" @click="deleteUserConfirm">OK</v-btn>
-            <v-spacer></v-spacer>
+            <!-- Button to add a new prescription -->
+            <v-btn color="primary" @click="openAddPrescriptioDialog">Add Prescription</v-btn>
+            <v-btn color="blue darken-1" text @click="closePrescriptionDialog">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -164,6 +198,8 @@ export default {
   data() {
     return {
     
+      dialogOpenPrescription: false,
+
       dialog: false,
       editedItem: {
         user_id: '',
@@ -216,8 +252,7 @@ export default {
           zip_code: '',
           full_name: 'Ferdinand A. Espiritu',
           prescriptions: [
-            { id: 1, title: 'Prescription 1', date: '2024-04-30', description: 'Description 1', editing: false },
-            { id: 2, title: 'Prescription 2', date: '2024-04-29', description: 'Description 2', editing: false },
+            { id: 1, title: 'Prescription History', date: '2024-04-30', description: 'Ammoxicilin 1', editing: false },
           ],
         },
       ],
@@ -244,6 +279,7 @@ export default {
     closeDialog() {
     this.dialog = false;
   },
+  
     viewPrescriptions(user) { 
       user.showPrescriptions = !user.showPrescriptions;
     },
@@ -282,6 +318,16 @@ export default {
       this.dialogAddPrescription = false;
     },
 
+     openPrescriptionDialog(item) {
+      this.selectedItem = item; // Set the selected item for reference
+      this.dialogOpenPrescription = true; // Open the dialog
+    },
+
+    closePrescriptionDialog() {
+      this.dialogOpenPrescription = false; // Close the dialog
+    },
+
+
     saveNewPrescription() {
       const newPrescription = {
         title: this.editedItem.title,
@@ -289,31 +335,30 @@ export default {
       };
     },
     saveNewUser() {
-  // Create a new user object
-  const newUser = {
-    user_id: this.editedItem.user_id,
-    first_name: this.editedItem.full_name,
-    contact_number: this.editedItem.contact_number,
-    address: this.editedItem.address,
-    child_name: this.editedItem.child_name,
-    child_age: this.editedItem.child_age,
-    prescriptions: [],
-  };
+      const newUser = {
+        user_id: this.editedItem.user_id,
+        first_name: this.editedItem.full_name,
+        contact_number: this.editedItem.contact_number,
+        address: this.editedItem.address,
+        child_name: this.editedItem.child_name,
+        child_age: this.editedItem.child_age,
+        prescriptions: [],
+      };
 
-  // Check if the user ID already exists
-  const existingUser = this.users.find((u) => u.user_id === newUser.user_id);
+        // Check if the user ID already exists
+      const existingUser = this.users.find((u) => u.user_id === newUser.user_id);
 
-  if (existingUser) {
-    // User already exists, show an alert
-    alert('User ID already exists! Please use a different ID.');
-  } else {
-    // User does not exist, confirm and save the new user
-    if (confirm('Are you sure you want to save this new user?')) {
-      this.users.push(newUser);
-      this.closeDialog();
-    }
-  }
-},
+      if (existingUser) {
+        // User already exists, show an alert
+        alert('User ID already exists! Please use a different ID.');
+      } else {
+        // User does not exist, confirm and save the new user
+        if (confirm('Are you sure you want to save this new user?')) {
+          this.users.push(newUser);
+          this.closeDialog();
+        }
+      }
+    },
 
 saveRecord(user, prescription) {
   if (confirm('Are you sure you want to save this edited prescription?')) {

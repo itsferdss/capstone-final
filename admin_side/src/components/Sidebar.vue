@@ -18,7 +18,7 @@
               <span class="text">User List</span>
           </router-link>
           
-      </div>
+      </div>    
 
       <div class="menu">
           <router-link class="button" to="/schedule">
