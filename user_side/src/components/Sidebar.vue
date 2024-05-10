@@ -1,7 +1,7 @@
 <template>
     <aside :class="`${is_expanded && 'is_expanded'}`">
         
-        <h2 class="sp-text">PediaCare Admin</h2>
+        <h2 class="sp-text">PediaCare User</h2>
       <br>
   <hr>
           <div class="menu-toggle-wrap">
@@ -13,9 +13,9 @@
       </div>
       
       <div class="menu">
-          <router-link class="button" to="/viewusers">
-              <span class="material-icons">people</span>
-              <span class="text">User List</span>
+          <router-link class="button" to="/home">
+              <span class="material-icons">home</span>
+              <span class="text">Home</span>
           </router-link>
           
       </div>
