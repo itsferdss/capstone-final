@@ -21,7 +21,7 @@
       </div>
 
       <div class="menu">
-          <router-link class="button" to="/examination">
+          <router-link class="button" to="/schedule">
               <span class="material-icons">calendar_month</span>
               <span class="text">Schedules</span>
           </router-link>

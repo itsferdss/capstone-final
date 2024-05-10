@@ -4,7 +4,7 @@
         <div class="main-content">
 
             <div class="schedules">
-                <Examination/>
+                <Schedule />
             </div>
         </div>
 
@@ -14,11 +14,11 @@
 </template>
 
 <script>
-import Examination from '../components/Examination.vue';
+import Schedule from '../components/Schedule.vue';
 
 export default {
   components: {
-    Examination
+    Schedule
   }
 };
 </script>

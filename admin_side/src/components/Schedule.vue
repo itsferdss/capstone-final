@@ -130,7 +130,7 @@
 
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>
-          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this user?</v-card-title>
+          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this schedule?</v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color=#35623D variant="text" @click="closeDelete">Cancel</v-btn>

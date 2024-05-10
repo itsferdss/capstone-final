@@ -13,8 +13,8 @@ const router = createRouter({
             component: () => import('../views/ViewUsers.vue')
         },
         {
-            path: '/examination',
-            component: () => import('../views/Examination.vue')
+            path: '/schedule',
+            component: () => import('../views/Schedule.vue')
         },
        
         { path: '/', redirect: '/adminlogin' }

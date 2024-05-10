@@ -1,62 +1,61 @@
 <template>
-    <v-app>
-    <AdminLogin v-if="showLogin"></AdminLogin>
+  <v-app>
+    <AdminLogin v-if="showLogin" />
     
     <div v-else>
-    <div class="app">
-
-    <Sidebar/>
+      <div class="app">
+        <Sidebar v-if="showSidebar" />
         <div class="headerAndContent">
-            <Header />
-            <router-view v-slot="{Component}"> 
-                <transition name="fade" mode="out-in">
-                    <Component :is="Component"/>
-                </transition>
-            </router-view>
+          <Header />
+          <router-view v-slot="{ Component }"> 
+            <transition name="fade" mode="out-in">
+              <Component :is="Component" />
+            </transition>
+          </router-view>
         </div>
+      </div>
     </div>
-    </div>
-</v-app>
+  </v-app>
 </template>
 
 <script>
 import Sidebar from './components/Sidebar.vue';
-import Header from './components/Header.vue';
 import AdminLogin from './views/AdminLogin.vue';
-import StudentRecords from './views/StudentRecords.vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: 'App',
   components: {
-    Sidebar, 
-    Header,
+    Sidebar,
     AdminLogin,
-    StudentRecords,
-},
-    data() {
-    return {
-        showLogin: false// Initially show the login component
-    };
-}
-}
+   
+  },
+  setup() {
+    const route = useRoute();
+    const showLogin = computed(() => route.path === '/adminlogin');
+    const showSidebar = computed(() => route.path !== '/');
+
+    return { showLogin, showSidebar };
+  }
+};
 </script>
 
 <style lang="scss" >
 :root {
     --primary: #727885;
     --grey:#64748b;
-    --dark:#2F3F64;
+    --dark:#35623D;
     --dark-alt: #334155;
     --light:#cdd1da;
-    --sidebar-width:300px;
-    --header-height:100px
+    --sidebar-width:250px;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Sofia Sans';
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -87,17 +86,6 @@ button {
         display: flex;
         flex-direction: column;
         width: 100%;
-    }
-
-    .fade-enter-from,
-    .fade-leave-to {
-        opacity: 0;
-    }
-    
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: opacity 0.3s ease-out;
-    }    
-
+    }   
 }
 </style>

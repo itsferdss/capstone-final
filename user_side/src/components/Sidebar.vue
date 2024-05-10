@@ -1,9 +1,7 @@
 <template>
     <aside :class="`${is_expanded && 'is_expanded'}`">
         
-        <img class="sna-logo" src="/src/assets/SNA Logo with BG.png" alt="">
-
-        <h2 class="sp-text">Guidance Admin</h2>
+        <h2 class="sp-text">PediaCare Admin</h2>
       <br>
   <hr>
           <div class="menu-toggle-wrap">
@@ -15,21 +13,20 @@
       </div>
       
       <div class="menu">
-          <router-link class="button" to="/studentrecords">
-              <span class="material-icons">book</span>
-              <span class="text">Student Records</span>
+          <router-link class="button" to="/viewusers">
+              <span class="material-icons">people</span>
+              <span class="text">User List</span>
           </router-link>
           
       </div>
 
       <div class="menu">
-          <router-link class="button" to="/appointment">
-              <span class="material-icons">watch</span>
-              <span class="text">Appointments</span>
+          <router-link class="button" to="/schedule">
+              <span class="material-icons">calendar_month</span>
+              <span class="text">Schedules</span>
           </router-link>
           
       </div>
-
   
       <div class="menu-logout">
           <router-link class="button" to="/">
@@ -64,13 +61,6 @@
       color: var(--light);
   
       transition: 0.2s ease-out;
-  
-      .sna-logo {
-        height: 2.5rem;
-        width: 2.5rem;
-        transition: 0.2s ease-out;
-        border-radius: 1.1rem;
-      }
 
       .sp-text{
         display: none;
