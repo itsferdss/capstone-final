@@ -114,7 +114,7 @@ html, body {
 }
 
 #section2 {
-    height: 650px;
+    height: 750px;
     background-color: white;
     margin: 0;
     padding: 0;

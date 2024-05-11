@@ -190,14 +190,6 @@
               
   
           }
-          .sna-logo{
-                height: 9rem;
-                width: 9rem;
-                transition: 0.2s ease-out;
-                align-self: center;
-                border-radius: 5rem;
-          }
-
           .sp-text {
             margin-top: 1rem;
             margin-bottom: 0.5rem;

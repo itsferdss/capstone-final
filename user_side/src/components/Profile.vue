@@ -21,7 +21,7 @@
             <strong>Address:</strong> {{ user.address }}
           </v-col>
           <v-col cols="12" md="6">
-            <strong>Phone Number:</strong> {{ user.phoneNumber }}
+            <strong>Phone Number:</strong> {{ user.contact_number }}
           </v-col>
           <v-col cols="12" md="6">
             <strong>Email:</strong> {{ user.email }}
