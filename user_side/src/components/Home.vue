@@ -24,7 +24,7 @@
           tracking child growth, and enhancing communication between pediatricians and parents. The idea 
           for "Pedia Care" was born out of a desire to make a difference in the healthcare sector. Based  
           on experience and research we students identified the need for a digital solution to streamline 
-          clinic operations and improve patient care.The project will result in a mobile application that 
+          clinic operations and improve patient care.The project will result in a web and mobile application that 
           pediatricians can use in their clinics and parents can use to track their child's healthcare needs. 
           The application will feature digital record-keeping, growth tracking, vaccination schedules, and 
           communication tools.
