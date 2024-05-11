@@ -20,66 +20,77 @@
           style="max-width: 300px;"
         ></v-text-field>
         
-        <v-dialog v-model="dialog" max-width="1000px">
-          <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" prepend-icon="mdi-plus" style="font-weight: bold;">Add new User</v-btn>
-          </template>
-          
-<v-card>
-  <v-card-title>
-    <span class="text-h6 m-2" >New User and Prescription</span>
-  </v-card-title>
-  <v-card-text>
-    <v-container>
-      <v-row dense>
-        <v-col cols="12">
-          <v-text-field v-model="editedItem.user_id" label="User ID*" prepend-icon="mdi-account" required></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-text-field v-model="editedItem.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-        </v-col>
-         <v-col cols="6">
-          <v-text-field
-            v-model="editedItem.password"
-            label="Password"
-            prepend-icon="mdi-lock"
-            :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="editedItem.passwordVisible ? 'text' : 'password'"
-            @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
-            required
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field v-model="editedItem.child_name" label="Child Name" prepend-icon="mdi-account-child" required></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            v-model="editedItem.confirm_password"
-            label="Confirm Password"
-            prepend-icon="mdi-lock"
-            :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
-            @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
-            required
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-textarea v-model="editedItem.description" label="Enter Prescription" prepend-icon="mdi-file-document-edit" required></v-textarea>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-card-text>
 
-  <v-card-actions>
-    <v-spacer></v-spacer>
-    <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-    <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
-  </v-card-actions>
-</v-card> 
-        </v-dialog>
+        <!--Dialog for new users-->
+<v-dialog v-model="dialog" max-width="1000px">
+  <template v-slot:activator="{ props }">
+    <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" prepend-icon="mdi-plus" style="font-weight: bold;">Add new User</v-btn>
+  </template>
+  
+  <v-card>
+    <v-card-title>
+      <span class="text-h6 m-2">New User and Prescription</span>
+    </v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-row dense>
+          <v-col cols="12">
+            <v-text-field v-model="editedItem.user_id" label="User ID*" prepend-icon="mdi-account" required></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="editedItem.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.child_name" label="Child Name" prepend-icon="mdi-account-child" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.child_age" label="Child Age" type="number" prepend-icon="mdi-calendar" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="editedItem.password"
+              label="Password"
+              prepend-icon="mdi-lock"
+              :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="editedItem.passwordVisible ? 'text' : 'password'"
+              @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="editedItem.confirm_password"
+              label="Confirm Password"
+              prepend-icon="mdi-lock"
+              :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
+              @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-textarea v-model="editedItem.description" label="Enter Prescription" prepend-icon="mdi-file-document-edit" required></v-textarea>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
+      <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
+    </v-card-actions>
+  </v-card> 
+</v-dialog>
 
       </v-toolbar>
     </template>
@@ -228,6 +239,50 @@
       </v-dialog>
 
 
+     
+  <!-- Vaccination Dialog -->
+<v-dialog v-model="vaccinationDialog" max-width="800px">
+  <v-card>
+    <v-card-title>
+      Child Vaccination Records
+    </v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-row>
+          <v-col cols="4">
+            <strong>Vaccine Name</strong>
+          </v-col>
+          <v-col cols="4">
+            <strong>Status</strong>
+          </v-col>
+          <v-col cols="4">
+            <strong>Date Taken</strong>
+          </v-col>
+        </v-row>
+        <!-- Use v-for to iterate through the vaccines -->
+        <v-row v-for="(vaccine, index) in vaccines" :key="index">
+          <v-col cols="4">{{ vaccine.vaccine_name }}</v-col>
+          <v-col cols="4">
+            <v-checkbox v-model="vaccine.status" @change="updateVaccineStatus(index)">
+              {{ vaccine.status ? 'Taken' : 'Not Taken' }}
+            </v-checkbox>
+          </v-col>
+          <v-col cols="4">
+            <v-text-field v-model="vaccine.date_taken" label="Date Taken" type="date" readonly :disabled="!vaccine.status"></v-text-field>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="updateChildVaccination">Update</v-btn>
+      <v-btn color="error" @click="closeVaccinationDialog">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+      
+
+
     </template>
   </v-data-table>
 </template>
@@ -238,6 +293,7 @@ export default {
     
       dialogOpenPrescription: false,
       childUpdateDialog: false,
+      vaccinationDialog: false,
 
       dialog: false,
       editedItem: {
@@ -304,9 +360,26 @@ export default {
       prescriptions: [
             { id: 1, 
               title: 'Take this 3 times a day',
-              date: '2024-04-30', description: 'Ammoxicilin 1', editing: false },
-            { id: 1, title: 'Prescription History', date: '2024-04-30', description: 'Ammoxicilin 1', editing: false },
+              date: '2024-04-30', 
+              description: 'Ammoxicilin 1', 
+              editing: false },
+            { id: 2, 
+              title: 'Prescription History', 
+              date: '2024-04-30', 
+              description: 'Ammoxicilin 1', 
+              editing: false },
           ],
+
+      vaccine: [
+            { id: 1,
+              vaccine_name: 'Vaccine 1',
+              date_taken: 'November 26, 2024',
+              status: true,
+              
+
+            }
+
+      ],
         },
       ],
       dialogDelete: false,
@@ -399,10 +472,17 @@ export default {
     },
 
     updateChildInfo() {
-      // Perform validation and update child information
-      // You can emit an event to parent component or make an API call here
-      // For now, just closing the dialog
+      
       this.closeChildUpdateDialog();
+    },
+
+    openVaccinationDialog(item) {
+      this.vaccinationDialog = true;
+      this.vaccines = item.vaccine;
+    },
+
+    closeVaccinationDialog() {
+      this.vaccinationDialog = false;
     },
 
 

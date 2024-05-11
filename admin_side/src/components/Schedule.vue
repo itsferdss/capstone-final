@@ -77,8 +77,7 @@
         <td>{{ item.formatted_appointment_date }}</td>
         <td>{{ item.appointment_time }}</td>
         <td>
-          <v-icon class="me-2" size="small" style="color: #2F3F64" @click="openAddPrescriptioDialog(item)">mdi-plus</v-icon>
-          <v-icon class="me-2" size="small" style="color: #2F3F64" @click="viewPrescriptions(item)">mdi-eye</v-icon>
+ 
           <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
         </td>
       </tr>
