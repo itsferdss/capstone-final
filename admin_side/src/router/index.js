@@ -16,6 +16,10 @@ const router = createRouter({
             path: '/schedule',
             component: () => import('../views/Schedule.vue')
         },
+        {
+            path: '/inventory',
+            component: () => import('../views/Inventory.vue')
+        },
        
         { path: '/', redirect: '/adminlogin' }
     ]
