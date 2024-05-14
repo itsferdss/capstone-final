@@ -38,19 +38,13 @@
             <v-text-field v-model="editedItem.user_id" label="User ID*" prepend-icon="mdi-account" required></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="editedItem.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
+            <v-text-field v-model="editedItem.full_name" label="Patient Name*" prepend-icon="mdi-account" required></v-text-field>
           </v-col>
           <v-col cols="12">
             <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
           </v-col>
           <v-col cols="6">
             <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="editedItem.child_name" label="Child Name" prepend-icon="mdi-account-child" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="editedItem.child_age" label="Child Age" type="number" prepend-icon="mdi-calendar" required></v-text-field>
           </v-col>
           <v-col cols="6">
             <v-text-field v-model="editedItem.birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
@@ -76,9 +70,6 @@
               @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
               required
             ></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-textarea v-model="editedItem.description" label="Enter Prescription" prepend-icon="mdi-file-document-edit" required></v-textarea>
           </v-col>
         </v-row>
       </v-container>
@@ -140,32 +131,6 @@
         </v-card>
       </v-dialog>
 
-      <!--DIalog for Add Prescription-->
-      <v-dialog v-model="dialogAddPrescription" max-width="800px">
-        <v-card>
-          <v-card-title class="text-h5">Add Prescription</v-card-title>
-            <v-card-text>
-              <!-- Prescription Form -->
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field v-model="newPrescription.title" label="Title"></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="newPrescription.description" label="Description"></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <!-- Save Prescription Button -->
-              <v-btn color="blue" text @click="saveNewPrescription">Save Prescription</v-btn>
-              <!-- Cancel Button -->
-              <v-btn color="blue" text @click="cancelAddPrescription">Cancel</v-btn>
-            </v-card-actions>
-        </v-card>
-      </v-dialog>
 
 
       <!--Dialog for Patient HIstory-->
@@ -191,28 +156,28 @@
   <v-card-text>
     <v-row>
       <v-col cols="3" md="12">
-        <strong>Date Updated:</strong> {{ item.prescriptions[0].date_updated }}
+        <strong>Date Updated:</strong> {{ item.prescription[0].date_updated }}
       </v-col>
       <v-col cols="3" md="3">
-        <strong>Left Eye Sphere:</strong> {{ item.prescriptions[0].left_eye_sphere }}
+        <strong>Left Eye Sphere:</strong> {{ item.prescription[0].left_eye_sphere }}
       </v-col>
       <v-col cols="3" md="3">
-        <strong>Left Eye Cylinder:</strong> {{ item.prescriptions[0].left_eye_cylinder }}
+        <strong>Left Eye Cylinder:</strong> {{ item.prescription[0].left_eye_cylinder }}
       </v-col>
       <v-col cols="3" md="4">
-        <strong>Left Eye Axis:</strong> {{ item.prescriptions[0].left_eye_axis }}
+        <strong>Left Eye Axis:</strong> {{ item.prescription[0].left_eye_axis }}
       </v-col>
       <v-col cols="3" md="3">
-        <strong>Right Eye Sphere:</strong> {{ item.prescriptions[0].right_eye_sphere }}
+        <strong>Right Eye Sphere:</strong> {{ item.prescription[0].right_eye_sphere }}
       </v-col>
       <v-col cols="3" md="3">
-        <strong>Right Eye Cylinder:</strong> {{ item.prescriptions[0].right_eye_cylinder }}
+        <strong>Right Eye Cylinder:</strong> {{ item.prescription[0].right_eye_cylinder }}
       </v-col>
       <v-col cols="3" md="4">
-        <strong>Right Eye Axis:</strong> {{ item.prescriptions[0].right_eye_axis }}
+        <strong>Right Eye Axis:</strong> {{ item.prescription[0].right_eye_axis }}
       </v-col>
       <v-col cols="3" md="3">
-        <strong>PD:</strong> {{ item.prescriptions[0].PD }}
+        <strong>PD:</strong> {{ item.prescription[0].PD }}
       </v-col>
     </v-row>
   </v-card-text>
@@ -231,90 +196,49 @@
 
       <!--DIALOG FOR CHILD UPDATE-->
       <v-dialog v-model="childUpdateDialog" max-width="500px">
-        <v-card>
-          <v-card-title>
-            Update Child Information
-          </v-card-title>
-          <v-card-text>
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedLeftSphere" label="Left Eye Sphere" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedRightSphere" label="Right Eye Sphere" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedLeftCylinder" label="Left Eye Cylinder" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedRightCylinder" label="Right Eye Cylinder" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedLeftAxis" label="Left Eye Axis" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="updatedRightAxis" label="Right Eye Axis" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                   <v-text-field v-model="updatePD" label="PD" ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                   <v-text-field v-model="dateUpdated" label="Date Updated" outlined readonly></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="primary" @click="updateChildInfo">Update</v-btn>
-            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-
-     
-  <!-- Vaccination Dialog -->
-<v-dialog v-model="vaccinationDialog" max-width="800px">
   <v-card>
     <v-card-title>
-      Child Vaccination Records
+      New Prescription
     </v-card-title>
     <v-card-text>
-      <v-container>
-        <v-row>
-          <v-col cols="4">
-            <strong>Vaccine Name</strong>
-          </v-col>
-          <v-col cols="4">
-            <strong>Status</strong>
-          </v-col>
-          <v-col cols="4">
-            <strong>Date Taken</strong>
-          </v-col>
-        </v-row>
-        <!-- Use v-for to iterate through the vaccines -->
-        <v-row v-for="(vaccine, index) in vaccines" :key="index">
-          <v-col cols="4">{{ vaccine.vaccine_name }}</v-col>
-          <v-col cols="4">
-            <v-checkbox v-model="vaccine.status" @change="updateVaccineStatus(index)">
-              {{ vaccine.status ? 'Taken' : 'Not Taken' }}
-            </v-checkbox>
-          </v-col>
-          <v-col cols="4">
-            <v-text-field v-model="vaccine.date_taken" label="Date Taken" type="date" readonly :disabled="!vaccine.status"></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-form>
+        <v-container>
+          <v-row>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" type="number"></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field v-model="editedItem.PD" label="PD" ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+               <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" outlined readonly></v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-form>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="primary" @click="updateChildVaccination">Update</v-btn>
-      <v-btn color="error" @click="closeVaccinationDialog">Cancel</v-btn>
+      <v-btn color="primary" @click="saveNewPrescription">Save</v-btn>
+      <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
+
 
       
 
@@ -378,7 +302,7 @@ export default {
           }
 
           ],
-      prescriptions: [
+      prescription: [
             { id: 1, 
               left_eye_sphere: -1.4,
               left_eye_cylinder: -2.00,
@@ -460,23 +384,43 @@ export default {
       this.deleteRecordIndex = -1;
     },
 
-    openAddPrescriptioDialog() {
-      this.dialogAddPrescription = true;
-    },
+    openChildUpdateDialog() {
+    // Initialize fields for new prescription
+    this.updatedLeftSphere = null;
+    this.updatedRightSphere = null;
+    this.updatedLeftCylinder = null;
+    this.updatedRightCylinder = null;
+    this.updatedLeftAxis = null;
+    this.updatedRightAxis = null;
+    this.updatePD = null;
+    this.newPrescription.dateUpdated = new Date().toISOString().split('T')[0]
 
-    cancelAddPrescription() {
-      this.dialogAddPrescription = false;
-    },
+    // Show child update dialog
+    this.childUpdateDialog = true;
+  },
 
-    openChildUpdateDialog(item) {
-       item.showPrescriptions = true;
-      // Set the values for the child update dialog
-      this.updatedWeight = parseFloat(item.child_weight); // Convert to float if necessary
-      this.updatedHeight = parseFloat(item.child_height); // Convert to float if necessary
-      this.updatedAge = parseInt(item.child_age); // Convert to integer if necessary
-      this.childUpdateDialog = true;// Convert to integer if necessary
-      this.dateUpdated = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    },
+ saveNewPrescription() {
+  // Create a new prescription object
+  const newPrescription = {
+    left_eye_sphere: this.editedItem.left_eye_sphere,
+    right_eye_sphere: this.editedItem.right_eye_sphere,
+    left_eye_cylinder: this.editedItem.left_eye_cylinder,
+    right_eye_cylinder: this.editedItem.right_eye_cylinder,
+    left_eye_axis: this.editedItem.left_eye_axis,
+    right_eye_axis: this.editedItem.right_eye_axis,
+    PD: this.editedItem.PD,
+    date_updated: new Date().toLocaleDateString(), // Set the current date automatically
+  };
+
+  // Push the new prescription to the editedItem's prescriptions array
+  this.editedItem.prescriptions.push(newPrescription);
+
+  // Close the child update dialog
+  this.childUpdateDialog = false;
+
+  // Optionally, you can add code here to save the new prescription to the database
+},
+    
 
      closeChildUpdateDialog() {
       this.updatedWeight = null;
@@ -511,14 +455,6 @@ export default {
 
 
 
-
-
-    saveNewPrescription() {
-      const newPrescription = {
-        title: this.editedItem.title,
-        description: this.editedItem.description,
-      };
-    },
     saveNewUser() {
       const newUser = {
         user_id: this.editedItem.user_id,
