@@ -102,8 +102,6 @@
         <td>{{ item.first_name }} {{ item.middle_name }} {{ item.last_name }} {{ item.extension }}</td>
         <td>{{ item.contact_number }}</td>
         <td>{{ item.address }}</td>
-        <td>{{ item.child_name }}</td>
-        <td>{{ item.child_age }}</td>
         <td>
           <v-icon class="me-2" size="small" style="color: #2F3F64" @click="viewPrescriptions(item)">mdi-information</v-icon>
 
@@ -115,19 +113,14 @@
           <tr v-if="item.showPrescriptions">
           <td :colspan="headers.length + 1">
             <v-row justify="space-between">
-              <v-col cols="4">
+              <v-col cols="6">
                 <v-btn @click="openDialogPatientHistory(item)" block>
                   View Patient's History
                 </v-btn>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="6">
                 <v-btn @click="openChildUpdateDialog(item)" block>
                   Add New Prescription
-                </v-btn>
-              </v-col>
-              <v-col cols="4">
-                <v-btn @click="openVaccinationDialog(item)" block>
-                  See Purchases
                 </v-btn>
               </v-col>
             </v-row>
@@ -356,8 +349,6 @@ export default {
         { title: 'Parent Name', align: 'start', key: 'full_name' },
         { title: 'Contact Number', key: 'contact_number' },
         { title: 'Address', key: 'address' }, 
-        { title: 'Child Name', key: 'child_name' },
-        { title: 'Child Age', key: 'child_age' },
         { title: 'Actions', sortable: false },
       ],
       viewingRecords: false,
