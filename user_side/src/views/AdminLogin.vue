@@ -1,7 +1,7 @@
   <template>
    <div class="container">
       <div class="logo">
-        <img src="C:\Users\Ferdinand\Desktop\SIA.Guidance_Frontend\admin_side\src\assets\logo.png">  
+        <img src="C:\Users\Ferdinand\Documents\codes\capstone-final\admin_side\src\assets\logo.png">  
       </div>
 
       <div class="login-form-container">
