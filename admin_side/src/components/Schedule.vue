@@ -82,50 +82,7 @@
         </td>
       </tr>
        
-      <tr v-if="item.showPrescriptions">
-        <td :colspan="headers.length + 1">
-          <v-card class="mb-4" v-for="(prescription, index) in item.prescriptions" :key="index" elevation="2" color="--light">
-            <v-card-title class="d-flex align-center justify-space-between cursor-pointer" @click="togglePrescriptionEdit(item, prescription)">
-              <div>{{ prescription.title }}</div>
-              <v-icon @click.stop="deletePrescription(item, index)" class="mx-2">mdi-delete</v-icon>
-            </v-card-title>
-            <v-expand-transition>
-              <div v-if="prescription.editing" class="px-4 pb-4" style="max-height: 300px; overflow-y: auto;">
-                <v-text-field v-model="prescription.title" label="Title"></v-text-field>
-                <v-textarea v-model="prescription.description" label="Description"></v-textarea>
-                <v-btn @click="savePrescription(item, prescription)" color=#2F3F64>Save</v-btn>
-              </div>
-            </v-expand-transition>
-          </v-card>
-        </td>
-      </tr>
-
-      <v-dialog v-model="dialogAddPrescription" max-width="800px">
-        <v-card>
-          <v-card-title class="text-h5">Add Prescription</v-card-title>
-            <v-card-text>
-              <!-- Prescription Form -->
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field v-model="newPrescription.title" label="Title"></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="newPrescription.description" label="Description"></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <!-- Save Prescription Button -->
-              <v-btn color="blue" text @click="saveNewPrescription">Save Prescription</v-btn>
-              <!-- Cancel Button -->
-              <v-btn color="blue" text @click="cancelAddPrescription">Cancel</v-btn>
-            </v-card-actions>
-        </v-card>
-      </v-dialog>
-
+    
 
       <v-dialog v-model="dialogDelete" max-width="500px">
         <v-card>

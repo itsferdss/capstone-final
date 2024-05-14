@@ -160,7 +160,7 @@ aside {
   }
 
   &.is_expanded {
-    width: var(--sidebar-width);
+    width: 250px;
 
     .menu-logout {
       display: flex;

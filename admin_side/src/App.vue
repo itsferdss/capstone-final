@@ -42,32 +42,10 @@ export default {
 </script>
 
 <style lang="scss" >
-:root {
-    --primary: #727885;
-    --grey:#64748b;
-    --dark:#35623D;
-    --dark-alt: #334155;
-    --light:#cdd1da;
-    --sidebar-width:250px;
-}
-
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background: #e2e2e2;
-}
-
-button {
-    cursor: pointer;
-    appearance: none;
-    border: none;
-    outline: none;
-    background: none;
 }
 
 .app {

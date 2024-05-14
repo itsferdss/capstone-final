@@ -20,11 +20,10 @@
           style="max-width: 300px;"
         ></v-text-field>
         
-
         <!--Dialog for new users-->
 <v-dialog v-model="dialog" max-width="1000px">
   <template v-slot:activator="{ props }">
-    <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" prepend-icon="mdi-plus" style="font-weight: bold;">Add new Patient</v-btn>
+    <v-btn @click="openDialog"  color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Patient</v-btn>
   </template>
   
   <!--DIALOG FOR NEW USER-->
@@ -117,18 +116,18 @@
           <td :colspan="headers.length + 1">
             <v-row justify="space-between">
               <v-col cols="4">
-                <v-btn @click="openPrescriptionDialog(item)" block>
-                  Prescription
+                <v-btn @click="openDialogPatientHistory(item)" block>
+                  View Patient's History
                 </v-btn>
               </v-col>
               <v-col cols="4">
                 <v-btn @click="openChildUpdateDialog(item)" block>
-                  Child Update
+                  Add New Prescription
                 </v-btn>
               </v-col>
               <v-col cols="4">
                 <v-btn @click="openVaccinationDialog(item)" block>
-                  Vaccination
+                  See Purchases
                 </v-btn>
               </v-col>
             </v-row>
@@ -176,35 +175,64 @@
       </v-dialog>
 
 
-      <!--Dialog for prescription-->
-      <v-dialog v-model="dialogOpenPrescription" max-width="800px">
-        <v-card>
-          <v-card-title class="text-h5">Past Prescriptions</v-card-title>
-          <v-card-text>
-            <!-- List of past prescriptions -->
-            <v-list>
-              <v-list-item v-for="(prescription, index) in selectedItem.prescriptions" :key="index">
-                <v-list-item-content>
-                  <div>{{ prescription.title }}</div>
-                  <div>{{ prescription.description }}</div>
-                  <div>{{ prescription.date }}</div>
-                </v-list-item-content>
-                <!-- Optionally, add a delete button for each prescription -->
-                <v-list-item-action>
-                  <v-btn icon @click="deletePrescription(selectedItem, index)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-          <v-card-actions>
-            <!-- Button to add a new prescription -->
-            <v-btn color="primary" @click="openAddPrescriptioDialog">Add Prescription</v-btn>
-            <v-btn color="blue darken-1" text @click="closePrescriptionDialog">Close</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <!--Dialog for Patient HIstory-->
+<v-dialog v-model="dialogPatientHistory" max-width="1300px">
+  <v-card>
+    <v-card-title>User's Information and Prescriptions</v-card-title>
+    <v-card-text>
+      <!-- Parent's Information -->
+      <v-card class="mb-4">
+        <v-card-title>Patient's Information</v-card-title>
+        <v-card-text>
+          <v-col cols="12" md="3">
+            <strong>Name:</strong> {{ item.full_name}} 
+          </v-col>
+          <v-col cols="12" md="3">
+            <strong>Contact Number:</strong> {{ item.contact_number }}
+          </v-col>
+        </v-card-text>
+      </v-card>
+
+    <v-card class="mb-4">
+  <v-card-title>Patient's History</v-card-title>
+  <v-card-text>
+    <v-row>
+      <v-col cols="3" md="12">
+        <strong>Date Updated:</strong> {{ item.prescriptions[0].date_updated }}
+      </v-col>
+      <v-col cols="3" md="3">
+        <strong>Left Eye Sphere:</strong> {{ item.prescriptions[0].left_eye_sphere }}
+      </v-col>
+      <v-col cols="3" md="3">
+        <strong>Left Eye Cylinder:</strong> {{ item.prescriptions[0].left_eye_cylinder }}
+      </v-col>
+      <v-col cols="3" md="4">
+        <strong>Left Eye Axis:</strong> {{ item.prescriptions[0].left_eye_axis }}
+      </v-col>
+      <v-col cols="3" md="3">
+        <strong>Right Eye Sphere:</strong> {{ item.prescriptions[0].right_eye_sphere }}
+      </v-col>
+      <v-col cols="3" md="3">
+        <strong>Right Eye Cylinder:</strong> {{ item.prescriptions[0].right_eye_cylinder }}
+      </v-col>
+      <v-col cols="3" md="4">
+        <strong>Right Eye Axis:</strong> {{ item.prescriptions[0].right_eye_axis }}
+      </v-col>
+      <v-col cols="3" md="3">
+        <strong>PD:</strong> {{ item.prescriptions[0].PD }}
+      </v-col>
+    </v-row>
+  </v-card-text>
+</v-card>
+
+<v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
+<span>&nbsp;</span>
+<v-btn color="error" @click="closeDialogPatientHistory">Cancel</v-btn>
+    </v-card-text>
+    
+  </v-card>
+
+</v-dialog>
 
 
 
@@ -218,14 +246,26 @@
             <v-form>
               <v-container>
                 <v-row>
-                  <v-col cols="12">
-                    <v-text-field v-model="updatedWeight" label="Weight (kg)" type="number"></v-text-field>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedLeftSphere" label="Left Eye Sphere" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedRightSphere" label="Right Eye Sphere" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedLeftCylinder" label="Left Eye Cylinder" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedRightCylinder" label="Right Eye Cylinder" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedLeftAxis" label="Left Eye Axis" type="number"></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="updatedRightAxis" label="Right Eye Axis" type="number"></v-text-field>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field v-model="updatedHeight" label="Height (cm)" type="number"></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field v-model="updatedAge" label="Age (years)" type="number"></v-text-field>
+                   <v-text-field v-model="updatePD" label="PD" ></v-text-field>
                   </v-col>
                   <v-col cols="12">
                    <v-text-field v-model="dateUpdated" label="Date Updated" outlined readonly></v-text-field>
@@ -293,8 +333,7 @@
 export default {
   data() {
     return {
-    
-      dialogOpenPrescription: false,
+      dialogPatientHistory: false,
       childUpdateDialog: false,
       vaccinationDialog: false,
 
@@ -331,26 +370,14 @@ export default {
           extension: '',
           contact_number: '09668109204',
           address: 'San Narciso, Zambales',
-          child_name: 'Ferdinand C. Espiritu II',
-          child_age: '20',
-          child_weight: '50.5kg',
-          child_height: '3.5ft',
+          full_name: 'Ferdinand Espiritu',
+    
 
 
           email: 'sample@example.com',
           sex_at_birth: 'Male',
           birth_date: '2003-05-13',
-          birth_place: '',
-          civil_status: '',
-          citizenship: '',
-          religion: '',
-          street: '',
-          barangay: '',
-          city: '',
-          province: '',
-          region: '',
-          zip_code: '',
-          full_name: 'Ferdinand A. Espiritu',
+  
       child:[
           {
              childUpdateDialog: false,
@@ -362,27 +389,30 @@ export default {
           ],
       prescriptions: [
             { id: 1, 
-              title: 'Take this 3 times a day',
-              date: '2024-04-30', 
-              description: 'Ammoxicilin 1', 
-              editing: false },
-            { id: 2, 
-              title: 'Prescription History', 
-              date: '2024-04-30', 
-              description: 'Ammoxicilin 1', 
-              editing: false },
+              left_eye_sphere: -1.4,
+              left_eye_cylinder: -2.00,
+              left_eye_axis: 50,
+
+              right_eye_sphere: -1.4,
+              right_eye_cylinder: -2.00,
+              right_eye_axis: 50,
+
+              PD: 50.5,
+              date_updated: 'November 26, 2024',
+            },
+
           ],
+
+      
 
       vaccine: [
             { id: 1,
               vaccine_name: 'Vaccine 1',
               date_taken: 'November 26, 2024',
               status: true,
-              
-
             }
-
       ],
+
         },
       ],
       dialogDelete: false,
@@ -447,15 +477,6 @@ export default {
       this.dialogAddPrescription = false;
     },
 
-     openPrescriptionDialog(item) {
-      this.selectedItem = item; // Set the selected item for reference
-      this.dialogOpenPrescription = true; // Open the dialog
-    },
-
-    closePrescriptionDialog() {
-      this.dialogOpenPrescription = false; // Close the dialog
-    },
-
     openChildUpdateDialog(item) {
        item.showPrescriptions = true;
       // Set the values for the child update dialog
@@ -487,6 +508,14 @@ export default {
     closeVaccinationDialog() {
       this.vaccinationDialog = false;
     },
+
+    openDialogPatientHistory(item) {
+      this.dialogPatientHistory = true;
+    },
+
+    closeDialogPatientHistory() {
+      this.dialogPatientHistory = false;
+    },  
 
 
 
@@ -542,7 +571,4 @@ saveRecord(user, prescription) {
   background-color: #f0f0f0; /* Set the hover color here */
 }
 
-headers{
-  font-weight: bold;
-}
 </style>

@@ -3,7 +3,6 @@
 
         <div class="main-content">
        
-            
 
             <div class="users">
            
@@ -27,26 +26,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.top-container{
-    display: flex;
-    margin: 0.5rem;
-    .users{
-        flex: 1;
-        
-        .material-icons{
-            color: var(--dark);
-            font-size: 2.5rem;
-        }
-        .text{
-            position: relative;
-            color: var(--dark);
-            font-size: 1.5rem;
-            font-weight: 900;
-            bottom: 0.5rem;
-        }
-    }
 
-} 
 
 .main-content {
     display: flex;
