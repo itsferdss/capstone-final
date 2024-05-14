@@ -151,37 +151,47 @@
         </v-card-text>
       </v-card>
 
-    <v-card class="mb-4">
-  <v-card-title>Patient's History</v-card-title>
-  <v-card-text>
-    <v-row>
-      <v-col cols="3" md="12">
-        <strong>Date Updated:</strong> {{ item.prescription[0].date_updated }}
-      </v-col>
-      <v-col cols="3" md="3">
-        <strong>Left Eye Sphere:</strong> {{ item.prescription[0].left_eye_sphere }}
-      </v-col>
-      <v-col cols="3" md="3">
-        <strong>Left Eye Cylinder:</strong> {{ item.prescription[0].left_eye_cylinder }}
-      </v-col>
-      <v-col cols="3" md="4">
-        <strong>Left Eye Axis:</strong> {{ item.prescription[0].left_eye_axis }}
-      </v-col>
-      <v-col cols="3" md="3">
-        <strong>Right Eye Sphere:</strong> {{ item.prescription[0].right_eye_sphere }}
-      </v-col>
-      <v-col cols="3" md="3">
-        <strong>Right Eye Cylinder:</strong> {{ item.prescription[0].right_eye_cylinder }}
-      </v-col>
-      <v-col cols="3" md="4">
-        <strong>Right Eye Axis:</strong> {{ item.prescription[0].right_eye_axis }}
-      </v-col>
-      <v-col cols="3" md="3">
-        <strong>PD:</strong> {{ item.prescription[0].PD }}
-      </v-col>
-    </v-row>
-  </v-card-text>
-</v-card>
+    <v-card v-for="(prescription, index) in item.prescription" :key="index" class="mb-4">
+        <v-card-title>Patient's Prescription {{ index + 1 }}</v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" md="12">
+              <strong>Date Updated:</strong> {{ prescription.date_updated }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>Left Eye Cylinder:</strong> {{ prescription.left_eye_cylinder }}
+            </v-col>
+            <v-col cols="3" md="4">
+              <strong>Left Eye Axis:</strong> {{ prescription.left_eye_axis }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>Right Eye Sphere:</strong> {{ prescription.right_eye_sphere }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>Right Eye Cylinder:</strong> {{ prescription.right_eye_cylinder }}
+            </v-col>
+            <v-col cols="3" md="4">
+              <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>PD:</strong> {{ prescription.PD }}
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+
+      <!-- New Box for Prescriptions -->
+      <v-card class="mb-4">
+        <v-card-title>New Prescription</v-card-title>
+        <v-card-text>
+          <!-- Content for adding a new prescription goes here -->
+          <!-- You can use your existing dialog and form components here -->
+          <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Prescription</v-btn> -->
+        </v-card-text>
+      </v-card>
 
 <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
 <span>&nbsp;</span>
@@ -205,28 +215,28 @@
         <v-container>
           <v-row>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere"  required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere"  required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder"  required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder"  required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis"  required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" type="number"></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis"  required></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="editedItem.PD" label="PD" ></v-text-field>
+              <v-text-field v-model="editedItem.PD" label="PD"  required></v-text-field>
             </v-col>
             <v-col cols="12">
-               <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" outlined readonly></v-text-field>
+               <v-text-field v-model="editedItem.dateUpdated" label="Birthdate" type="date" required></v-text-field>
             </v-col>
           </v-row>
         </v-container>
@@ -411,14 +421,11 @@ export default {
     PD: this.editedItem.PD,
     date_updated: new Date().toLocaleDateString(), // Set the current date automatically
   };
+      const selectedUser = this.users[0]; // Assuming you want to add the prescription to the first user
+      selectedUser.prescription.push(newPrescription);
 
-  // Push the new prescription to the editedItem's prescriptions array
-  this.editedItem.prescriptions.push(newPrescription);
-
-  // Close the child update dialog
-  this.childUpdateDialog = false;
-
-  // Optionally, you can add code here to save the new prescription to the database
+      // Close the dialog after saving the prescription
+      this.closeChildUpdateDialog();
 },
     
 
