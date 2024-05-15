@@ -20,10 +20,10 @@
     <v-row>
       <v-col v-for="item in dataHolder.Products" :key="item.product_id" cols="3"> <!-- Adjust the width according to your preference -->
         <v-card class="v-card" elevation="2" style="height: 100%;">
-          <v-img :src="item.image" aspect-ratio="16/9" contain></v-img>
-          <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-text>{{ item.description }}</v-card-text>
-          <v-card-actions>
+          <v-img :src="item.image" contain></v-img>
+          <v-card-title class="product-name">{{ item.name }}</v-card-title>
+          <v-card-text class="product-description">{{ item.description }}</v-card-text>
+          <v-card-actions class="product-price">
             <v-btn color="primary" @click="reserve(item)">Reserve</v-btn>
             <div class="flex-grow-1"></div> <!-- This creates space between button and price -->
             <span class="caption">{{ item.price }}</span>
@@ -53,7 +53,7 @@ export default {
             name: 'Product 2',
             description: 'Description for Product 2',
             price: '$200',
-            image: '../src/assets/product2.jpg'
+            image: '../src/assets/product1.jpg'
           },
 
           { 
@@ -61,7 +61,15 @@ export default {
             name: 'Product 2',
             description: 'Description for Product 2',
             price: '$200',
-            image: '../src/assets/product2.jpg'
+            image: '../src/assets/product1.jpg'
+          },
+
+          { 
+            product_id: 1,
+            name: 'Product 1',
+            description: 'Description for Product 1',
+            price: '$100',
+            image: '../src/assets/product1.jpg'
           },
 
           { 
@@ -104,4 +112,7 @@ export default {
 .four-in-one-column {
   display: flex;
 }
+
+
+
 </style>
