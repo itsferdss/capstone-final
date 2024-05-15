@@ -46,6 +46,9 @@
                 <v-col cols="3">
                     <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
                 </v-col>
+                <v-col cols="3">
+                    <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
+                </v-col>
                 </v-row>
         </v-container>
         </v-card-text>
@@ -66,10 +69,11 @@
             <td>{{ item.product_id }}</td>
             <td>{{ item.product_name }}</td>
             <td>{{ item.supplier }}</td>
-            <td>{{ item.stock }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price }}</td>
             <td>
-    
-            <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-pencil</v-icon>
+            <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
+            <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
             </td>
         </tr>
         
@@ -87,6 +91,39 @@
             </v-card>
         </v-dialog>
 
+<!--DIALOG FOR EDIT PRODUCT -->
+<v-dialog v-model="editItemDialog" max-width="800px">
+    <v-card>
+        <v-card-title>
+        <span class="text-h6 m-2">Edit Product</span>
+        </v-card-title>
+        <v-card-text>
+        <v-container>
+        <v-row dense>
+                <v-col cols="6">
+                    <v-text-field v-model="editedItem.product_name" label="Product Name*" prepend-icon="mdi-package-variant-closed" required></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                    <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                    <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                    <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
+                </v-col>
+                </v-row>
+        </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="black" text @click="closeEditItemDialog">Cancel</v-btn>
+        <v-btn color="black" text @click="saveEditedProduct">Save Product</v-btn>
+        </v-card-actions>
+    </v-card> 
+    </v-dialog>
+
         </template>
     </v-data-table>
     </template>
@@ -94,26 +131,28 @@
     export default {
     data() {
         return {
+
+        editItemDialog: false,
         
         dialog: false,
         editedItem: {
-            user_id: '',
-            title: '',
-            description: '',
-        },
+        product_id: '',
+        product_name: '',
+        supplier: '',
+        quantity: '',
+        price: '', // Add price property
+      },
 
         search: '',
         dialogAddPrescription: false,
-        newPrescription: {
-            title: '',
-            description: ''
-        },
+        
 
         headers: [
             { title: 'Product ID', align: 'start', key: 'product_id' },
             { title: 'Product Name', align: 'start', key: 'product_name' },
             { title: 'Supplier', key: 'supplier' },
-            { title: 'quantity', key: 'stock' },
+            { title: 'Quantity', key: 'quantity' },
+            { title: 'Price', key: 'price' },
             { title: 'Actions', sortable: false },
         ],
 
@@ -123,7 +162,8 @@
             product_id: '1',
             product_name: 'Ferdinand',
             supplier: 'Eye-wear PH',
-            stock: '10',
+            quantity: '10',
+            price: '102',
             
             },
         ],
@@ -193,7 +233,8 @@
                 product_id: this.editedItem.product_id,
                 product_name: this.editedItem.product_name,
                 supplier: this.editedItem.supplier,
-                stock: this.editedItem.quantity, // Change 'stock' to match your data structure
+                quantity: this.editedItem.quantity, // Change 'stock' to match your data structure
+                price: this.editedItem.price,
             };
 
             // Push the new product into the products array
@@ -202,51 +243,36 @@
             // Close the dialog
             this.dialog = false;
         },
-        acceptAppointment(userId) {
-        const user = this.pendingAppointments.find(u => u.user_id === userId);
 
-        if (user) {
-            const newUser = {
-            user_id: user.user_id,
-            first_name: user.first_name,
-            middle_name: user.middle_name,
-            last_name: user.last_name,
-            extension: user.extension,
-            contact_number: user.contact_number,
-            formatted_appointment_date: user.formatted_appointment_date,
-            appointment_time: user.appointment_time,
-            // Add other appointment properties as needed
-            };
+        openEditItem(item) {
+            // Create a shallow copy of the item
+            this.editedItem = { ...item };
+            // Open the editItemDialog
+            this.editItemDialog = true;
+        },
 
-            this.products.push(newUser);
-            // Optionally, you can remove the accepted appointment from the pending appointments list
-            const index = this.pendingAppointments.findIndex(appointment => appointment.user_id === userId);
+        closeEditItemDialog() {
+            this.editItemDialog = false;
+        },
+
+       saveEditedProduct() {
+            const index = this.products.findIndex(product => product.product_id === this.editedItem.product_id);
             if (index !== -1) {
-            this.pendingAppointments.splice(index, 1);
+                // Update the product at the found index with the edited data
+                this.products[index] = {
+                product_id: this.editedItem.product_id,
+                product_name: this.editedItem.product_name,
+                supplier: this.editedItem.supplier,
+                quantity: this.editedItem.quantity, 
+                price: this.editedItem.price, // Include price
+                };
+                // Close the editItemDialog
+                this.editItemDialog = false;
+            } else {
+                // Handle error: Product not found
+                console.error('Product not found for editing.');
             }
-        }
-
-    // Check if the user ID already exists
-    const existingUser = this.products.find((u) => u.user_id === newUser.user_id);
-
-    if (existingUser) {
-        // User already exists, show an alert
-        alert('User ID already exists! Please use a different ID.');
-    } else {
-        // User does not exist, confirm and save the new user
-        if (confirm('Are you sure you want to save this new user?')) {
-        this.products.push(newUser);
-        this.closeDialog();
-        }
-    }
-    },
-
-    saveRecord(user, prescription) {
-    if (confirm('Are you sure you want to save this edited prescription?')) {
-        prescription.editing = false;
-        // Optionally, you can add code here to save the edited prescription to the database
-    }
-    },
+        },
     },
 
 
