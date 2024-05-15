@@ -142,7 +142,6 @@
 <v-dialog v-model="dialogPatientHistory" max-width="1300px">
   <v-card>
     <v-card-title>{{ item.first_name }}'s Past Prescriptions</v-card-title>
-    
     <v-card-text>
       <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
       <span>&nbsp;</span>
@@ -270,8 +269,12 @@
         <v-card>
           <v-card-title>{{ item.first_name }}'s Glasses Information</v-card-title>
           <v-card-text>
+            <v-btn @click="openGlassesUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add New</v-btn>
+              <span>&nbsp;</span>
+            <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
+
             <v-card v-for="(glasses, index) in item.glasses.slice().reverse()" :key="index" class="mb-4">
-              <v-card-title>Prescription Date: {{ glasses.glasses_updated }}</v-card-title> <!-- Changed title here -->
+              <v-card-title>Updated at: {{ glasses.glasses_updated }}</v-card-title> <!-- Changed title here -->
               <v-card-text>
                 <v-row>
                   <v-col cols="3" md="6">
@@ -307,6 +310,44 @@
         </v-card>
       </v-dialog>
       
+      <!--DIALOG FOR GLASS UPDATE-->
+      <v-dialog v-model="GlassesUpdateDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            Glass Update
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-container>
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.reading_add" label="Reading Add"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.frame" label="Frame"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.type_lens" label="Type of Lens"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field v-model="editedItem.glasses_updated" label="Date Updated" type="date" required></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="saveGlassInformation">Save</v-btn>
+            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
 
     </template>
@@ -322,6 +363,7 @@ export default {
       detailedPrescription: false,
       MoreHistoryDialog: false,
       PatientGlassesInformation: false,
+      GlassesUpdateDialog: false,
 
       dialog: false,
       editedItem: {
@@ -486,12 +528,37 @@ export default {
     this.PatientGlassesInformation = true;
   },
 
+  openGlassesUpdateDialog() {
+    this.GlassesUpdateDialog = true;
+  },
+
+  closePatientGlassesInformation() {
+     this.PatientGlassesInformation = false;
+  },
+
+   closeGlassesUpdateDialog() {
+      this.GlassesUpdateDialog = false;
+    },
+
+ saveGlassInformation() {
+  const newGlassInformation = {
+    reading_add: this.editedItem.reading_add,
+    best_visual_acuity: this.editedItem.best_visual_acuity,
+    frame: this.editedItem.frame,
+    type_lens: this.editedItem.type_lens,
+    remarks: this.editedItem.remarks,
+    glasses_updated: new Date().toLocaleDateString(), // Set the current date automatically
+  };
+
+  const selectedUser = this.users[0]; // Assuming you want to add the information to the first user
+  selectedUser.glasses.push(newGlassInformation);
+ 
+
+  this.closeGlassesUpdateDialog();
+},
 
 
-
-
-
-
+ 
 
 
 
@@ -516,10 +583,6 @@ export default {
     
 
      closeChildUpdateDialog() {
-      this.updatedWeight = null;
-      this.updatedHeight = null;
-      this.updatedAge = null;
-      this.dateUpdated = '';
       this.childUpdateDialog = false;
     },
 
