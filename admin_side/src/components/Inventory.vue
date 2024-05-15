@@ -29,7 +29,7 @@
     <!--DIALOG FOR NEW USER-->
     <v-card>
         <v-card-title>
-        <span class="text-h6 m-2">New User and Prescription</span>
+        <span class="text-h6 m-2">New Product</span>
         </v-card-title>
         <v-card-text>
         <v-container>
