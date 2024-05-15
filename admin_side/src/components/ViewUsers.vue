@@ -102,16 +102,21 @@
 
         <!--Add Prescription Bellow the name-->
           <tr v-if="item.showPrescriptions">
-          <td :colspan="headers.length + 1">
+          <td :colspan="headers.length + 5">
             <v-row justify="space-between">
-              <v-col cols="6">
+              <v-col cols="4">
                 <v-btn @click="openDialogPatientHistory(item)" block>
-                  View Patient's History
+                  View Patient's Prescription History
                 </v-btn>
               </v-col>
-              <v-col cols="6">
-                <v-btn @click="openChildUpdateDialog(item)" block>
-                  Add New Prescription
+              <v-col cols="4">
+                <v-btn @click="openPatientGlassesInformation(item)" block>
+                  Patient's Glasses Information
+                </v-btn>
+              </v-col>
+              <v-col cols="4">
+                <v-btn @click="openMoreHistoryDialog(item)" block>
+                  View Patient's Medical History
                 </v-btn>
               </v-col>
             </v-row>
@@ -136,28 +141,19 @@
       <!--Dialog for Patient HIstory-->
 <v-dialog v-model="dialogPatientHistory" max-width="1300px">
   <v-card>
-    <v-card-title>User's Information and Prescriptions</v-card-title>
+    <v-card-title>{{ item.first_name }}'s Past Prescriptions</v-card-title>
+    
     <v-card-text>
-      <!-- Parent's Information -->
-      <v-card class="mb-4">
-        <v-card-title>Patient's Information</v-card-title>
-        <v-card-text>
-          <v-col cols="12" md="3">
-            <strong>Name:</strong> {{ item.full_name}} 
-          </v-col>
-          <v-col cols="12" md="3">
-            <strong>Contact Number:</strong> {{ item.contact_number }}
-          </v-col>
-        </v-card-text>
-      </v-card>
+      <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
+      <span>&nbsp;</span>
+      <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
 
-    <v-card v-for="(prescription, index) in item.prescription" :key="index" class="mb-4">
-        <v-card-title>Patient's Prescription {{ index + 1 }}</v-card-title>
+      <!--PRESCRIPTIONS-->
+      <!-- Sort prescriptions from latest to oldest -->
+      <v-card v-for="(prescription, index) in item.prescription.slice().reverse()" :key="index" class="mb-4">
+        <v-card-title>Prescription Date: {{ prescription.date_updated }}</v-card-title> <!-- Changed title here -->
         <v-card-text>
           <v-row>
-            <v-col cols="12" md="12">
-              <strong>Date Updated:</strong> {{ prescription.date_updated }}
-            </v-col>
             <v-col cols="3" md="3">
               <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
             </v-col>
@@ -176,9 +172,10 @@
             <v-col cols="3" md="4">
               <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
             </v-col>
-            <v-col cols="3" md="3">
+            <v-col cols="12" md="12">
               <strong>PD:</strong> {{ prescription.PD }}
             </v-col>
+            <v-btn color="error" @click="deletePrescription(item, index)">Delete</v-btn>
           </v-row>
         </v-card-text>
       </v-card>
@@ -192,20 +189,14 @@
           <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Prescription</v-btn> -->
         </v-card-text>
       </v-card>
-
-<v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
-<span>&nbsp;</span>
-<v-btn color="error" @click="closeDialogPatientHistory">Cancel</v-btn>
     </v-card-text>
-    
   </v-card>
-
 </v-dialog>
 
 
 
-      <!--DIALOG FOR CHILD UPDATE-->
-      <v-dialog v-model="childUpdateDialog" max-width="500px">
+      <!--DIALOG FOR EYE UPDATE-->
+<v-dialog v-model="childUpdateDialog" max-width="500px">
   <v-card>
     <v-card-title>
       New Prescription
@@ -236,7 +227,7 @@
               <v-text-field v-model="editedItem.PD" label="PD"  required></v-text-field>
             </v-col>
             <v-col cols="12">
-               <v-text-field v-model="editedItem.dateUpdated" label="Birthdate" type="date" required></v-text-field>
+               <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" type="date" required></v-text-field>
             </v-col>
           </v-row>
         </v-container>
@@ -249,7 +240,72 @@
   </v-card>
 </v-dialog>
 
+<!--DIALOG FOR DETAILED HISTORY-->
+<v-dialog v-model="MoreHistoryDialog" max-width="1200px">
+  <v-card>
+    <v-card-title>{{ item.first_name }}'s Medical History</v-card-title>
+    <v-card-text>
+      <!--FIRST CARD-->
+      <v-card class="mb-12">
+        <v-card-title>Patient's Information</v-card-title>
+        <v-card-text>
+          <v-col cols="3" md="3" >
+            <strong>Medical Health Record:</strong> {{ }} 
+          </v-col>
+          <v-col cols="3" md="3" >
+            <strong>Ocular Health Record:</strong> {{  }}
+          </v-col>
+          <v-btn color="#35623D" @click="saveNewPrescription">Add New</v-btn>
+          <span>&nbsp;</span>
+          <v-btn color="primary" @click="saveNewPrescription">View More</v-btn>
+        </v-card-text>
+      </v-card>
+      <v-btn color="error" @click="closeMoreHistoryDialog">Close</v-btn>
+    </v-card-text>
+  </v-card>
+</v-dialog>
 
+      <!--GLASSES INFORMATION-->
+     <v-dialog v-model="PatientGlassesInformation" max-width="1000px">
+        <v-card>
+          <v-card-title>{{ item.first_name }}'s Glasses Information</v-card-title>
+          <v-card-text>
+            <v-card v-for="(glasses, index) in item.glasses.slice().reverse()" :key="index" class="mb-4">
+              <v-card-title>Prescription Date: {{ glasses.glasses_updated }}</v-card-title> <!-- Changed title here -->
+              <v-card-text>
+                <v-row>
+                  <v-col cols="3" md="6">
+                    <strong>Reading Add:</strong> {{ glasses.reading_add }}
+                  </v-col>
+                  <v-col cols="3" md="6">
+                    <strong>Best Visual Acuity:</strong> {{ glasses.best_visual_acuity }}
+                  </v-col>
+                  <v-col cols="3" md="6">
+                    <strong>Frame:</strong> {{ glasses.frame }}
+                  </v-col>
+                  <v-col cols="3" md="6">
+                    <strong>Type of Lens:</strong> {{ glasses.type_lens }}
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <strong>Remarks:</strong> {{ glasses.remarks }}
+                  </v-col>
+                  <v-btn color="error" @click="deleteGlasses(item, index)">Delete</v-btn>
+                </v-row>
+              </v-card-text>
+            </v-card>
+
+            <!-- New Box for Glasses -->
+            <v-card class="mb-4">
+              <v-card-title>New Glasses Information</v-card-title>
+              <v-card-text>
+                <!-- Content for adding new glasses information goes here -->
+                <!-- You can use your existing dialog and form components here -->
+                <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Glasses Information</v-btn> -->
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
       
 
 
@@ -263,6 +319,9 @@ export default {
       dialogPatientHistory: false,
       childUpdateDialog: false,
       vaccinationDialog: false,
+      detailedPrescription: false,
+      MoreHistoryDialog: false,
+      PatientGlassesInformation: false,
 
       dialog: false,
       editedItem: {
@@ -323,20 +382,23 @@ export default {
               right_eye_axis: 50,
 
               PD: 50.5,
-              date_updated: 'November 26, 2024',
+              date_updated: '05/13/2003',
             },
-
           ],
 
-      
+      glasses: [
+        { id: 1,
+          reading_add: '+3.00',
+          best_visual_acuity: '20/19',
+          frame: 'Browline',
+          type_lens: 'Bifocals',
+          remarks: 'Very clear',
 
-      vaccine: [
-            { id: 1,
-              vaccine_name: 'Vaccine 1',
-              date_taken: 'November 26, 2024',
-              status: true,
-            }
+          glasses_updated: '12/31/2002'
+        }
       ],
+
+      
 
         },
       ],
@@ -371,7 +433,9 @@ export default {
       prescription.editing = !prescription.editing;
     },
     deletePrescription(user, index) {
-      user.prescriptions.splice(index, 1);
+      if (confirm('Are you sure you want to delete this prescription?')) {
+        user.prescription.splice(index, 1);
+      }
     },
 
     deleteUser(item) {
@@ -408,6 +472,28 @@ export default {
     // Show child update dialog
     this.childUpdateDialog = true;
   },
+  
+  openMoreHistoryDialog() {
+    this.MoreHistoryDialog = true;
+  },
+
+  closeMoreHistoryDialog() {
+    this.MoreHistoryDialog = false;
+  },
+
+  openPatientGlassesInformation(item) {
+
+    this.PatientGlassesInformation = true;
+  },
+
+
+
+
+
+
+
+
+
 
  saveNewPrescription() {
   // Create a new prescription object
