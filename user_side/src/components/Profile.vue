@@ -30,42 +30,6 @@
       </v-card-text>
     </v-card>
 
-  <!-- Child's information -->
-    <v-card class="mb-4">
-      <v-card-title>Child's Information</v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12">
-            <strong>Child's Name:</strong> {{ childInfo.name }}
-          </v-col>
-          <v-col cols="12" md="4">
-            <strong>Age:</strong> {{ childInfo.age }}
-          </v-col>
-          <v-col cols="12" md="4">
-            <strong>Birthdate:</strong> {{ childInfo.birthdate }}
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-
-    <!--Another child's information-->
-     <v-card class="mb-4">
-      <v-card-title>Child's Information</v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12">
-            <strong>Child's Name:</strong> {{ childInfo1.name }}
-          </v-col>
-          <v-col cols="12" md="4">
-            <strong>Age:</strong> {{ childInfo1.age }}
-          </v-col>
-          <v-col cols="12" md="4">
-            <strong>Birthdate:</strong> {{ childInfo1.birthdate }}
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-   
   <v-btn @click="openUpdateParentDialog" color="#35623D" dark style="font-weight: bold;">Update Information</v-btn>
 
 <!--Dialog for update parent profile-->
@@ -130,16 +94,6 @@ export default {
       passwordVisible: false,
       confirmPasswordVisible: false,
  
-      childInfo: {
-        name: 'Jovert Laureano',
-        age: 5,
-        birthdate: '2019-02-14',
-      },
-      childInfo1: {
-        name: 'Bryce Laureano',
-        age: 6,
-        birthdate: '2018-05-13',
-      },
     };
   },
   methods:{

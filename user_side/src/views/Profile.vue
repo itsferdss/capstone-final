@@ -31,20 +31,4 @@ export default {
     }
 }
 
-.Profile {
-    flex: 1;
-
-    .material-icons {
-        color: var(--dark);
-        font-size: 2.5rem;
-    }
-    .text {
-        position: relative;
-        color: var(--dark);
-        font-size: 1.5rem;
-        font-weight: 900;
-        bottom: 0.5rem;
-    }
-}
-
 </style>

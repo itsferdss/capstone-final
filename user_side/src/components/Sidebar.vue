@@ -21,21 +21,12 @@
       </div>
 
       <div class="menu">
-          <router-link class="button" to="/schedule">
-              <span class="material-icons">book</span>
-              <span class="text">Book an Appointment</span>
+          <router-link class="button" to="/products">
+              <span class="material-icons">storefront</span>
+              <span class="text">See Products</span>
           </router-link>
       </div>
-
-      <div class="menu">
-          <router-link class="button" to="/schedule">
-              <span class="material-icons">medication</span>
-              <span class="text">Prescriptions</span>
-          </router-link>
-      </div>
-
       
-  
       <div class="menu-logout">
           <router-link class="button" to="/">
               <span class="text">Logout</span>

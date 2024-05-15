@@ -10,10 +10,6 @@ import 'vuetify/dist/vuetify.min.css';
 
 loadFonts()
 
-createApp(App)
-  .use(router)
-  .use(store)
-  .use(vuetify)
-  .mount('#app')
+createApp(App).use(router).use(store).use(vuetify).mount('#app')
 
   Vue.config.productionTip = false;
