@@ -23,12 +23,12 @@
         
       <v-dialog v-model="dialog" max-width="1000px">
   <template v-slot:activator="{ props }">
-    <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" style="font-weight: bold;">See Pending Schedules</v-btn>
+    <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" style="font-weight: bold;">See Pending Reservations</v-btn>
   </template>
   
   <v-card>
       <v-card-title>
-        <span class="text-h6 m-2">List of Pending Appointments</span>
+        <span class="text-h6 m-2">List of Pending Reservations</span>
       </v-card-title>
       <v-card-text>
         <v-container>

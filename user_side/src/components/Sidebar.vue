@@ -1,54 +1,46 @@
 <template>
-    <aside :class="{ 'is_expanded': is_expanded }" @mouseenter="is_expanded = true" @mouseleave="is_expanded = false">
-        
-        <h2 class="sp-text">PediaCare User</h2>
-      <br>
-  <hr>
-      
-      <div class="menu">
-          <router-link class="button" to="/home">
-              <span class="material-icons">home</span>
-              <span class="text">Home</span>
-          </router-link>
-          
-      </div>
+  <aside :class="{ 'is_expanded': is_expanded }">
+    <h2 class="sp-text">PediaCare Admin</h2>
+    <br>
+    <hr>
 
-      <div class="menu">
-          <router-link class="button" to="/profile">
-              <span class="material-icons">person</span>
-              <span class="text">Profile</span>
-          </router-link>
-      </div>
+    <div class="menu">
+      <router-link class="button" to="/viewusers">
+        <span class="material-icons">people</span>
+        <span class="text">User List</span>
+      </router-link>
+    </div>
 
-      <div class="menu">
-          <router-link class="button" to="/products">
-              <span class="material-icons">storefront</span>
-              <span class="text">See Products</span>
-          </router-link>
-      </div>
-      
-      <div class="menu-logout">
-          <router-link class="button" to="/">
-              <span class="text">Logout</span>
-          </router-link>
-      </div>
-    </aside>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  
-  const is_expanded = ref(localStorage.getItem("is_expanded") === "true")
-  
-  const ToggleMenu = () => {
-      is_expanded.value = !is_expanded.value
-  
-      localStorage.setItem("is_expanded", is_expanded.value)
-  }
-  </script>
-  
-  <style lang="scss" scoped>
-  aside {
+    <div class="menu">
+      <router-link class="button" to="/inventory">
+        <span class="material-icons">inventory_2</span>
+        <span class="text">Inventory</span>
+      </router-link>
+    </div>
+
+    <div class="menu">
+      <router-link class="button" to="/schedule">
+        <span class="material-icons">event_available</span>
+        <span class="text">Reservations</span>
+      </router-link>
+    </div>
+
+    <div class="menu-logout">
+      <router-link class="button" to="/">
+        <span class="text">Logout</span>
+      </router-link>
+    </div>
+  </aside>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const is_expanded = ref(true)
+</script>
+
+<style lang="scss" scoped>
+aside {
   display: flex;
   flex-direction: column;
   width: calc(2.5rem + 32px);

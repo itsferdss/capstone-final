@@ -21,45 +21,49 @@
             style="max-width: 300px;"
             ></v-text-field>
 
-    <v-dialog v-model="dialog" max-width="1000px">
-    <template v-slot:activator="{ props }">
-        <v-btn @click="openDialog"  color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Product</v-btn>
-    </template>
+   <v-dialog v-model="dialog" max-width="1000px">
+  <template v-slot:activator="{ props }">
+    <v-btn @click="openDialog" color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Product</v-btn>
+  </template>
     
-    <!--DIALOG FOR NEW USER-->
-    <v-card>
-        <v-card-title>
-        <span class="text-h6 m-2">New Product</span>
-        </v-card-title>
-        <v-card-text>
-        <v-container>
+  <!-- DIALOG FOR NEW PRODUCT -->
+  <v-card>
+    <v-card-title>
+      <span class="text-h6 m-2">New Product</span>
+    </v-card-title>
+    <v-card-text>
+      <v-container>
         <v-row dense>
-                <v-col cols="6">
-                    <v-text-field v-model="editedItem.product_id" label="Product ID*" prepend-icon="mdi-barcode-scan" required></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field v-model="editedItem.product_name" label="Product Name*" prepend-icon="mdi-package-variant-closed" required></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                    <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                    <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
-                </v-col>
-                </v-row>
-        </v-container>
-        </v-card-text>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.product_id" label="Product ID*" prepend-icon="mdi-barcode-scan" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.product_name" label="Product Name*" prepend-icon="mdi-package-variant-closed" required></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
+          </v-col>
+          <!-- Image Upload -->
+          <v-col cols="12">
+            <v-file-input v-model="editedItem.image" label="Product Image" accept="image/*"></v-file-input>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
 
-        <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-        <v-btn color="black" text @click="saveNewProduct">Save Product</v-btn>
-        </v-card-actions>
-    </v-card> 
-    </v-dialog>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
+      <v-btn color="black" text @click="saveNewProduct">Save Product</v-btn>
+    </v-card-actions>
+  </v-card> 
+</v-dialog>
 
         </v-toolbar>
         </template>
