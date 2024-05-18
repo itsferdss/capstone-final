@@ -5,21 +5,21 @@
     <hr>
 
     <div class="menu">
-      <router-link class="button" to="/viewusers">
-        <span class="material-icons">people</span>
-        <span class="text">User List</span>
+      <router-link class="button" to="/home">
+        <span class="material-icons">home</span>
+        <span class="text">Home</span>
       </router-link>
     </div>
 
     <div class="menu">
-      <router-link class="button" to="/inventory">
-        <span class="material-icons">inventory_2</span>
-        <span class="text">Inventory</span>
+      <router-link class="button" to="/profile">
+        <span class="material-icons">person</span>
+        <span class="text">Profile</span>
       </router-link>
     </div>
 
     <div class="menu">
-      <router-link class="button" to="/schedule">
+      <router-link class="button" to="/products">
         <span class="material-icons">event_available</span>
         <span class="text">Reservations</span>
       </router-link>
