@@ -43,12 +43,11 @@ const is_expanded = ref(true)
 aside {
   display: flex;
   flex-direction: column;
-  width: 250px; /* Adjusted width since sidebar is always expanded */
+  width: 250px;
   min-height: 100vh;
   padding: 1rem;
   background-color: #35623D;
   color: #cdd1da;
-  
 
   .sp-text {
     margin-top: 1rem;
@@ -56,7 +55,6 @@ aside {
     color: #fff;
     display: block;
     text-align: center;
-  
   }
 
   .button .text {
@@ -74,12 +72,19 @@ aside {
       padding: 0.8rem 1rem;
       margin-bottom: 0.5rem;
       transition: 0.2s ease-out;
+      position: relative;
 
       .material-icons {
         font-size: 30px;
         color: #cdd1da;
         margin-right: 1rem;
         transition: 0.1s ease-out;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .text {
@@ -89,13 +94,12 @@ aside {
 
       &:hover,
       &.router-link-exact-active {
-        background-color: #fff;
-        margin-left: 0.5rem;
-        border-top-left-radius: 20px;
-        border-bottom-left-radius: 20px;
-        .material-icons,
-        .text {
+        .material-icons {
+          background-color: #fff;
           color: #35623D;
+        }
+        .text {
+          color: #fff; /* Adjust text color on hover or active state */
         }
       }
     }

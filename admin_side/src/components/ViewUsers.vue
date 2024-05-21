@@ -27,60 +27,60 @@
   </template>
   
   <!--DIALOG FOR NEW USER-->
-  <v-card>
+ <v-card>
     <v-card-title>
-      <span class="text-h6 m-2">New User</span>
+        <span class="text-h6 m-2">New User</span>
     </v-card-title>
     <v-card-text>
-      <v-container>
-        <v-row dense>
-          <v-col cols="12">
-            <v-text-field v-model="editedItem.user_id" label="User ID*" prepend-icon="mdi-account" required></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="editedItem.full_name" label="Patient Name*" prepend-icon="mdi-account" required></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="editedItem.birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field
-              v-model="editedItem.password"
-              label="Password"
-              prepend-icon="mdi-lock"
-              :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="editedItem.passwordVisible ? 'text' : 'password'"
-              @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
-              required
-            ></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field
-              v-model="editedItem.confirm_password"
-              label="Confirm Password"
-              prepend-icon="mdi-lock"
-              :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
-              @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
-              required
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
+        <v-container>
+            <v-row dense>
+                <v-col cols="12">
+                    <v-text-field v-model="editedItem.user_name" label="User Name*" prepend-icon="mdi-account" required></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                    <v-text-field v-model="editedItem.user_email" label="Email*" prepend-icon="mdi-email" required></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                    <v-text-field v-model="editedItem.user_address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                    <v-text-field v-model="editedItem.user_contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                    <v-text-field v-model="editedItem.user_birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                    <v-text-field
+                        v-model="editedItem.password"
+                        label="Password"
+                        prepend-icon="mdi-lock"
+                        :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+                        :type="editedItem.passwordVisible ? 'text' : 'password'"
+                        @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
+                        required
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                    <v-text-field
+                        v-model="editedItem.confirm_password"
+                        label="Confirm Password"
+                        prepend-icon="mdi-lock"
+                        :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+                        :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
+                        @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
+                        required
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+        </v-container>
     </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-      <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
-    </v-card-actions>
-  </v-card> 
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
+            <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
+        </v-card-actions>
+    </v-card>
 </v-dialog>
 
       </v-toolbar>
@@ -111,7 +111,7 @@
               </v-col>
               <v-col cols="4">
                 <v-btn @click="openPatientGlassesInformation(item)" block>
-                  Patient's Glasses Information
+                  View Patient's Spectacles
                 </v-btn>
               </v-col>
               <v-col cols="4">
@@ -171,7 +171,13 @@
             <v-col cols="3" md="4">
               <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
             </v-col>
-            <v-col cols="12" md="12">
+            <v-col cols="3" md="3">
+              <strong>Reading Add:</strong> {{ prescription.reading_add }}
+            </v-col>
+            <v-col cols="3" md="3">
+              <strong>Best Visual Acuity:</strong> {{ prescription.best_visual_acuity }}
+            </v-col>
+            <v-col cols="4" md="6">
               <strong>PD:</strong> {{ prescription.PD }}
             </v-col>
             <v-btn color="error" @click="deletePrescription(item, index)">Delete</v-btn>
@@ -205,28 +211,34 @@
         <v-container>
           <v-row>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere"  required></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere"  required></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder"  required></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder"  required></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis"  required></v-text-field>
+              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" required></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis"  required></v-text-field>
+              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" required></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field v-model="editedItem.PD" label="PD"  required></v-text-field>
+              <v-text-field v-model="editedItem.PD" label="PD" required></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.reading_add" label="Reading Add" required></v-text-field>
+            </v-col>
+            <v-col cols="6">
+              <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity" required></v-text-field>
             </v-col>
             <v-col cols="12">
-               <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" type="date" required></v-text-field>
+              <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" type="date" required></v-text-field>
             </v-col>
           </v-row>
         </v-container>
@@ -267,7 +279,7 @@
       <!--GLASSES INFORMATION-->
      <v-dialog v-model="PatientGlassesInformation" max-width="1000px">
         <v-card>
-          <v-card-title>{{ item.first_name }}'s Glasses Information</v-card-title>
+          <v-card-title>{{ item.first_name }}'s Spectacles</v-card-title>
           <v-card-text>
             <v-btn @click="openGlassesUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add New</v-btn>
               <span>&nbsp;</span>
@@ -277,12 +289,6 @@
               <v-card-title>Updated at: {{ glasses.glasses_updated }}</v-card-title> <!-- Changed title here -->
               <v-card-text>
                 <v-row>
-                  <v-col cols="3" md="6">
-                    <strong>Reading Add:</strong> {{ glasses.reading_add }}
-                  </v-col>
-                  <v-col cols="3" md="6">
-                    <strong>Best Visual Acuity:</strong> {{ glasses.best_visual_acuity }}
-                  </v-col>
                   <v-col cols="3" md="6">
                     <strong>Frame:</strong> {{ glasses.frame }}
                   </v-col>
@@ -320,12 +326,6 @@
             <v-form>
               <v-container>
                 <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.reading_add" label="Reading Add"  required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity"  required></v-text-field>
-                  </v-col>
                   <v-col cols="6">
                     <v-text-field v-model="editedItem.frame" label="Frame"  required></v-text-field>
                   </v-col>
@@ -423,6 +423,9 @@ export default {
               right_eye_cylinder: -2.00,
               right_eye_axis: 50,
 
+              reading_add: +3.00,
+              best_visual_acuity: 19,
+
               PD: 50.5,
               date_updated: '05/13/2003',
             },
@@ -430,8 +433,7 @@ export default {
 
       glasses: [
         { id: 1,
-          reading_add: '+3.00',
-          best_visual_acuity: '20/19',
+          
           frame: 'Browline',
           type_lens: 'Bifocals',
           remarks: 'Very clear',
@@ -439,6 +441,8 @@ export default {
           glasses_updated: '12/31/2002'
         }
       ],
+
+      
 
       
 
@@ -459,7 +463,17 @@ export default {
         )
       );
     },
+    formattedBestVisualAcuity: {
+      get() {
+        return `20/${this.editedItem.best_visual_acuity}`;
+      },
+      set(value) {
+        this.editedItem.best_visual_acuity = value.replace(/^20\//, '');
+      }
+    },
+
   },
+  
   methods: {
     openDialog() {
     this.dialog = true;

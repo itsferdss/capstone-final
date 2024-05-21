@@ -43,51 +43,27 @@ const is_expanded = ref(true)
 aside {
   display: flex;
   flex-direction: column;
-  width: calc(2.5rem + 32px);
+  width: 250px;
   min-height: 100vh;
-  overflow: hidden;
   padding: 1rem;
   background-color: #35623D;
   color: #cdd1da;
-  transition: 0.2s ease-out;
 
   .sp-text {
-    display: none;
-    transition: 0.2s ease-out;
-  }
-
-  .menu-toggle-wrap {
-    display: flex;
-    justify-content: flex-end;
-    position: relative;
-    top: 0;
-    transition: 0.2s ease-out;
-    margin: 5px;
-  }
-
-  .menu-toggle {
-    transition: 0.2s ease-out;
-    .material-icons {
-      font-size: 2rem;
-      color:#cdd1da;
-      transition: 0.2s ease-out;
-    }
-
-    &:hover {
-      .material-icons {
-        color: #727885;
-        transform: translateX(0.5rem);
-      }
-    }
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    display: block;
+    text-align: center;
   }
 
   .button .text {
-    opacity: 0;
+    opacity: 1;
     transition: 0.3s ease-out;
   }
 
   .menu {
-    margin: -0 -1rem;
+    margin: 0 -1rem;
 
     .button {
       display: flex;
@@ -96,11 +72,19 @@ aside {
       padding: 0.8rem 1rem;
       margin-bottom: 0.5rem;
       transition: 0.2s ease-out;
+      position: relative;
 
       .material-icons {
         font-size: 30px;
         color: #cdd1da;
+        margin-right: 1rem;
         transition: 0.1s ease-out;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .text {
@@ -110,21 +94,19 @@ aside {
 
       &:hover,
       &.router-link-exact-active {
-        background-color: #fff;
-        margin-left: 0.5rem;
-        border-top-left-radius: 20px;
-        border-bottom-left-radius: 20px;
-        .material-icons,
-        .text {
+        .material-icons {
+          background-color: #fff;
           color: #35623D;
+        }
+        .text {
+          color: #fff; /* Adjust text color on hover or active state */
         }
       }
     }
   }
 
   .menu-logout {
-    margin: -0 -1rem;
-    transition: 0.2s ease-out;
+    margin: 0 -1rem;
     flex: 1;
     display: flex;
     align-items: flex-end;
@@ -154,45 +136,6 @@ aside {
         .text {
           color: #727885;
         }
-      }
-    }
-  }
-
-  &.is_expanded {
-    width: 250px;
-
-    .menu-logout {
-      display: flex;
-      align-items: flex-end;
-      margin: -0 2rem;
-      transition: 0.2s ease-out;
-    }
-
-    .sp-text {
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      color: #fff;
-      opacity: 1;
-      display: block;
-      transition: 0.2s ease-out;
-      text-align: center;
-    }
-
-    .menu-toggle-wrap {
-      top: -4rem;
-      left: 0.5rem;
-      .menu-toggle {
-        transform: rotate(-180deg);
-      }
-    }
-
-    .button .text {
-      opacity: 1;
-    }
-
-    .button {
-      .material-icons {
-        margin-right: 1rem;
       }
     }
   }

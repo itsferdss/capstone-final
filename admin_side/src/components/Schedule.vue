@@ -21,7 +21,7 @@
         ></v-text-field>
         
         
-      <v-dialog v-model="dialog" max-width="1000px">
+<v-dialog v-model="dialog" max-width="1000px">
   <template v-slot:activator="{ props }">
     <v-btn @click="openDialog" class="mb-2 rounded-l" color="#35623D" dark v-bind="props" style="font-weight: bold;">See Pending Reservations</v-btn>
   </template>
