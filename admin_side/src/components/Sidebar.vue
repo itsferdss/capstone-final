@@ -1,147 +1,100 @@
 <template>
-  <aside :class="{ 'is_expanded': is_expanded }">
-    <h2 class="sp-text">PediaCare Admin</h2>
-    <br>
-    <hr>
+  <v-navigation-drawer
+    v-model="drawer"
+    permanent
+    class="navigation-drawer"
+  >
+    <div class="admin-title">
+      <h1 class="admin-text">Admin</h1>
+    </div>
 
-    <div class="menu">
-      <router-link class="button" to="/viewusers">
+    <v-divider></v-divider>
+
+    <v-list dense nav>
+      <router-link :to="{ path: '/viewusers' }" active-class="active-link" class="sidebar-link">
         <span class="material-icons">people</span>
-        <span class="text">User List</span>
+        <span class="link-text">View Patients</span>
       </router-link>
-    </div>
 
-    <div class="menu">
-      <router-link class="button" to="/inventory">
-        <span class="material-icons">inventory_2</span>
-        <span class="text">Inventory</span>
+      <router-link :to="{ path: '/schedule' }" active-class="active-link" class="sidebar-link">
+        <span class="material-icons">bookmark</span>
+        <span class="link-text">See Reservations</span>
       </router-link>
-    </div>
 
-    <div class="menu">
-      <router-link class="button" to="/schedule">
-        <span class="material-icons">event_available</span>
-        <span class="text">Reservations</span>
+      <router-link :to="{ path: '/inventory' }" active-class="active-link" class="sidebar-link">
+        <span class="material-icons">inventory</span>
+        <span class="link-text">See Products</span>
       </router-link>
-    </div>
+    </v-list>
 
-    <div class="menu-logout">
-      <router-link class="button" to="/">
-        <span class="text">Logout</span>
+    <!-- Logout Link -->
+    <v-list-item class="logout-link">
+      <router-link to="/" class="sidebar-link">
+        <span class="material-icons">logout</span>
+        <span class="link-text">Logout</span>
       </router-link>
-    </div>
-  </aside>
+    </v-list-item>
+  </v-navigation-drawer>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-const is_expanded = ref(true)
+<script>
+export default {
+  data() {
+    return {
+      drawer: true
+    };
+  }
+};
 </script>
 
-<style lang="scss" scoped>
-aside {
+<style scoped>
+.navigation-drawer {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  width: 250px;
-  min-height: 100vh;
-  padding: 1rem;
-  background-color: #35623D;
-  color: #cdd1da;
+  background-color: #B3D9E6; /* Light blue background */
+  border-radius: 10px; /* Rounded corners */
+}
 
-  .sp-text {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    color: #fff;
-    display: block;
-    text-align: center;
-  }
+.admin-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px; /* Ensure enough height for the text */
+}
 
-  .button .text {
-    opacity: 1;
-    transition: 0.3s ease-out;
-  }
+.admin-text {
+  font-weight: bold;
+  font-size: 33px; /* Make the "ADMIN" text bigger */
+  margin: 0; /* Remove default margin */
+}
 
-  .menu {
-    margin: 0 -1rem;
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: 5px; /* Rounded corners */
+}
 
-    .button {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      padding: 0.8rem 1rem;
-      margin-bottom: 0.5rem;
-      transition: 0.2s ease-out;
-      position: relative;
+.sidebar-link:hover {
+  background-color: #a1becd; /* Lighter blue on hover */
+}
 
-      .material-icons {
-        font-size: 30px;
-        color: #cdd1da;
-        margin-right: 1rem;
-        transition: 0.1s ease-out;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+.active-link {
+  background-color: #E3F1F8; /* Lighter blue for active link */
+}
 
-      .text {
-        color: #cdd1da;
-        transition: 0.2s ease-out;
-      }
+.material-icons {
+  margin-right: 8px;
+}
 
-      &:hover,
-      &.router-link-exact-active {
-        .material-icons {
-          background-color: #fff;
-          color: #35623D;
-        }
-        .text {
-          color: #fff; /* Adjust text color on hover or active state */
-        }
-      }
-    }
-  }
+.link-text {
+  font-size: 16px;
+}
 
-  .menu-logout {
-    margin: 0 -1rem;
-    flex: 1;
-    display: flex;
-    align-items: flex-end;
-
-    .button {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      padding: 0.8rem 1rem;
-      margin-bottom: 0.5rem;
-      transition: 0.2s ease-out;
-
-      .material-icons {
-        font-size: 1rem;
-        color: #cdd1da;
-        transition: 0.1s ease-out;
-      }
-
-      .text {
-        color: #cdd1da;
-        transition: 0.2s ease-out;
-      }
-
-      &:hover,
-      &.router-link-exact-active {
-        .material-icons,
-        .text {
-          color: #727885;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    z-index: 99;
-  }
+.logout-link {
+  margin-top: 300px; /* Push the logout link to the bottom */
 }
 </style>

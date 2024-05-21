@@ -28,14 +28,16 @@ export default {
 .main-content {
     display: flex;
     flex-direction: column;
+    margin-left: 250px;
 
-    .inventory{
+    .inventory {
         border-radius: 10px;
         background-color: #f0f0f0;
         padding: 0.5rem;
         height: 100vh;
     }
 }
+
 
 
 </style>

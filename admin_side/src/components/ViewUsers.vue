@@ -252,29 +252,32 @@
 </v-dialog>
 
 <!--DIALOG FOR DETAILED HISTORY-->
-<v-dialog v-model="MoreHistoryDialog" max-width="1200px">
-  <v-card>
-    <v-card-title>{{ item.first_name }}'s Medical History</v-card-title>
-    <v-card-text>
-      <!--FIRST CARD-->
-      <v-card class="mb-12">
-        <v-card-title>Patient's Information</v-card-title>
-        <v-card-text>
-          <v-col cols="3" md="3" >
-            <strong>Medical Health Record:</strong> {{ }} 
-          </v-col>
-          <v-col cols="3" md="3" >
-            <strong>Ocular Health Record:</strong> {{  }}
-          </v-col>
-          <v-btn color="#35623D" @click="saveNewPrescription">Add New</v-btn>
-          <span>&nbsp;</span>
-          <v-btn color="primary" @click="saveNewPrescription">View More</v-btn>
-        </v-card-text>
-      </v-card>
-      <v-btn color="error" @click="closeMoreHistoryDialog">Close</v-btn>
-    </v-card-text>
-  </v-card>
-</v-dialog>
+<template>
+  <v-dialog v-model="MoreHistoryDialog" max-width="1200px">
+    <v-card>
+      <v-card-title>{{ item.first_name }}'s Medical History</v-card-title>
+      <v-card-text>
+        <v-btn color="#35623D" @click="MedicalHistoryDialog">Add New</v-btn>
+        <span>&nbsp;</span>
+        <v-btn color="error" @click="closeMoreHistoryDialog">Close</v-btn>
+        <!-- FIRST CARD -->
+        <v-card class="mb-12">
+          <v-card-title>Patient's Information</v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="3" md="3">
+                <strong>Medical Health Record:</strong> {{ medicalHistory.user_medical_health }} 
+              </v-col>
+              <v-col cols="3" md="3">
+                <strong>Ocular Health Record:</strong> {{ medicalHistory.user_ocular_health }}
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+</template>
 
       <!--GLASSES INFORMATION-->
      <v-dialog v-model="PatientGlassesInformation" max-width="1000px">
@@ -349,7 +352,38 @@
         </v-card>
       </v-dialog>
 
-
+      <!--DIALOG FOR ADD MEDICAL HISTORY-->
+      <v-dialog v-model="MedicalHistoryDialog" max-width="500px">
+        <v-card>
+          <v-card-title>
+            Glass Update
+          </v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-container>
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.frame" label="Frame"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.type_lens" label="Type of Lens"  required></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field v-model="editedItem.glasses_updated" label="Date Updated" type="date" required></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" @click="saveGlassInformation">Save</v-btn>
+            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </template>
   </v-data-table>
 </template>
@@ -364,6 +398,8 @@ export default {
       MoreHistoryDialog: false,
       PatientGlassesInformation: false,
       GlassesUpdateDialog: false,
+      MedicalHistoryDialog: false,
+      childUpdateDialog: false,
 
       dialog: false,
       editedItem: {
@@ -404,15 +440,8 @@ export default {
           sex_at_birth: 'Male',
           birth_date: '2003-05-13',
   
-      child:[
-          {
-             childUpdateDialog: false,
-             updatedWeight: null,
-             updatedHeight: null,
-             updatedAge: null,
-          }
-
-          ],
+             
+          
       prescription: [
             { id: 1, 
               left_eye_sphere: -1.4,
@@ -434,17 +463,25 @@ export default {
       glasses: [
         { id: 1,
           
-          frame: 'Browline',
+          frame: 'Brownline',
           type_lens: 'Bifocals',
           remarks: 'Very clear',
 
           glasses_updated: '12/31/2002'
-        }
+        },
       ],
 
-      
+      medicalHistory: [
+        { id: 1,
 
-      
+          user_medical_health: 'Had operation in the arms',
+          user_ocular_health: 'Operation in the left eye',
+
+          history_updated: '12/31/2024'
+        },
+        
+      ],
+
 
         },
       ],
@@ -571,6 +608,14 @@ export default {
   this.closeGlassesUpdateDialog();
 },
 
+  openMedicalHistoryDialog(item) {
+    this.selectedItem = item;
+    this.MoreHistoryDialog = true;
+  },
+  closeMoreHistoryDialog() {
+      this.MoreHistoryDialog = false;
+      this.selectedItem = null; // Reset the selected item when the dialog is closed
+    },
 
  
 
