@@ -206,6 +206,7 @@
     <v-card-title>
       New Prescription
     </v-card-title>
+    <v-divider></v-divider>
     <v-card-text>
       <v-form>
         <v-container>
@@ -237,9 +238,6 @@
             <v-col cols="6">
               <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity" required></v-text-field>
             </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="editedItem.dateUpdated" label="Date Updated" type="date" required></v-text-field>
-            </v-col>
           </v-row>
         </v-container>
       </v-form>
@@ -257,23 +255,34 @@
     <v-card>
       <v-card-title>{{ item.first_name }}'s Medical History</v-card-title>
       <v-card-text>
-        <v-btn color="#35623D" @click="MedicalHistoryDialog">Add New</v-btn>
+        <v-btn color="#35623D" @click="openMedicalHistoryDialog">Add New</v-btn>
         <span>&nbsp;</span>
         <v-btn color="error" @click="closeMoreHistoryDialog">Close</v-btn>
         <!-- FIRST CARD -->
-        <v-card class="mb-12">
-          <v-card-title>Patient's Information</v-card-title>
+
+        
+        <v-card  v-for="(history, index) in item.history.slice().reverse()" :key="index" class="mb-12">
+          <v-card-title>Updated at: {{ history.history_updated }}</v-card-title>
           <v-card-text>
             <v-row>
-              <v-col cols="3" md="3">
-                <strong>Medical Health Record:</strong> {{ medicalHistory.user_medical_health }} 
+              <v-col cols="3" md="12">
+                <strong>Medical Health Record:</strong> {{ history.user_medical_health  }} 
               </v-col>
-              <v-col cols="3" md="3">
-                <strong>Ocular Health Record:</strong> {{ medicalHistory.user_ocular_health }}
+              <v-col cols="3" md="12">
+                <strong>Ocular Health Record:</strong> {{ history.user_ocular_health }}
               </v-col>
+              <v-btn color="error" @click="deleteGlasses(item, index)">Delete</v-btn>
             </v-row>
           </v-card-text>
         </v-card>
+        <v-card class="mb-4">
+              <v-card-title>New Medical History</v-card-title>
+              <v-card-text>
+                <!-- Content for adding new glasses information goes here -->
+                <!-- You can use your existing dialog and form components here -->
+                <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Glasses Information</v-btn> -->
+              </v-card-text>
+            </v-card>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -308,7 +317,7 @@
 
             <!-- New Box for Glasses -->
             <v-card class="mb-4">
-              <v-card-title>New Glasses Information</v-card-title>
+              <v-card-title>New User's Spectacles</v-card-title>
               <v-card-text>
                 <!-- Content for adding new glasses information goes here -->
                 <!-- You can use your existing dialog and form components here -->
@@ -325,6 +334,7 @@
           <v-card-title>
             Glass Update
           </v-card-title>
+          <v-divider></v-divider>
           <v-card-text>
             <v-form>
               <v-container>
@@ -334,9 +344,6 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field v-model="editedItem.type_lens" label="Type of Lens"  required></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field v-model="editedItem.glasses_updated" label="Date Updated" type="date" required></v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
@@ -356,23 +363,18 @@
       <v-dialog v-model="MedicalHistoryDialog" max-width="500px">
         <v-card>
           <v-card-title>
-            Glass Update
+            Add New Medical History
           </v-card-title>
+          <v-divider></v-divider>
           <v-card-text>
             <v-form>
               <v-container>
                 <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.frame" label="Frame"  required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.type_lens" label="Type of Lens"  required></v-text-field>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.user_medical_health" label="Medical Health Record" required></v-textarea>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field v-model="editedItem.glasses_updated" label="Date Updated" type="date" required></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
+                    <v-textarea v-model="editedItem.user_ocular_health" label="Ocular Health Record" required></v-textarea>
                   </v-col>
                 </v-row>
               </v-container>
@@ -400,21 +402,25 @@ export default {
       GlassesUpdateDialog: false,
       MedicalHistoryDialog: false,
       childUpdateDialog: false,
-
+      dialogAddPrescription: false,
+      viewingRecords: false,
       dialog: false,
+      dialogDelete: false,
+
+      deleteRecordIndex: -1,
       editedItem: {
         user_id: '',
-        title: '',
-        description: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        extension: '',
+        contact_number: '',
+        address: '',
+        full_name: '',
+        email: '',
+        sex_at_birth: '',
+        birth_date: ''
       },
-
-      search: '',
-      dialogAddPrescription: false,
-      newPrescription: {
-        title: '',
-        description: ''
-      },
-
       headers: [
         { title: 'User ID', align: 'start', key: 'user_id' },
         { title: 'Parent Name', align: 'start', key: 'full_name' },
@@ -422,71 +428,87 @@ export default {
         { title: 'Address', key: 'address' }, 
         { title: 'Actions', sortable: false },
       ],
-      viewingRecords: false,
-      users: [
+
+      search: '',
+      newPrescription: {
+        user_id: '', 
+        left_eye_sphere: '',
+        left_eye_cylinder: '',
+        left_eye_axis: '',
+
+        right_eye_sphere: '',
+        right_eye_cylinder: '',
+        right_eye_axis: '',
+
+        reading_add: '',
+        best_visual_acuity: '',
+
+        PD: '',
+        date_updated: '',
+      },
+      
+    users: [
         {
-          user_id: '1',
-          first_name: 'Ferdinand',
-          middle_name: 'A',
-          last_name: 'Espiritu',
-          extension: '',
-          contact_number: '09668109204',
-          address: 'San Narciso, Zambales',
-          full_name: 'Ferdinand Espiritu',
-    
+        user_id: '1',
+        first_name: 'Ferdinand',
+        middle_name: 'A',
+        last_name: 'Espiritu',
+        extension: '',
+        contact_number: '09668109204',
+        address: 'San Narciso, Zambales',
+        full_name: 'Ferdinand Espiritu',
+        email: 'sample@example.com',
+        sex_at_birth: 'Male',
+        birth_date: '2003-05-13',
+      
+    prescription: [
+        { 
+        user_id: 1, 
+        left_eye_sphere: -1.4,
+        left_eye_cylinder: -2.00,
+        left_eye_axis: 50,
 
+        right_eye_sphere: -1.4,
+        right_eye_cylinder: -2.00,
+        right_eye_axis: 50,
 
-          email: 'sample@example.com',
-          sex_at_birth: 'Male',
-          birth_date: '2003-05-13',
-  
-             
+        reading_add: +3.00,
+        best_visual_acuity: 19,
+
+        PD: 50.5,
+        date_updated: '05/13/2003',
+      },
+    ],
+
+    glasses: [
+        { 
+        user_id: 1,
           
-      prescription: [
-            { id: 1, 
-              left_eye_sphere: -1.4,
-              left_eye_cylinder: -2.00,
-              left_eye_axis: 50,
+        frame: 'Brownline',
+        type_lens: 'Bifocals',
+        remarks: 'Very clear',
 
-              right_eye_sphere: -1.4,
-              right_eye_cylinder: -2.00,
-              right_eye_axis: 50,
-
-              reading_add: +3.00,
-              best_visual_acuity: 19,
-
-              PD: 50.5,
-              date_updated: '05/13/2003',
-            },
-          ],
-
-      glasses: [
-        { id: 1,
-          
-          frame: 'Brownline',
-          type_lens: 'Bifocals',
-          remarks: 'Very clear',
-
-          glasses_updated: '12/31/2002'
+        glasses_updated: '12/31/2002'
         },
       ],
 
-      medicalHistory: [
-        { id: 1,
+    history: [
+        { 
+        user_id: 1,
 
-          user_medical_health: 'Had operation in the arms',
-          user_ocular_health: 'Operation in the left eye',
+        user_medical_health: 'Had operation in the arms',
+        user_ocular_health: 'Operation in the left eye',
 
-          history_updated: '12/31/2024'
+        history_updated: '12/31/2024'
         },
         
       ],
 
 
         },
+        
       ],
-      dialogDelete: false,
-      deleteRecordIndex: -1,
+      
     };
     
   },
@@ -610,12 +632,13 @@ export default {
 
   openMedicalHistoryDialog(item) {
     this.selectedItem = item;
-    this.MoreHistoryDialog = true;
+    this.MedicalHistoryDialog = true;
   },
   closeMoreHistoryDialog() {
       this.MoreHistoryDialog = false;
       this.selectedItem = null; // Reset the selected item when the dialog is closed
     },
+    
 
  
 
