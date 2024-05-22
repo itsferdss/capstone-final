@@ -2,7 +2,7 @@
   <v-data-table
     :search="search"
     :headers="headers"
-    :items="displayedUsers"  
+    :items="displayedUsers"
     :sort-by="[{ key: 'userId', order: 'asc' }]"
   >
     <template v-slot:top>
@@ -19,721 +19,595 @@
           single-line
           style="max-width: 300px;"
         ></v-text-field>
-        
-        <!--Dialog for new users-->
-<v-dialog v-model="dialog" max-width="1000px">
-  <template v-slot:activator="{ props }">
-    <v-btn @click="openDialog"  color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Patient</v-btn>
-  </template>
-  
-  <!--DIALOG FOR NEW USER-->
- <v-card>
-    <v-card-title>
-        <span class="text-h6 m-2">New User</span>
-    </v-card-title>
-    <v-card-text>
-        <v-container>
-            <v-row dense>
-                <v-col cols="12">
+
+        <v-dialog v-model="dialog" max-width="1000px">
+          <template v-slot:activator="{ props }">
+            <v-btn @click="openDialog" color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Patient</v-btn>
+          </template>
+          <v-card>
+            <v-card-title>
+              <span class="text-h6 m-2">New User</span>
+            </v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row dense>
+                  <v-col cols="12">
                     <v-text-field v-model="editedItem.user_name" label="User Name*" prepend-icon="mdi-account" required></v-text-field>
-                </v-col>
-                <v-col cols="12">
+                  </v-col>
+                  <v-col cols="12">
                     <v-text-field v-model="editedItem.user_email" label="Email*" prepend-icon="mdi-email" required></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                    <v-text-field v-model="editedItem.user_address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                    <v-text-field v-model="editedItem.user_contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-                </v-col>
-                <v-col cols="6">
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
                     <v-text-field v-model="editedItem.user_birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
-                </v-col>
-                <v-col cols="6">
+                  </v-col>
+                  <v-col cols="6">
                     <v-text-field
-                        v-model="editedItem.password"
-                        label="Password"
-                        prepend-icon="mdi-lock"
-                        :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-                        :type="editedItem.passwordVisible ? 'text' : 'password'"
-                        @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
-                        required
+                      v-model="editedItem.password"
+                      label="Password"
+                      prepend-icon="mdi-lock"
+                      :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="editedItem.passwordVisible ? 'text' : 'password'"
+                      @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
+                      required
                     ></v-text-field>
-                </v-col>
-                <v-col cols="6">
+                  </v-col>
+                  <v-col cols="6">
                     <v-text-field
-                        v-model="editedItem.confirm_password"
-                        label="Confirm Password"
-                        prepend-icon="mdi-lock"
-                        :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-                        :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
-                        @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
-                        required
+                      v-model="editedItem.confirm_password"
+                      label="Confirm Password"
+                      prepend-icon="mdi-lock"
+                      :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
+                      @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
+                      required
                     ></v-text-field>
-                </v-col>
-            </v-row>
-        </v-container>
-    </v-card-text>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
 
-        <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-            <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
-        </v-card-actions>
-    </v-card>
-</v-dialog>
-
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
+              <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-toolbar>
     </template>
 
-    <!--HEADER OF TABLE-->
-<template v-slot:item="{ item }">
+    <template v-slot:item="{ item }">
       <tr>
         <td>{{ item.user_id }}</td>
-        <td>{{ item.first_name }} {{ item.middle_name }} {{ item.last_name }} {{ item.extension }}</td>
+        <td>{{ item.user_name }}</td>
         <td>{{ item.contact_number }}</td>
         <td>{{ item.address }}</td>
         <td>
           <v-icon class="me-2" size="small" style="color: #2F3F64" @click="viewPrescriptions(item)">mdi-information</v-icon>
-
           <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
         </td>
       </tr>
 
-        <!--Add Prescription Bellow the name-->
-          <tr v-if="item.showPrescriptions">
-          <td :colspan="headers.length + 5">
-            <v-row justify="space-between">
-              <v-col cols="4">
-                <v-btn @click="openDialogPatientHistory(item)" block>
-                  View Patient's Prescription History
-                </v-btn>
-              </v-col>
-              <v-col cols="4">
-                <v-btn @click="openPatientGlassesInformation(item)" block>
-                  View Patient's Spectacles
-                </v-btn>
-              </v-col>
-              <v-col cols="4">
-                <v-btn @click="openMoreHistoryDialog(item)" block>
-                  View Patient's Medical History
-                </v-btn>
-              </v-col>
-            </v-row>
-          </td>
-        </tr>
+      <tr v-if="item.showPrescriptions">
+        <td :colspan="headers.length + 5">
+          <v-row justify="space-between">
+            <v-col cols="4">
+              <v-btn @click="openDialogPatientHistory(item)" block>View Patient's Prescription History</v-btn>
+            </v-col>
+            <v-col cols="4">
+              <v-btn @click="openPatientGlassesInformation(item)" block>View Patient's Spectacles</v-btn>
+            </v-col>
+            <v-col cols="4">
+              <v-btn @click="openMoreHistoryDialog(item)" block>View Patient's Medical History</v-btn>
+            </v-col>
+          </v-row>
+        </td>
+      </tr>
 
-        <!--DIALOG FOR DELETE USER-->
+      <!--DIALOG FOR DELETE USER-->
       <v-dialog v-model="dialogDelete" max-width="200px">
         <v-card>
           <v-card-title style="font-weight: bold; text-align: center;">Delete this user?</v-card-title>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color=#35623D variant="text" @click="closeDelete">Cancel</v-btn>
-            <v-btn color=#35623D variant="text" @click="deleteUserConfirm">OK</v-btn>
+            <v-btn color="#35623D" variant="text" @click="closeDelete">Cancel</v-btn>
+            <v-btn color="#35623D" variant="text" @click="deleteUserConfirm">OK</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
       </v-dialog>
 
-
-
-      <!--Dialog for Patient HIstory-->
-<v-dialog v-model="dialogPatientHistory" max-width="1300px">
-  <v-card>
-    <v-card-title>{{ item.first_name }}'s Past Prescriptions</v-card-title>
-    <v-card-text>
-      <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
-      <span>&nbsp;</span>
-      <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
-
-      <!--PRESCRIPTIONS-->
-      <!-- Sort prescriptions from latest to oldest -->
-      <v-card v-for="(prescription, index) in item.prescription.slice().reverse()" :key="index" class="mb-4">
-        <v-card-title>Prescription Date: {{ prescription.date_updated }}</v-card-title> <!-- Changed title here -->
+      <!--DIALOG FOR PATIENT HISTORY-->
+    <v-dialog v-model="dialogPatientHistory" max-width="1300px">
+      <v-card>
+        <v-card-title v-if="selectedUser">Prescriptions for {{ selectedUser.user_name }}</v-card-title>
         <v-card-text>
-          <v-row>
-            <v-col cols="3" md="3">
-              <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
-            </v-col>
-            <v-col cols="3" md="3">
-              <strong>Left Eye Cylinder:</strong> {{ prescription.left_eye_cylinder }}
-            </v-col>
-            <v-col cols="3" md="4">
-              <strong>Left Eye Axis:</strong> {{ prescription.left_eye_axis }}
-            </v-col>
-            <v-col cols="3" md="3">
-              <strong>Right Eye Sphere:</strong> {{ prescription.right_eye_sphere }}
-            </v-col>
-            <v-col cols="3" md="3">
-              <strong>Right Eye Cylinder:</strong> {{ prescription.right_eye_cylinder }}
-            </v-col>
-            <v-col cols="3" md="4">
-              <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
-            </v-col>
-            <v-col cols="3" md="3">
-              <strong>Reading Add:</strong> {{ prescription.reading_add }}
-            </v-col>
-            <v-col cols="3" md="3">
-              <strong>Best Visual Acuity:</strong> {{ prescription.best_visual_acuity }}
-            </v-col>
-            <v-col cols="4" md="6">
-              <strong>PD:</strong> {{ prescription.PD }}
-            </v-col>
-            <v-btn color="error" @click="deletePrescription(item, index)">Delete</v-btn>
-          </v-row>
+          <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
+          <span>&nbsp;</span>
+          <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
+          
+          <v-card v-for="(prescription, index) in selectedUserPrescriptions" :key="index" class="mb-4">
+            <v-card-title v-if="prescription.user_id === selectedUser.user_id">Prescription Date: {{ prescription.date_updated }}</v-card-title>
+            <v-card-text v-if="prescription.user_id === selectedUser.user_id">
+              <v-row>
+                <v-col cols="3" md="3">
+                  <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
+                </v-col>
+                <v-col cols="3" md="3">
+                  <strong>Left Eye Cylinder:</strong> {{ prescription.left_eye_cylinder }}
+                </v-col>
+                <v-col cols="3" md="4">
+                  <strong>Left Eye Axis:</strong> {{ prescription.left_eye_axis }}
+                </v-col>
+                <v-col cols="3" md="3">
+                  <strong>Right Eye Sphere:</strong> {{ prescription.right_eye_sphere }}
+                </v-col>
+                <v-col cols="3" md="3">
+                  <strong>Right Eye Cylinder:</strong> {{ prescription.right_eye_cylinder }}
+                </v-col>
+                <v-col cols="3" md="4">
+                  <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
+                </v-col>
+                <v-col cols="3" md="3">
+                  <strong>Reading Add:</strong> {{ prescription.reading_add }}
+                </v-col>
+                <v-col cols="3" md="3">
+                  <strong>Best Visual Acuity:</strong> {{ prescription.best_visual_acuity }}
+                </v-col>
+                <v-col cols="4" md="6">
+                  <strong>PD:</strong> {{ prescription.PD }}
+                </v-col>
+                <v-btn color="error" @click="deletePrescription(index)">Delete</v-btn>
+              </v-row>
+            </v-card-text>
+          </v-card>
         </v-card-text>
       </v-card>
-
-      <!-- New Box for Prescriptions -->
-      <v-card class="mb-4">
-        <v-card-title>New Prescription</v-card-title>
-        <v-card-text>
-          <!-- Content for adding a new prescription goes here -->
-          <!-- You can use your existing dialog and form components here -->
-          <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Prescription</v-btn> -->
-        </v-card-text>
-      </v-card>
-    </v-card-text>
-  </v-card>
-</v-dialog>
+    </v-dialog>
 
 
+      <!--DONE NA YUNG TAAS-->
 
-      <!--DIALOG FOR EYE UPDATE-->
-<v-dialog v-model="childUpdateDialog" max-width="500px">
-  <v-card>
-    <v-card-title>
-      New Prescription
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-card-text>
-      <v-form>
-        <v-container>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" required></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field v-model="editedItem.PD" label="PD" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.reading_add" label="Reading Add" required></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity" required></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn color="primary" @click="saveNewPrescription">Save</v-btn>
-      <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+          
 
-<!--DIALOG FOR DETAILED HISTORY-->
-<template>
-  <v-dialog v-model="MoreHistoryDialog" max-width="1200px">
-    <v-card>
-      <v-card-title>{{ item.first_name }}'s Medical History</v-card-title>
-      <v-card-text>
-        <v-btn color="#35623D" @click="openMedicalHistoryDialog">Add New</v-btn>
-        <span>&nbsp;</span>
-        <v-btn color="error" @click="closeMoreHistoryDialog">Close</v-btn>
-        <!-- FIRST CARD -->
-
-        
-        <v-card  v-for="(history, index) in item.history.slice().reverse()" :key="index" class="mb-12">
-          <v-card-title>Updated at: {{ history.history_updated }}</v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="3" md="12">
-                <strong>Medical Health Record:</strong> {{ history.user_medical_health  }} 
-              </v-col>
-              <v-col cols="3" md="12">
-                <strong>Ocular Health Record:</strong> {{ history.user_ocular_health }}
-              </v-col>
-              <v-btn color="error" @click="deleteGlasses(item, index)">Delete</v-btn>
-            </v-row>
-          </v-card-text>
-        </v-card>
-        <v-card class="mb-4">
-              <v-card-title>New Medical History</v-card-title>
-              <v-card-text>
-                <!-- Content for adding new glasses information goes here -->
-                <!-- You can use your existing dialog and form components here -->
-                <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Glasses Information</v-btn> -->
-              </v-card-text>
-            </v-card>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
-</template>
-
-      <!--GLASSES INFORMATION-->
-     <v-dialog v-model="PatientGlassesInformation" max-width="1000px">
+      <!--DIALOG FOR EYE UPDATE/PRESCRIPTION-->
+      <v-dialog v-model="childUpdateDialog" max-width="500px">
         <v-card>
-          <v-card-title>{{ item.first_name }}'s Spectacles</v-card-title>
-          <v-card-text>
-            <v-btn @click="openGlassesUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add New</v-btn>
-              <span>&nbsp;</span>
-            <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
-
-            <v-card v-for="(glasses, index) in item.glasses.slice().reverse()" :key="index" class="mb-4">
-              <v-card-title>Updated at: {{ glasses.glasses_updated }}</v-card-title> <!-- Changed title here -->
-              <v-card-text>
-                <v-row>
-                  <v-col cols="3" md="6">
-                    <strong>Frame:</strong> {{ glasses.frame }}
-                  </v-col>
-                  <v-col cols="3" md="6">
-                    <strong>Type of Lens:</strong> {{ glasses.type_lens }}
-                  </v-col>
-                  <v-col cols="12" md="12">
-                    <strong>Remarks:</strong> {{ glasses.remarks }}
-                  </v-col>
-                  <v-btn color="error" @click="deleteGlasses(item, index)">Delete</v-btn>
-                </v-row>
-              </v-card-text>
-            </v-card>
-
-            <!-- New Box for Glasses -->
-            <v-card class="mb-4">
-              <v-card-title>New User's Spectacles</v-card-title>
-              <v-card-text>
-                <!-- Content for adding new glasses information goes here -->
-                <!-- You can use your existing dialog and form components here -->
-                <!-- Example: <v-btn @click="openChildUpdateDialog" color="#35623D" dark>Add Glasses Information</v-btn> -->
-              </v-card-text>
-            </v-card>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-      
-      <!--DIALOG FOR GLASS UPDATE-->
-      <v-dialog v-model="GlassesUpdateDialog" max-width="500px">
-        <v-card>
-          <v-card-title>
-            Glass Update
-          </v-card-title>
+          <v-card-title>New Prescription</v-card-title>
           <v-divider></v-divider>
           <v-card-text>
             <v-form>
               <v-container>
                 <v-row>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.frame" label="Frame"  required></v-text-field>
+                    <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" required></v-text-field>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.type_lens" label="Type of Lens"  required></v-text-field>
+                    <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" required></v-text-field>
                   </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.reading_add" label="Reading Add" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.PD" label="PD" required></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
             </v-form>
           </v-card-text>
+          <v-divider></v-divider>
           <v-card-actions>
-            <v-btn color="primary" @click="saveGlassInformation">Save</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="#35623D" @click="savePrescription">Save</v-btn>
             <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-
-      <!--DIALOG FOR ADD MEDICAL HISTORY-->
-      <v-dialog v-model="MedicalHistoryDialog" max-width="500px">
+      <!--DIALOG FOR PATIENT GLASSES-->
+      <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
         <v-card>
-          <v-card-title>
-            Add New Medical History
-          </v-card-title>
+          <v-card-title>{{ selectedUser.user_name }}'s Spectacles Information</v-card-title>
+          <v-card-text>
+            <v-btn @click="openChildGlassesDialog" color="#35623D" dark style="font-weight: bold;">Add Spectacles</v-btn>
+            <span>&nbsp;</span>
+            <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
+
+            <v-card v-for="(glasses, index) in selectedUserGlasses" :key="index" class="mb-4">
+              <v-card-title>Order Date: {{ glasses.date_updated }}</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="3" md="3">
+                    <strong>Brand:</strong> {{ editedItem.brand }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Frame:</strong> {{ editedItem.frame }}
+                  </v-col>
+                  <v-col cols="3" md="4">
+                    <strong>Lens:</strong> {{ editedItem.lens }}
+                  </v-col>
+                  <v-btn color="error" @click="deleteGlasses(selectedUser, index)">Delete</v-btn>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <!--DIALOG FOR GLASSES UPDATE-->
+      <v-dialog v-model="childGlassesDialog" max-width="500px">
+        <v-card>
+          <v-card-title>New Glasses</v-card-title>
           <v-divider></v-divider>
           <v-card-text>
             <v-form>
               <v-container>
                 <v-row>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.user_medical_health" label="Medical Health Record" required></v-textarea>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.frame" label="Brand" required></v-text-field>
                   </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.user_ocular_health" label="Ocular Health Record" required></v-textarea>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.type_of_lens" label="Frame" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.remarks" label="Lens" required></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
             </v-form>
           </v-card-text>
+          <v-divider></v-divider>
           <v-card-actions>
-            <v-btn color="primary" @click="saveGlassInformation">Save</v-btn>
-            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="#35623D" @click="saveChildGlasses">Save</v-btn>
+            <v-btn color="error" @click="closeChildGlassesDialog">Cancel</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!--DIALOG FOR MORE HISTORY-->
+      <v-dialog v-model="dialogMoreHistory" max-width="1300px">
+        <v-card>
+          <v-card-title>{{ selectedUser.user_name }}'s Medical History</v-card-title>
+          <v-card-text>
+            <v-btn @click="openChildHistoryDialog" color="#35623D" dark style="font-weight: bold;">Add Medical History</v-btn>
+            <span>&nbsp;</span>
+            <v-btn color="primary" @click="closeMoreHistoryDialog">Close</v-btn>
+
+            <v-card v-for="(history, index) in selectedUserHistory" :key="index" class="mb-4">
+              <v-card-title>Date: {{ history.date_updated }}</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="3" md="3">
+                    <strong>Medical Condition:</strong> {{ history.medical_condition }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Notes:</strong> {{ history.notes }}
+                  </v-col>
+                  <v-btn color="error" @click="deleteHistory(selectedUser, index)">Delete</v-btn>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <!--DIALOG FOR HISTORY UPDATE-->
+      <v-dialog v-model="childHistoryDialog" max-width="500px">
+        <v-card>
+          <v-card-title>New Medical History</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-form>
+              <v-container>
+                <v-row>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.medical_condition" label="Medical Condition" required></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.notes" label="Notes" required></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-form>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="#35623D" @click="saveChildHistory">Save</v-btn>
+            <v-btn color="error" @click="closeChildHistoryDialog">Cancel</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
     </template>
   </v-data-table>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      dialogPatientHistory: false,
-      childUpdateDialog: false,
-      vaccinationDialog: false,
-      detailedPrescription: false,
-      MoreHistoryDialog: false,
-      PatientGlassesInformation: false,
-      GlassesUpdateDialog: false,
-      MedicalHistoryDialog: false,
-      childUpdateDialog: false,
-      dialogAddPrescription: false,
-      viewingRecords: false,
+      search: '',
       dialog: false,
       dialogDelete: false,
-
-      deleteRecordIndex: -1,
+      dialogPatientHistory: false,
+      childUpdateDialog: false,
+      dialogPatientGlassesInformation: false,
+      childGlassesDialog: false,
+      dialogMoreHistory: false,
+      childHistoryDialog: false,
       editedItem: {
         user_id: '',
-        first_name: '',
-        middle_name: '',
-        last_name: '',
-        extension: '',
-        contact_number: '',
-        address: '',
-        full_name: '',
-        email: '',
-        sex_at_birth: '',
-        birth_date: ''
+        user_name: '',
+        user_email: '',
+        user_address: '',
+        user_contact_number: '',
+        user_birthdate: '',
+        password: '',
+        confirm_password: '',
+        passwordVisible: false,
+        confirmPasswordVisible: false,
+        left_eye_sphere: '',
+        right_eye_sphere: '',
+        left_eye_cylinder: '',
+        right_eye_cylinder: '',
+        left_eye_axis: '',
+        right_eye_axis: '',
+        reading_add: '',
+        best_visual_acuity: '',
+        PD: '',
+        date_updated: '',
+        type_of_lens: '',
+        frame: '',
+        remarks: '',
+        medical_condition: '',
+        notes: '',
       },
-      headers: [
+       headers: [
         { title: 'User ID', align: 'start', key: 'user_id' },
-        { title: 'Parent Name', align: 'start', key: 'full_name' },
-        { title: 'Contact Number', key: 'contact_number' },
+        { title: 'Parent Name', align: 'start', key: 'user_full_name' },
+        { title: 'Contact Number', key: 'user_contact_number' },
         { title: 'Address', key: 'address' }, 
         { title: 'Actions', sortable: false },
       ],
-
-      search: '',
-      newPrescription: {
-        user_id: '', 
-        left_eye_sphere: '',
-        left_eye_cylinder: '',
-        left_eye_axis: '',
-
-        right_eye_sphere: '',
-        right_eye_cylinder: '',
-        right_eye_axis: '',
-
-        reading_add: '',
-        best_visual_acuity: '',
-
-        PD: '',
-        date_updated: '',
-      },
-      
-    users: [
+      displayedUsers: [
         {
-        user_id: '1',
-        first_name: 'Ferdinand',
-        middle_name: 'A',
-        last_name: 'Espiritu',
-        extension: '',
-        contact_number: '09668109204',
-        address: 'San Narciso, Zambales',
-        full_name: 'Ferdinand Espiritu',
-        email: 'sample@example.com',
-        sex_at_birth: 'Male',
-        birth_date: '2003-05-13',
-      
-    prescription: [
-        { 
-        user_id: 1, 
-        left_eye_sphere: -1.4,
-        left_eye_cylinder: -2.00,
-        left_eye_axis: 50,
-
-        right_eye_sphere: -1.4,
-        right_eye_cylinder: -2.00,
-        right_eye_axis: 50,
-
-        reading_add: +3.00,
-        best_visual_acuity: 19,
-
-        PD: 50.5,
-        date_updated: '05/13/2003',
-      },
-    ],
-
-    glasses: [
-        { 
-        user_id: 1,
-          
-        frame: 'Brownline',
-        type_lens: 'Bifocals',
-        remarks: 'Very clear',
-
-        glasses_updated: '12/31/2002'
+          user_id: '1',
+          user_name: 'John Doe',
+          contact_number: '1234567890',
+          address: '123 Main St, Cityville',
+          showPrescriptions: false,
         },
-      ],
-
-    history: [
-        { 
-        user_id: 1,
-
-        user_medical_health: 'Had operation in the arms',
-        user_ocular_health: 'Operation in the left eye',
-
-        history_updated: '12/31/2024'
+        {
+          user_id: '2',
+          user_name: 'Jane Smith',
+          contact_number: '0987654321',
+          address: '456 Elm St, Townsville',
+          showPrescriptions: false,
         },
-        
-      ],
-
-
-        },
-        
       ],
       
-    };
-    
-  },
-  computed: {
-    displayedUsers() {
-      const searchTerm = this.search.toLowerCase();
-      return this.users.filter((users) =>
-        Object.values(users).some(
-          (value) =>
-            typeof value === 'string' && value.toLowerCase().includes(searchTerm)
-        )
-      );
-    },
-    formattedBestVisualAcuity: {
-      get() {
-        return `20/${this.editedItem.best_visual_acuity}`;
-      },
-      set(value) {
-        this.editedItem.best_visual_acuity = value.replace(/^20\//, '');
-      }
-    },
-
-  },
   
+      selectedUser: null,
+      selectedUserPrescriptions: [
+        {
+          date_updated: '2024-05-13',
+
+          user_id: '1',
+          left_eye_sphere: '13',
+          left_eye_cylinder: '12',
+          left_eye_axis: '10',
+
+          right_eye_sphere: '12',
+          right_eye_cylinder: '10',
+          right_eye_axis: '9',
+
+          reading_add: '20',
+          best_visual_acuity: '20/20',
+          PD: 10,
+        },
+        {
+          date_updated: '2024-05-22',
+
+          user_id: '2',
+          left_eye_sphere: '42',
+          left_eye_cylinder: '64',
+          left_eye_axis: '34',
+
+          right_eye_sphere: '76',
+          right_eye_cylinder: '23',
+          right_eye_axis: '4',
+
+          reading_add: '12',
+          best_visual_acuity: '20/13',
+          PD: 10,
+        },
+      ],
+      
+      selectedUserGlasses: [],
+      selectedUserHistory: [],
+    };
+  },
   methods: {
     openDialog() {
-    this.dialog = true;
-  },
+      this.dialog = true;
+    },
     closeDialog() {
-    this.dialog = false;
-  },
-  
-    viewPrescriptions(user) { 
+      this.dialog = false;
+      this.resetEditedItem();
+    },
+    saveNewUser() {
+  // Add the new user to the displayedUsers array
+      this.displayedUsers.push({ ...this.editedItem, user_id: this.displayedUsers.length + 1 });
+      this.closeDialog();
+    },
+    viewPrescriptions(user) {
       user.showPrescriptions = !user.showPrescriptions;
     },
-    togglePrescriptionEdit(user, prescription) {
-      prescription.editing = !prescription.editing;
-    },
-    deletePrescription(user, index) {
-      if (confirm('Are you sure you want to delete this prescription?')) {
-        user.prescription.splice(index, 1);
-      }
-    },
-
-    deleteUser(item) {
-      // Set the deleteRecordIndex and open the delete confirmation dialog
-      this.deleteRecordIndex = this.users.indexOf(item);
+    deleteUser(user) {
+      this.selectedUser = user;
       this.dialogDelete = true;
     },
-
     deleteUserConfirm() {
-      if (this.deleteRecordIndex !== -1) {
-        // Remove the user at deleteRecordIndex
-        this.users.splice(this.deleteRecordIndex, 1);
-        this.dialogDelete = false;
-        this.deleteRecordIndex = -1;
+      const index = this.displayedUsers.indexOf(this.selectedUser);
+      if (index > -1) {
+        this.displayedUsers.splice(index, 1);
       }
+      this.dialogDelete = false;
+      this.selectedUser = null;
     },
-
     closeDelete() {
       this.dialogDelete = false;
-      this.deleteRecordIndex = -1;
     },
-
-    openChildUpdateDialog() {
-    // Initialize fields for new prescription
-    this.updatedLeftSphere = null;
-    this.updatedRightSphere = null;
-    this.updatedLeftCylinder = null;
-    this.updatedRightCylinder = null;
-    this.updatedLeftAxis = null;
-    this.updatedRightAxis = null;
-    this.updatePD = null;
-    this.newPrescription.dateUpdated = new Date().toISOString().split('T')[0]
-
-    // Show child update dialog
-    this.childUpdateDialog = true;
-  },
-  
-  openMoreHistoryDialog() {
-    this.MoreHistoryDialog = true;
-  },
-
-  closeMoreHistoryDialog() {
-    this.MoreHistoryDialog = false;
-  },
-
-  openPatientGlassesInformation(item) {
-
-    this.PatientGlassesInformation = true;
-  },
-
-  openGlassesUpdateDialog() {
-    this.GlassesUpdateDialog = true;
-  },
-
-  closePatientGlassesInformation() {
-     this.PatientGlassesInformation = false;
-  },
-
-   closeGlassesUpdateDialog() {
-      this.GlassesUpdateDialog = false;
-    },
-
- saveGlassInformation() {
-  const newGlassInformation = {
-    reading_add: this.editedItem.reading_add,
-    best_visual_acuity: this.editedItem.best_visual_acuity,
-    frame: this.editedItem.frame,
-    type_lens: this.editedItem.type_lens,
-    remarks: this.editedItem.remarks,
-    glasses_updated: new Date().toLocaleDateString(), // Set the current date automatically
-  };
-
-  const selectedUser = this.users[0]; // Assuming you want to add the information to the first user
-  selectedUser.glasses.push(newGlassInformation);
- 
-
-  this.closeGlassesUpdateDialog();
-},
-
-  openMedicalHistoryDialog(item) {
-    this.selectedItem = item;
-    this.MedicalHistoryDialog = true;
-  },
-  closeMoreHistoryDialog() {
-      this.MoreHistoryDialog = false;
-      this.selectedItem = null; // Reset the selected item when the dialog is closed
-    },
-    
-
- 
-
-
-
- saveNewPrescription() {
-  // Create a new prescription object
-  const newPrescription = {
-    left_eye_sphere: this.editedItem.left_eye_sphere,
-    right_eye_sphere: this.editedItem.right_eye_sphere,
-    left_eye_cylinder: this.editedItem.left_eye_cylinder,
-    right_eye_cylinder: this.editedItem.right_eye_cylinder,
-    left_eye_axis: this.editedItem.left_eye_axis,
-    right_eye_axis: this.editedItem.right_eye_axis,
-    PD: this.editedItem.PD,
-    date_updated: new Date().toLocaleDateString(), // Set the current date automatically
-  };
-      const selectedUser = this.users[0]; // Assuming you want to add the prescription to the first user
-      selectedUser.prescription.push(newPrescription);
-
-      // Close the dialog after saving the prescription
-      this.closeChildUpdateDialog();
-},
-    
-
-     closeChildUpdateDialog() {
-      this.childUpdateDialog = false;
-    },
-
-    updateChildInfo() {
-      
-      this.closeChildUpdateDialog();
-    },
-
-    openVaccinationDialog(item) {
-      this.vaccinationDialog = true;
-      this.vaccines = item.vaccine;
-    },
-
-    closeVaccinationDialog() {
-      this.vaccinationDialog = false;
-    },
-
-    openDialogPatientHistory(item) {
+    openDialogPatientHistory(user) {
+      this.selectedUser = user;
       this.dialogPatientHistory = true;
+        
     },
-
     closeDialogPatientHistory() {
       this.dialogPatientHistory = false;
-    },  
-
-
-
-
-    saveNewUser() {
-      const newUser = {
-        user_id: this.editedItem.user_id,
-        first_name: this.editedItem.full_name,
-        contact_number: this.editedItem.contact_number,
-        address: this.editedItem.address,
-        child_name: this.editedItem.child_name,
-        child_age: this.editedItem.child_age,
-        prescriptions: [],
-      };
-
-        // Check if the user ID already exists
-      const existingUser = this.users.find((u) => u.user_id === newUser.user_id);
-
-      if (existingUser) {
-        // User already exists, show an alert
-        alert('User ID already exists! Please use a different ID.');
-      } else {
-        // User does not exist, confirm and save the new user
-        if (confirm('Are you sure you want to save this new user?')) {
-          this.users.push(newUser);
-          this.closeDialog();
-        }
-      }
+      this.selectedUser = null;
     },
+    deletePrescription(index) {
+      this.selectedUserPrescriptions.splice(index, 1);
+    },
+    openChildUpdateDialog(prescription) {
+      this.editedItem = { ...prescription };
+      this.childUpdateDialog = true;
+    },
+    closeChildUpdateDialog() {
+      this.childUpdateDialog = false;
+      this.resetEditedItem();
+    },
+    savePrescription() {
+       const newPrescription = {
+          date_updated: new Date().toISOString().slice(0, 10),
+          user_id: this.selectedUser.user_id,
+          left_eye_sphere: this.editedItem.left_eye_sphere,
+          right_eye_sphere: this.editedItem.right_eye_sphere,
+          left_eye_cylinder: this.editedItem.left_eye_cylinder,
+          right_eye_cylinder: this.editedItem.right_eye_cylinder,
+          left_eye_axis: this.editedItem.left_eye_axis,
+          right_eye_axis: this.editedItem.right_eye_axis,
+          reading_add: this.editedItem.reading_add,
+          best_visual_acuity: this.editedItem.best_visual_acuity,
+          PD: this.editedItem.PD,
+        };
 
-saveRecord(user, prescription) {
-  if (confirm('Are you sure you want to save this edited prescription?')) {
-    prescription.editing = false;
-    // Optionally, you can add code here to save the edited prescription to the database
-  }
-},
+        this.selectedUserPrescriptions.push(newPrescription);
+
+        this.childUpdateDialog = false;
+      },
+    openDialogPatientGlassesInformation(user) {
+      this.selectedUser = user;
+      this.dialogPatientGlassesInformation = true;
+      // Fetch glasses information for the selected user
+      this.selectedUserGlasses = this.fetchGlasses(user.user_id);
+    },
+    closePatientGlassesInformation() {
+      this.dialogPatientGlassesInformation = false;
+      this.selectedUser = null;
+    },
+    openChildGlassesDialog() {
+      this.childGlassesDialog = true;
+    },
+    closeChildGlassesDialog() {
+      this.childGlassesDialog = false;
+      this.resetEditedItem();
+    },
+    saveChildGlasses() {
+      this.selectedUserGlasses.push({ ...this.editedItem });
+      this.closeChildGlassesDialog();
+    },
+    deleteGlasses(user, index) {
+      user.selectedUserGlasses.splice(index, 1);
+    },
+    openDialogMoreHistory(user) {
+      this.selectedUser = user;
+      this.dialogMoreHistory = true;
+      // Fetch medical history for the selected user
+      this.selectedUserHistory = this.fetchMedicalHistory(user.user_id);
+    },
+    closeMoreHistoryDialog() {
+      this.dialogMoreHistory = false;
+      this.selectedUser = null;
+    },
+    openChildHistoryDialog() {
+      this.childHistoryDialog = true;
+    },
+    closeChildHistoryDialog() {
+      this.childHistoryDialog = false;
+      this.resetEditedItem();
+    },
+    saveChildHistory() {
+      this.selectedUserHistory.push({ ...this.editedItem });
+      this.closeChildHistoryDialog();
+    },
+    deleteHistory(user, index) {
+      user.selectedUserHistory.splice(index, 1);
+    },
+    fetchPrescriptions(userId) {
+      // Fetch prescriptions from the backend or other source
+      return [];
+    },
+    fetchGlasses(userId) {
+      // Fetch glasses information from the backend or other source
+      return [];
+    },
+    fetchMedicalHistory(userId) {
+      // Fetch medical history from the backend or other source
+      return [];
+    },
+    resetEditedItem() {
+      this.editedItem = {
+        user_name: '',
+        user_email: '',
+        user_address: '',
+        user_contact_number: '',
+        user_birthdate: '',
+        password: '',
+        confirm_password: '',
+        passwordVisible: false,
+        confirmPasswordVisible: false,
+        left_eye_sphere: '',
+        right_eye_sphere: '',
+        left_eye_cylinder: '',
+        right_eye_cylinder: '',
+        left_eye_axis: '',
+        right_eye_axis: '',
+        reading_add: '',
+        best_visual_acuity: '',
+        PD: '',
+        brand: '',
+        frame: '',
+        lens: '',
+        medical_condition: '',
+        notes: '',
+      };
+    },
   },
-
-
 };
 </script>
 
 <style>
-.v-card:hover {
-  background-color: #f0f0f0; /* Set the hover color here */
-}
-
 </style>
