@@ -101,7 +101,7 @@
               <v-btn @click="openDialogPatientHistory(item)" block>View Patient's Prescription History</v-btn>
             </v-col>
             <v-col cols="4">
-              <v-btn @click="openPatientGlassesInformation(item)" block>View Patient's Spectacles</v-btn>
+              <v-btn @click="openDialogPatientGlassesInformation(item)" block>View Patient's Spectacles</v-btn>
             </v-col>
             <v-col cols="4">
               <v-btn @click="openMoreHistoryDialog(item)" block>View Patient's Medical History</v-btn>
@@ -229,34 +229,38 @@
 
           
       <!--DIALOG FOR PATIENT GLASSES-->
-      <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
-        <v-card>
-          <v-card-title>{{ selectedUser.user_name }}'s Spectacles Information</v-card-title>
-          <v-card-text>
-            <v-btn @click="openChildGlassesDialog" color="#35623D" dark style="font-weight: bold;">Add Spectacles</v-btn>
-            <span>&nbsp;</span>
-            <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
+      <template>
+        <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
+          <v-card>
+            <v-card-title>{{ selectedUser.user_name }}'s Spectacles Information</v-card-title>
+            <v-card-text>
+              <v-btn @click="openChildGlassesDialog" color="#35623D" dark style="font-weight: bold;">Add Spectacles</v-btn>
+              <span>&nbsp;</span>
+              <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
 
-            <v-card v-for="(glasses, index) in selectedUserGlasses" :key="index" class="mb-4">
-              <v-card-title>Order Date: {{ glasses.date_updated }}</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <v-col cols="3" md="3">
-                    <strong>Brand:</strong> {{ editedItem.brand }}
-                  </v-col>
-                  <v-col cols="3" md="3">
-                    <strong>Frame:</strong> {{ editedItem.frame }}
-                  </v-col>
-                  <v-col cols="3" md="4">
-                    <strong>Lens:</strong> {{ editedItem.lens }}
-                  </v-col>
-                  <v-btn color="error" @click="deleteGlasses(selectedUser, index)">Delete</v-btn>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+              <v-card v-for="(glasses, index) in selectedUserGlasses" :key="index" class="mb-4">
+                <v-card-title v-if="glasses.user_id === selectedUser.user_id">Date Updated: {{ glasses.glasses_date_updated }}</v-card-title>
+                <v-card-text v-if="glasses.user_id === selectedUser.user_id">
+                  <v-row>
+                    <v-col cols="3" md="3">
+                      <strong>Frame:</strong> {{ glasses.frame }}
+                    </v-col>
+                    <v-col cols="3" md="3">
+                      <strong>Type of Lens:</strong> {{ glasses.type_of_lens }}
+                    </v-col>
+                    <v-col cols="4" md="4">
+                      <strong>Remarks:</strong> {{ glasses.remarks }}
+                    </v-col>
+                    <v-col cols="2" md="12">
+                      <v-btn color="error" @click="deleteGlasses(index)">Delete</v-btn>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+      </template>
 
       <!--DIALOG FOR GLASSES UPDATE-->
       <v-dialog v-model="childGlassesDialog" max-width="500px">
@@ -381,9 +385,10 @@ export default {
         best_visual_acuity: '',
         PD: '',
         date_updated: '',
-        type_of_lens: '',
         frame: '',
+        type_of_lens: '',
         remarks: '',
+        glasses_date_updated: '',
         medical_condition: '',
         notes: '',
       },
@@ -448,7 +453,25 @@ export default {
         },
       ],
       
-      selectedUserGlasses: [],
+      selectedUserGlasses: [
+        {
+          user_id: '1',
+          glasses_date_updated: '05/31/2020',
+
+          frame: 'brownline',
+          type_of_lens: 'photocromic',
+          remarks: 'Very high contras',
+        },
+        {
+          user_id: '2',
+          glasses_date_updated: '11/26/2020',
+
+          frame: 'wood',
+          type_of_lens: 'thick',
+          remarks: 'Very high astigmatism',
+        },
+        
+      ],
       selectedUserHistory: [],
     };
   },
@@ -523,10 +546,8 @@ export default {
         this.childUpdateDialog = false;
       },
     openDialogPatientGlassesInformation(user) {
-      this.selectedUser = user;
-      this.dialogPatientGlassesInformation = true;
-      // Fetch glasses information for the selected user
-      this.selectedUserGlasses = this.fetchGlasses(user.user_id);
+       this.selectedUser = user;
+       this.dialogPatientGlassesInformation = true;
     },
     closePatientGlassesInformation() {
       this.dialogPatientGlassesInformation = false;
@@ -537,10 +558,10 @@ export default {
     },
     closeChildGlassesDialog() {
       this.childGlassesDialog = false;
-      this.resetEditedItem();
+      this.reseteditedGlasses();
     },
     saveChildGlasses() {
-      this.selectedUserGlasses.push({ ...this.editedItem });
+      this.selectedUserGlasses.push({ ...this.editedGlasses });
       this.closeChildGlassesDialog();
     },
     deleteGlasses(user, index) {
