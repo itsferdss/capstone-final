@@ -221,13 +221,6 @@
         </v-card>
       </v-dialog>
 
-
-      
-
-
-      <!--DONE NA YUNG TAAS-->
-
-          
       <!--DIALOG FOR PATIENT GLASSES-->
       <template>
         <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
@@ -272,13 +265,13 @@
               <v-container>
                 <v-row>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.frame" label="Brand" required></v-text-field>
+                    <v-text-field v-model="editedItem.frame" label="Frame" required></v-text-field>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.type_of_lens" label="Frame" required></v-text-field>
+                    <v-text-field v-model="editedItem.type_of_lens" label="Type of Lens" required></v-text-field>
                   </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.remarks" label="Lens" required></v-text-field>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
                   </v-col>
                 </v-row>
               </v-container>
@@ -287,11 +280,19 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="#35623D" @click="saveChildGlasses">Save</v-btn>
             <v-btn color="error" @click="closeChildGlassesDialog">Cancel</v-btn>
+                 <v-btn color="#35623D" @click="saveChildGlasses">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+      
+      
+
+
+      <!--DONE NA YUNG TAAS-->
+
+          
 
       <!--DIALOG FOR MORE HISTORY-->
       <v-dialog v-model="dialogMoreHistory" max-width="1300px">
@@ -553,16 +554,24 @@ export default {
       this.dialogPatientGlassesInformation = false;
       this.selectedUser = null;
     },
-    openChildGlassesDialog() {
+    openChildGlassesDialog(glasses) {
+      this.editedItem = { ...glasses };
       this.childGlassesDialog = true;
     },
     closeChildGlassesDialog() {
       this.childGlassesDialog = false;
-      this.reseteditedGlasses();
+      this.resetEditedItem();
     },
     saveChildGlasses() {
-      this.selectedUserGlasses.push({ ...this.editedGlasses });
-      this.closeChildGlassesDialog();
+      const newGlasses = {
+        glasses_date_updated: new Date().toISOString().slice(0, 10),
+        user_id: this.selectedUser.user_id,
+        frame: this.editedItem.frame,
+        type_of_lens: this.editedItem.type_of_lens,
+        remarks: this.editedItem.remarks,
+      }
+      this.selectedUserGlasses.unshift(newGlasses);
+      this.childGlassesDialog = false;
     },
     deleteGlasses(user, index) {
       user.selectedUserGlasses.splice(index, 1);
