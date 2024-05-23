@@ -124,57 +124,53 @@
       </v-dialog>
 
       <!--DIALOG FOR PATIENT HISTORY-->
-    <v-dialog v-model="dialogPatientHistory" max-width="1300px">
-      <v-card>
-        <v-card-title v-if="selectedUser">Prescriptions for {{ selectedUser.user_name }}</v-card-title>
-        <v-card-text>
-          <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
-          <span>&nbsp;</span>
-          <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
-          
-          <v-card v-for="(prescription, index) in selectedUserPrescriptions" :key="index" class="mb-4">
-            <v-card-title v-if="prescription.user_id === selectedUser.user_id">Prescription Date: {{ prescription.date_updated }}</v-card-title>
-            <v-card-text v-if="prescription.user_id === selectedUser.user_id">
-              <v-row>
-                <v-col cols="3" md="3">
-                  <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
-                </v-col>
-                <v-col cols="3" md="3">
-                  <strong>Left Eye Cylinder:</strong> {{ prescription.left_eye_cylinder }}
-                </v-col>
-                <v-col cols="3" md="4">
-                  <strong>Left Eye Axis:</strong> {{ prescription.left_eye_axis }}
-                </v-col>
-                <v-col cols="3" md="3">
-                  <strong>Right Eye Sphere:</strong> {{ prescription.right_eye_sphere }}
-                </v-col>
-                <v-col cols="3" md="3">
-                  <strong>Right Eye Cylinder:</strong> {{ prescription.right_eye_cylinder }}
-                </v-col>
-                <v-col cols="3" md="4">
-                  <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
-                </v-col>
-                <v-col cols="3" md="3">
-                  <strong>Reading Add:</strong> {{ prescription.reading_add }}
-                </v-col>
-                <v-col cols="3" md="3">
-                  <strong>Best Visual Acuity:</strong> {{ prescription.best_visual_acuity }}
-                </v-col>
-                <v-col cols="4" md="6">
-                  <strong>PD:</strong> {{ prescription.PD }}
-                </v-col>
-                <v-btn color="error" @click="deletePrescription(index)">Delete</v-btn>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+   <v-dialog v-model="dialogPatientHistory" max-width="1300px">
+        <v-card>
+          <v-card-title>{{ selectedUser.user_name }}'s Past Prescriptions</v-card-title>
+          <v-card-text>
+            <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
+            <span>&nbsp;</span>
+            <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
+            
+            <v-card v-for="(prescription, index) in selectedUserPrescriptions" :key="index" class="mb-4">
+              <v-card-title v-if="prescription.user_id === selectedUser.user_id">Prescription Date: {{ prescription.date_updated }}</v-card-title>
+              <v-card-text v-if="prescription.user_id === selectedUser.user_id">
+                <v-row>
+                  <v-col cols="3" md="3">
+                    <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Left Eye Cylinder:</strong> {{ prescription.left_eye_cylinder }}
+                  </v-col>
+                  <v-col cols="3" md="4">
+                    <strong>Left Eye Axis:</strong> {{ prescription.left_eye_axis }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Right Eye Sphere:</strong> {{ prescription.right_eye_sphere }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Right Eye Cylinder:</strong> {{ prescription.right_eye_cylinder }}
+                  </v-col>
+                  <v-col cols="3" md="4">
+                    <strong>Right Eye Axis:</strong> {{ prescription.right_eye_axis }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Reading Add:</strong> {{ prescription.reading_add }}
+                  </v-col>
+                  <v-col cols="3" md="3">
+                    <strong>Best Visual Acuity:</strong> {{ prescription.best_visual_acuity }}
+                  </v-col>
+                  <v-col cols="4" md="6">
+                    <strong>PD:</strong> {{ prescription.PD }}
+                  </v-col>
+                  <v-btn color="error" @click="deletePrescription(index)">Delete</v-btn>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
 
-
-      <!--DONE NA YUNG TAAS-->
-
-          
 
       <!--DIALOG FOR EYE UPDATE/PRESCRIPTION-->
       <v-dialog v-model="childUpdateDialog" max-width="500px">
@@ -219,11 +215,19 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="#35623D" @click="savePrescription">Save</v-btn>
             <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
+            <v-btn color="#35623D" @click="savePrescription">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
+
+      
+
+
+      <!--DONE NA YUNG TAAS-->
+
+          
       <!--DIALOG FOR PATIENT GLASSES-->
       <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
         <v-card>
@@ -514,8 +518,8 @@ export default {
           PD: this.editedItem.PD,
         };
 
-        this.selectedUserPrescriptions.push(newPrescription);
-
+        
+        this.selectedUserPrescriptions.unshift(newPrescription);
         this.childUpdateDialog = false;
       },
     openDialogPatientGlassesInformation(user) {
