@@ -20,30 +20,17 @@ export default {
 
 <style lang="scss" scoped>
 .main-content {
+    margin: 0;
     display: flex;
     flex-direction: column;
+    margin-left: 250px;
 
     .Home {
         border-radius: 10px;
         background-color: #f0f0f0;
         padding: 0.5rem;
         height: 100vh;
-    }
-}
-
-.Home {
-    flex: 1;
-
-    .material-icons {
-        color: var(--dark);
-        font-size: 2.5rem;
-    }
-    .text {
-        position: relative;
-        color: var(--dark);
-        font-size: 1.5rem;
-        font-weight: 900;
-        bottom: 0.5rem;
+        margin-left: 200px;
     }
 }
 

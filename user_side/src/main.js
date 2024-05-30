@@ -10,4 +10,3 @@ import 'vuetify/dist/vuetify.min.css';
 
 createApp(App).use(router).use(store).use(vuetify).mount('#app')
 
-  Vue.config.productionTip = false;

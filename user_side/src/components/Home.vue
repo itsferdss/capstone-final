@@ -6,7 +6,7 @@
 
       <div class="word">
         <h3 class="greet">Hello User!</h3>
-        <h1 class="title">Welcome to Pediacare!</h1>
+        <h1 class="title">Welcome to Opticare!</h1>
         <h5 class="subtitle">Empowering healthcare innovation</h5>
       </div>
     </div>

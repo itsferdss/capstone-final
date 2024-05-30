@@ -4,7 +4,7 @@
     <div class="login-form-container">
       <div id="login">
         <h1 class="title">MVC Optical Clinic</h1>
-        <p class="subtitle">Sign in to continue</p>
+        <p class="subtitle">Sign in as ADMIN</p>
         <div class="input-group">
           <label class="inputTitle" for="username">Name</label>
           <input type="text" id="username" v-model="username" required>

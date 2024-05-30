@@ -132,6 +132,9 @@
     </v-data-table>
     </template>
     <script>
+    import Swal from 'sweetalert2';
+    import axios from 'axios';
+
     export default {
     data() {
         return {
@@ -161,16 +164,7 @@
         ],
 
         viewingRecords: false,
-        products: [
-            {
-            product_id: '1',
-            product_name: 'Ferdinand',
-            supplier: 'Eye-wear PH',
-            quantity: '10',
-            price: '102',
-            
-            },
-        ],
+        products: [],
         dialogDelete: false,
         deleteRecordIndex: -1,
         };
@@ -187,7 +181,26 @@
         );
         },
     },
+    mounted() {
+        this.fetchProducts();
+    },
     methods: {
+        fetchProducts() {
+            axios.get('http://127.0.0.1:8000/api/products')
+                .then(response => {
+                if (Array.isArray(response.data)) {
+                    this.products = response.data;
+                } else {
+                    this.error = 'Unexpected response format';
+                }
+                })
+                .catch(error => {
+                this.error = 'Error fetching products: ' + error.message;
+                });
+            },
+
+
+
         openDialog() {
         this.dialog = true;
     },

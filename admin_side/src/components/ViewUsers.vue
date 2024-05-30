@@ -2,8 +2,8 @@
   <v-data-table
     :search="search"
     :headers="headers"
-    :items="displayedUsers"
-    :sort-by="[{ key: 'userId', order: 'asc' }]"
+    :items="displayedPatients"
+    :sort-by="[{ key: 'patient_id', order: 'asc' }]"
   >
     <template v-slot:top>
       <v-toolbar flat>
@@ -32,19 +32,19 @@
               <v-container>
                 <v-row dense>
                   <v-col cols="12">
-                    <v-text-field v-model="editedItem.user_name" label="User Name*" prepend-icon="mdi-account" required></v-text-field>
+                    <v-text-field v-model="editedItem.full_name" label="User Name*" prepend-icon="mdi-account" required></v-text-field>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field v-model="editedItem.user_email" label="Email*" prepend-icon="mdi-email" required></v-text-field>
+                    <v-text-field v-model="editedItem.email" label="Email*" prepend-icon="mdi-email" required></v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
+                    <v-text-field v-model="editedItem.contact" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field v-model="editedItem.user_birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
+                    <v-text-field v-model="editedItem.birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
@@ -84,9 +84,9 @@
 
     <template v-slot:item="{ item }">
       <tr>
-        <td>{{ item.user_id }}</td>
-        <td>{{ item.user_name }}</td>
-        <td>{{ item.contact_number }}</td>
+        <td>{{ item.id }}</td>
+        <td>{{ item.full_name }} </td>
+        <td>{{ item.contact }}</td>
         <td>{{ item.address }}</td>
         <td>
           <v-icon class="me-2" size="small" style="color: #2F3F64" @click="viewPrescriptions(item)">mdi-information</v-icon>
@@ -124,17 +124,19 @@
       </v-dialog>
 
       <!--DIALOG FOR PATIENT HISTORY-->
-   <v-dialog v-model="dialogPatientHistory" max-width="1300px">
+      <v-dialog v-model="dialogPatientHistory" max-width="1300px">
         <v-card>
-          <v-card-title>{{ selectedUser.user_name }}'s Past Prescriptions</v-card-title>
+          <v-card-title>{{ selectedUser.full_name }}'s Past Prescriptions</v-card-title>
           <v-card-text>
             <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
             
+            <!-- Loop through selectedUserPrescriptions -->
             <v-card v-for="(prescription, index) in selectedUserPrescriptions" :key="index" class="mb-4">
-              <v-card-title v-if="prescription.user_id === selectedUser.user_id">Prescription Date: {{ prescription.date_updated }}</v-card-title>
-              <v-card-text v-if="prescription.user_id === selectedUser.user_id">
+              <!-- Display prescription information -->
+              <v-card-title>Prescription Date: {{ formatPrescriptionDate(prescription.created_at) }}</v-card-title>
+              <v-card-text>
                 <v-row>
                   <v-col cols="3" md="3">
                     <strong>Left Eye Sphere:</strong> {{ prescription.left_eye_sphere }}
@@ -163,7 +165,7 @@
                   <v-col cols="4" md="6">
                     <strong>PD:</strong> {{ prescription.PD }}
                   </v-col>
-                  <v-btn color="error" @click="deletePrescription(index)">Delete</v-btn>
+                <v-btn color="error" @click="deletePrescription(selectedPatient.id, prescription.id)">Delete</v-btn>
                 </v-row>
               </v-card-text>
             </v-card>
@@ -181,6 +183,9 @@
             <v-form>
               <v-container>
                 <v-row>
+                  <v-col cols="6">
+                    <v-text-field v-model="selectedPatient.id" label="Patient ID" readonly></v-text-field>
+                  </v-col>
                   <v-col cols="6">
                     <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" required></v-text-field>
                   </v-col>
@@ -221,27 +226,35 @@
         </v-card>
       </v-dialog>
 
+
+
+      <!--BACKEND DONE!!!-->
+
+
+
+
+
       <!--DIALOG FOR PATIENT GLASSES-->
       <template>
         <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
           <v-card>
-            <v-card-title>{{ selectedUser.user_name }}'s Spectacles Information</v-card-title>
+            <v-card-title>{{ selectedUser.full_name }}'s Spectacles Information</v-card-title>
             <v-card-text>
               <v-btn @click="openChildGlassesDialog" color="#35623D" dark style="font-weight: bold;">Add Spectacles</v-btn>
               <span>&nbsp;</span>
               <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
 
               <v-card v-for="(glasses, index) in selectedUserGlasses" :key="index" class="mb-4">
-                <v-card-title v-if="glasses.user_id === selectedUser.user_id">Date Updated: {{ glasses.glasses_date_updated }}</v-card-title>
-                <v-card-text v-if="glasses.user_id === selectedUser.user_id">
+                <v-card-title v-if="glasses.patient_id === selectedUser.patient_id">Date Updated: {{ glasses.glasses_date_updated }}</v-card-title>
+                <v-card-text>
                   <v-row>
-                    <v-col cols="3" md="3">
+                    <v-col cols="3" md="6">
                       <strong>Frame:</strong> {{ glasses.frame }}
                     </v-col>
-                    <v-col cols="3" md="3">
+                    <v-col cols="3" md="6">
                       <strong>Type of Lens:</strong> {{ glasses.type_of_lens }}
                     </v-col>
-                    <v-col cols="4" md="4">
+                    <v-col cols="4" md="12">
                       <strong>Remarks:</strong> {{ glasses.remarks }}
                     </v-col>
                     <v-col cols="2" md="12">
@@ -286,32 +299,24 @@
         </v-card>
       </v-dialog>
 
-      
-      
-
-
-      <!--DONE NA YUNG TAAS-->
-
-          
-
       <!--DIALOG FOR MORE HISTORY-->
       <v-dialog v-model="dialogMoreHistory" max-width="1300px">
         <v-card>
-          <v-card-title>{{ selectedUser.user_name }}'s Medical History</v-card-title>
+          <v-card-title>{{ selectedUser.full_name }}'s Medical History</v-card-title>
           <v-card-text>
             <v-btn @click="openChildHistoryDialog" color="#35623D" dark style="font-weight: bold;">Add Medical History</v-btn>
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeMoreHistoryDialog">Close</v-btn>
 
             <v-card v-for="(history, index) in selectedUserHistory" :key="index" class="mb-4">
-              <v-card-title>Date: {{ history.date_updated }}</v-card-title>
-              <v-card-text>
+              <v-card-title v-if="history.patient_id === selectedUser.patient_id">Date Updates: {{ history.history_updated }}</v-card-title>
+              <v-card-text v-if="history.patient_id === selectedUser.patient_id">
                 <v-row>
-                  <v-col cols="3" md="3">
-                    <strong>Medical Condition:</strong> {{ history.medical_condition }}
+                  <v-col cols="3" md="12">
+                    <strong>Medical History:</strong> {{ history.medical_history }}
                   </v-col>
-                  <v-col cols="3" md="3">
-                    <strong>Notes:</strong> {{ history.notes }}
+                  <v-col cols="3" md="12">
+                    <strong>Ocular History:</strong> {{ history.ocular_history }}
                   </v-col>
                   <v-btn color="error" @click="deleteHistory(selectedUser, index)">Delete</v-btn>
                 </v-row>
@@ -320,6 +325,15 @@
           </v-card-text>
         </v-card>
       </v-dialog>
+
+      
+      
+      
+
+
+      <!--DONE NA YUNG TAAS-->
+
+          
 
       <!--DIALOG FOR HISTORY UPDATE-->
       <v-dialog v-model="childHistoryDialog" max-width="500px">
@@ -330,11 +344,11 @@
             <v-form>
               <v-container>
                 <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.medical_condition" label="Medical Condition" required></v-text-field>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.medical_history" label="Medical History" required></v-textarea>
                   </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.notes" label="Notes" required></v-text-field>
+                  <v-col cols="12">
+                    <v-textarea v-model="editedItem.ocular_history" label="Ocular History" required></v-textarea>
                   </v-col>
                 </v-row>
               </v-container>
@@ -353,6 +367,9 @@
 </template>
 
 <script>
+import swal from 'sweetalert';
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -365,17 +382,19 @@ export default {
       childGlassesDialog: false,
       dialogMoreHistory: false,
       childHistoryDialog: false,
+      selectedPatient: null,
       editedItem: {
-        user_id: '',
-        user_name: '',
-        user_email: '',
-        user_address: '',
-        user_contact_number: '',
-        user_birthdate: '',
+        id: '',
+        full_name: '',
+        email: '',
+        address: '',
+        contact: '',
+        birthdate: '',
         password: '',
         confirm_password: '',
         passwordVisible: false,
         confirmPasswordVisible: false,
+
         left_eye_sphere: '',
         right_eye_sphere: '',
         left_eye_cylinder: '',
@@ -385,152 +404,121 @@ export default {
         reading_add: '',
         best_visual_acuity: '',
         PD: '',
-        date_updated: '',
+        patient_id: '',
+        prescription_id: '',
+
         frame: '',
         type_of_lens: '',
         remarks: '',
-        glasses_date_updated: '',
-        medical_condition: '',
-        notes: '',
+
+        history_updated: '',
+        medical_history: '',
+        ocular_history: '',
       },
-       headers: [
-        { title: 'User ID', align: 'start', key: 'user_id' },
-        { title: 'Parent Name', align: 'start', key: 'user_full_name' },
-        { title: 'Contact Number', key: 'user_contact_number' },
+      headers: [
+        { title: 'User ID',  key: 'id' },
+        { title: 'User Name', key: 'full_name' },
+        { title: 'Contact Number', key: 'contact' },
         { title: 'Address', key: 'address' }, 
         { title: 'Actions', sortable: false },
       ],
-      displayedUsers: [
-        {
-          user_id: '1',
-          user_name: 'John Doe',
-          contact_number: '1234567890',
-          address: '123 Main St, Cityville',
-          showPrescriptions: false,
-        },
-        {
-          user_id: '2',
-          user_name: 'Jane Smith',
-          contact_number: '0987654321',
-          address: '456 Elm St, Townsville',
-          showPrescriptions: false,
-        },
-      ],
-      
-  
-      selectedUser: null,
-      selectedUserPrescriptions: [
-        {
-          date_updated: '2024-05-13',
-
-          user_id: '1',
-          left_eye_sphere: '13',
-          left_eye_cylinder: '12',
-          left_eye_axis: '10',
-
-          right_eye_sphere: '12',
-          right_eye_cylinder: '10',
-          right_eye_axis: '9',
-
-          reading_add: '20',
-          best_visual_acuity: '20/20',
-          PD: 10,
-        },
-        {
-          date_updated: '2024-05-22',
-
-          user_id: '2',
-          left_eye_sphere: '42',
-          left_eye_cylinder: '64',
-          left_eye_axis: '34',
-
-          right_eye_sphere: '76',
-          right_eye_cylinder: '23',
-          right_eye_axis: '4',
-
-          reading_add: '12',
-          best_visual_acuity: '20/13',
-          PD: 10,
-        },
-      ],
-      
-      selectedUserGlasses: [
-        {
-          user_id: '1',
-          glasses_date_updated: '05/31/2020',
-
-          frame: 'brownline',
-          type_of_lens: 'photocromic',
-          remarks: 'Very high contras',
-        },
-        {
-          user_id: '2',
-          glasses_date_updated: '11/26/2020',
-
-          frame: 'wood',
-          type_of_lens: 'thick',
-          remarks: 'Very high astigmatism',
-        },
-        
-      ],
-      selectedUserHistory: [],
+      patients: [],
+      displayedPatients: [],
+      selectedUserPrescriptions: [],
+      selectedUserGlasses: [],
     };
   },
+  
+  mounted() {
+    this.fetchPatients();
+  },
   methods: {
-    openDialog() {
-      this.dialog = true;
+    
+    fetchPatients() {
+      axios.get('http://127.0.0.1:8000/api/patients')
+        .then(response => {
+          if (Array.isArray(response.data)) {
+            this.displayedPatients = response.data;
+          } else {
+            this.error = 'Unexpected response format';
+          }
+        })
+        .catch(error => {
+          this.error = 'Error fetching patients: ' + error.message;
+        });
     },
-    closeDialog() {
-      this.dialog = false;
-      this.resetEditedItem();
+    fetchPrescriptions(patient_id) {
+      axios.get(`/patients/${patient_id}/prescriptions`)
+        .then(response => {
+          if (Array.isArray(response.data)) {
+            this.selectedUserPrescriptions = response.data; // Update selectedUserPrescriptions
+          } else {
+            this.error = 'Unexpected response format';
+          }
+        })
+        .catch(error => {
+          this.error = 'Error fetching prescriptions: ' + error.message;
+        });
     },
-    saveNewUser() {
-  // Add the new user to the displayedUsers array
-      this.displayedUsers.push({ ...this.editedItem, user_id: this.displayedUsers.length + 1 });
-      this.closeDialog();
+    fetchGlasses(patient_id) {
+      axios.get(`/patients/${patient_id}/glasses`)
+        .then(response => {
+          if (Array.isArray(response.data)) {
+            this.selectedUserGlasses = response.data; // Update selectedUserGlasses
+          } else {
+            this.error = 'Unexpected response format';
+          }
+        })
+        .catch(error => {
+          this.error = 'Error fetching glasses: ' + error.message;
+        });
     },
-    viewPrescriptions(user) {
-      user.showPrescriptions = !user.showPrescriptions;
+     saveNewUser() {
+      axios.post('/patients', this.editedItem)
+        .then(response => {
+          this.displayedPatients.push(response.data);
+          this.closeDialog();
+          swal({
+            title: "Success",
+            text: "Patient created successfully!",
+            icon: "success",
+          });
+        })
+        .catch(error => {
+          console.error('Error creating patient', error);
+          swal({
+            title: "Error",
+            text: "Failed to create patient. Please try again later.",
+            icon: "error",
+          });
+        });
     },
-    deleteUser(user) {
-      this.selectedUser = user;
-      this.dialogDelete = true;
-    },
-    deleteUserConfirm() {
-      const index = this.displayedUsers.indexOf(this.selectedUser);
-      if (index > -1) {
-        this.displayedUsers.splice(index, 1);
-      }
-      this.dialogDelete = false;
-      this.selectedUser = null;
-    },
-    closeDelete() {
-      this.dialogDelete = false;
-    },
-    openDialogPatientHistory(user) {
-      this.selectedUser = user;
-      this.dialogPatientHistory = true;
-        
-    },
-    closeDialogPatientHistory() {
-      this.dialogPatientHistory = false;
-      this.selectedUser = null;
-    },
-    deletePrescription(index) {
-      this.selectedUserPrescriptions.splice(index, 1);
-    },
-    openChildUpdateDialog(prescription) {
-      this.editedItem = { ...prescription };
-      this.childUpdateDialog = true;
-    },
-    closeChildUpdateDialog() {
-      this.childUpdateDialog = false;
-      this.resetEditedItem();
-    },
-    savePrescription() {
-       const newPrescription = {
-          date_updated: new Date().toISOString().slice(0, 10),
-          user_id: this.selectedUser.user_id,
+      resetForm(){
+        this.editedItem = {
+          full_name: '',
+          email: '',
+          address: '',
+          contact: '',
+          birthdate: '',
+          password: '',
+        };
+      },
+      savePrescription() {
+        // Check if selectedPatient is valid
+        if (!this.selectedPatient || !this.selectedPatient.id) {
+          console.error("Error: No selected patient or patient ID");
+          return;
+        }
+
+        // Check if editedItem contains all necessary data
+        if (!this.editedItem) {
+          console.error("Error: No prescription data available");
+          return;
+        }
+
+        // Extract prescription data from editedItem
+        const prescriptionData = {
+          patient_id: this.selectedPatient.id, // Populate patient_id with selectedPatient's id
           left_eye_sphere: this.editedItem.left_eye_sphere,
           right_eye_sphere: this.editedItem.right_eye_sphere,
           left_eye_cylinder: this.editedItem.left_eye_cylinder,
@@ -539,20 +527,173 @@ export default {
           right_eye_axis: this.editedItem.right_eye_axis,
           reading_add: this.editedItem.reading_add,
           best_visual_acuity: this.editedItem.best_visual_acuity,
-          PD: this.editedItem.PD,
+          PD: this.editedItem.PD
         };
 
-        
-        this.selectedUserPrescriptions.unshift(newPrescription);
-        this.childUpdateDialog = false;
+        // Make a POST request to save the new prescription
+        axios.post(`/patients/${this.selectedPatient.id}/prescriptions`, prescriptionData)
+          .then(response => {
+            // Prescription saved successfully
+            console.log("Prescription saved successfully:", response.data);
+
+            // Provide feedback to the user
+            swal({
+              title: "Success",
+              text: "Prescription saved successfully!",
+              icon: "success",
+            });
+            // Close the dialog after saving
+            this.childUpdateDialog = false;
+
+             this.fetchPrescriptions(this.selectedPatient.id);
+          })
+          .catch(error => {
+            // Error occurred while saving the prescription
+            console.error("Error saving prescription:", error);
+
+            // Provide feedback to the user
+            swal({
+              title: "Error",
+              text: "Failed to save prescription. Please try again later.",
+              icon: "error",
+            });
+          });
       },
+      setSelectedPatient(patient) {
+        this.selectedPatient = patient;
+      },
+      
+      formatPrescriptionDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString(undefined, options);
+      },
+
+    deletePrescription(patient_id, prescription_id) {
+      console.log("Prescription ID:", prescription_id);
+    // Display a SweetAlert confirmation before deleting the prescription
+    swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this prescription!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            // If the user confirms deletion, make a DELETE request to delete the prescription
+            axios.delete(`/patients/${patient_id}/prescriptions/${prescription_id}`)
+            .then(response => {
+                // Prescription deleted successfully
+                console.log("Prescription deleted successfully:", response.data);
+
+                // Provide feedback to the user
+                swal({
+                    title: "Success",
+                    text: "Prescription deleted successfully!",
+                    icon: "success",
+                });
+                
+                 this.fetchPrescriptions(patient_id);
+                // Optionally, you may remove the deleted prescription from the list if needed
+                // this.selectedUserPrescriptions = this.selectedUserPrescriptions.filter(prescription => prescription.id !== prescription_id);
+            })
+            .catch(error => {
+                // Error occurred while deleting the prescription
+                console.error("Error deleting prescription:", error);
+
+                // Provide feedback to the user
+                swal({
+                    title: "Error",
+                    text: "Failed to delete prescription. Please try again later.",
+                    icon: "error",
+                });
+            });
+        } else {
+            // If the user cancels deletion, show a message indicating the prescription was not deleted
+            swal("Prescription not deleted!");
+        }
+    });
+},
+
+
+
+    openDialog() {
+      this.dialog = true;
+    },
+    closeDialog() {
+      this.dialog = false;
+      this.resetEditedItem();
+    },
+   
+    deleteUser(user) {
+      swal({
+        title: "Are you sure?",
+        text: "Once deleted, you will not be able to recover this patient!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+          axios.delete(`/patients/${user.id}`)
+            .then(() => {
+              this.displayedPatients = this.displayedPatients.filter(u => u.patient_id !== user.patient_id);
+              swal("Patient deleted successfully!", {
+                icon: "success",
+              });
+            })
+            .catch(error => {
+              console.error('Error deleting patient', error);
+              swal("Error", "Failed to delete patient. Please try again later.", "error");
+            });
+        } else {
+          swal("Patient not deleted!");
+        }
+      });
+    },
+
+    openDialogPatientHistory(user) { 
+      this.selectedUser = user;
+      this.dialogPatientHistory = true;
+      this.fetchPrescriptions(user.id); // Assuming user.id is the patient_id
+    },
+
+    closeDialogPatientHistory() {
+      this.dialogPatientHistory = false;
+      // Reset selectedUserPrescriptions array
+      this.selectedUserPrescriptions = [];
+    },
+
+   viewPrescriptions(user) {
+      user.showPrescriptions = !user.showPrescriptions;
+      if (user.showPrescriptions) {
+        this.selectedPatient = user;
+        this.fetchPrescriptions(user.id);
+        this.fetchGlasses(user.id); // Assuming user.id is the patient_id
+      } else {
+        this.selectedPatient = null; // Clear selected patient when hiding prescriptions
+      }
+    },
+   
+    openChildUpdateDialog(prescription) {
+      this.editedItem = { ...prescription };
+      this.childUpdateDialog = true;
+    },
+    closeChildUpdateDialog() {
+      this.childUpdateDialog = false;
+      this.resetEditedItem();
+    },
+
     openDialogPatientGlassesInformation(user) {
-       this.selectedUser = user;
-       this.dialogPatientGlassesInformation = true;
+      this.selectedUser = user;
+      this.dialogPatientGlassesInformation = true;
+      this.fetchGlasses(user.id) // Assuming user.id is the patient_id
     },
     closePatientGlassesInformation() {
       this.dialogPatientGlassesInformation = false;
-      this.selectedUser = null;
+      this.selectedUserGlasses = [];
+    
     },
     openChildGlassesDialog(glasses) {
       this.editedItem = { ...glasses };
@@ -563,30 +704,21 @@ export default {
       this.resetEditedItem();
     },
     saveChildGlasses() {
-      const newGlasses = {
-        glasses_date_updated: new Date().toISOString().slice(0, 10),
-        user_id: this.selectedUser.user_id,
-        frame: this.editedItem.frame,
-        type_of_lens: this.editedItem.type_of_lens,
-        remarks: this.editedItem.remarks,
-      }
-      this.selectedUserGlasses.unshift(newGlasses);
-      this.childGlassesDialog = false;
+    
     },
     deleteGlasses(user, index) {
-      user.selectedUserGlasses.splice(index, 1);
+     
     },
-    openDialogMoreHistory(user) {
+    openMoreHistoryDialog(user) {
       this.selectedUser = user;
       this.dialogMoreHistory = true;
-      // Fetch medical history for the selected user
-      this.selectedUserHistory = this.fetchMedicalHistory(user.user_id);
     },
     closeMoreHistoryDialog() {
       this.dialogMoreHistory = false;
-      this.selectedUser = null;
+    
     },
-    openChildHistoryDialog() {
+    openChildHistoryDialog(history) {
+      this.editedItem = { ...history};
       this.childHistoryDialog = true;
     },
     closeChildHistoryDialog() {
@@ -594,31 +726,32 @@ export default {
       this.resetEditedItem();
     },
     saveChildHistory() {
-      this.selectedUserHistory.push({ ...this.editedItem });
-      this.closeChildHistoryDialog();
+      const newHistory = {
+        history_updated: new Date().toISOString().slice(0, 10),
+        patient_id: this.selectedUser.patient_id,
+        medical_history: this.editedItem.medical_history,
+        ocular_history: this.editedItem.ocular_history,
+      }
+      this.selectedUserHistory.unshift(newHistory);
+      this.childHistoryDialog = false;
     },
     deleteHistory(user, index) {
       user.selectedUserHistory.splice(index, 1);
-    },
-    fetchPrescriptions(userId) {
-      // Fetch prescriptions from the backend or other source
-      return [];
-    },
-    fetchGlasses(userId) {
-      // Fetch glasses information from the backend or other source
-      return [];
     },
     fetchMedicalHistory(userId) {
       // Fetch medical history from the backend or other source
       return [];
     },
-    resetEditedItem() {
+     resetEditedItem() {
       this.editedItem = {
-        user_name: '',
-        user_email: '',
-        user_address: '',
-        user_contact_number: '',
-        user_birthdate: '',
+        fname: '',
+        lname: '',
+        mname: '',
+        extension: '',
+        email: '',
+        address: '',
+        contact: '',
+        birthdate: '',
         password: '',
         confirm_password: '',
         passwordVisible: false,
@@ -632,11 +765,12 @@ export default {
         reading_add: '',
         best_visual_acuity: '',
         PD: '',
-        brand: '',
         frame: '',
-        lens: '',
-        medical_condition: '',
-        notes: '',
+        type_of_lens: '',
+        remarks: '',
+        history_updated: '',
+        medical_history: '',
+        ocular_history: '',
       };
     },
   },

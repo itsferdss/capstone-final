@@ -22,6 +22,7 @@ export default {
 .main-content {
     display: flex;
     flex-direction: column;
+    margin-left: 250px;
 
     .Products {
         border-radius: 10px;
