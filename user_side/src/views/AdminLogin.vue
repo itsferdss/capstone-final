@@ -6,8 +6,8 @@
         <h1 class="title">MVC Optical Clinic</h1>
         <p class="subtitle">Sign in to continue</p>
         <div class="input-group">
-          <label class="inputTitle" for="username">Name</label>
-          <input type="text" id="username" v-model="username" required>
+          <label class="inputTitle" for="email">Email</label>
+          <input type="text" id="email" v-model="email" required>
         </div>
         <div class="input-group">
           <label class="inputTitle" for="password">Password</label>
@@ -22,30 +22,44 @@
   </div>
 </template>
 
-<script scoped>
-export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      errorMessage: ''
-    };
-  },
-  methods: {
-    login() {
-      console.log("Clicked login button");
-      console.log("Username:", this.username);
-      console.log("Password:", this.password);
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
-      if (this.username === 'ferdinand' && this.password === '123') {
-        console.log("Redirecting to /home");
-        this.$router.push('/home'); // Use router.push to navigate
-      } else {
-        console.log("Invalid username or password");
-        this.errorMessage = 'Invalid username or password';
-      }
+export default {
+    data() {
+        return {
+            email: '',
+            password: '',
+            errorMessage: ''
+        };
+    },
+    methods: {
+        login() {
+            axios.post('/login', {
+                    email: this.email,
+                    password: this.password
+                })
+                .then(response => {
+                    // If login is successful, redirect the user
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Successful',
+                        text: 'Welcome!',
+                    });
+                    this.$router.push('/home');
+                })
+                .catch(error => {
+                    // If login fails, display error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: 'Invalid email or password',
+                    });
+                    console.error('Login failed:', error);
+                });
+        }
     }
-  }
 };
 </script>
 

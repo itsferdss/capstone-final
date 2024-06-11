@@ -21,7 +21,7 @@
             style="max-width: 300px;"
             ></v-text-field>
 
-   <v-dialog v-model="dialog" max-width="1000px">
+   <v-dialog v-model="dialog" max-width="750px" enctype="multipart/form-data">
   <template v-slot:activator="{ props }">
     <v-btn @click="openDialog" color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Product</v-btn>
   </template>
@@ -35,18 +35,15 @@
       <v-container>
         <v-row dense>
           <v-col cols="6">
-            <v-text-field v-model="editedItem.product_id" label="Product ID*" prepend-icon="mdi-barcode-scan" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
             <v-text-field v-model="editedItem.product_name" label="Product Name*" prepend-icon="mdi-package-variant-closed" required></v-text-field>
           </v-col>
           <v-col cols="6">
             <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="6">
             <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="6">
             <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
           </v-col>
           <!-- Image Upload -->
@@ -70,14 +67,14 @@
 
     <template v-slot:item="{ item }">
         <tr>
-            <td>{{ item.product_id }}</td>
+            <td>{{ item.id }}</td>
             <td>{{ item.product_name }}</td>
             <td>{{ item.supplier }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.price }}</td>
+            <td>₱{{ item.price }}</td>
             <td>
             <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
-            <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
+            <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
             </td>
         </tr>
         
@@ -96,7 +93,7 @@
         </v-dialog>
 
 <!--DIALOG FOR EDIT PRODUCT -->
-<v-dialog v-model="editItemDialog" max-width="800px">
+<v-dialog v-model="editItemDialog" max-width="750px">
     <v-card>
         <v-card-title>
         <span class="text-h6 m-2">Edit Product</span>
@@ -110,10 +107,10 @@
                 <v-col cols="6">
                     <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6">
                     <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="6">
                     <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
                 </v-col>
                 </v-row>
@@ -132,23 +129,24 @@
     </v-data-table>
     </template>
     <script>
-    import Swal from 'sweetalert2';
+    import swal from 'sweetalert';
     import axios from 'axios';
 
     export default {
     data() {
         return {
-
         editItemDialog: false,
-        
         dialog: false,
         editedItem: {
+        product_image: '',
         product_id: '',
         product_name: '',
         supplier: '',
         quantity: '',
         price: '', // Add price property
+        image: '',
       },
+        
 
         search: '',
         dialogAddPrescription: false,
@@ -198,6 +196,74 @@
                 this.error = 'Error fetching products: ' + error.message;
                 });
             },
+       saveNewProduct() {
+            const formData = new FormData();
+
+            formData.append('product_name', this.editedItem.product_name);
+            formData.append('supplier', this.editedItem.supplier);
+            formData.append('quantity', this.editedItem.quantity);
+            formData.append('price', this.editedItem.price);
+            formData.append('product_image', this.editedItem.image);
+
+            axios.post('/products', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                swal('Success!', 'Product saved successfully.', 'success');
+
+                this.editedItem.product_name = '';
+                this.editedItem.supplier = '';
+                this.editedItem.quantity = '';
+                this.editedItem.price = '';
+                this.editedItem.image = null; 
+
+                this.closeDialog();
+
+              
+                this.fetchProducts();
+            })
+            .catch(error => {
+                console.error('Error saving product:', error);
+                swal('Oops...', 'Something went wrong!', 'error');
+            });
+        },
+        saveEditedProduct() {
+            axios.put(`/products/${this.editedItem.id}`, this.editedItem)
+                .then(response => {
+                    swal('Success!', 'Product updated successfully.', 'success');
+                    this.fetchProducts(); // Fetch updated product list
+                    this.closeEditItemDialog();
+                })
+                .catch(error => {
+                    console.error('Error updating product:', error);
+                    swal('Oops...', 'Something went wrong!', 'error');
+                });
+        },
+        deleteProduct(item) {
+        swal({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this product!',
+            icon: 'warning',
+            buttons: ['Cancel', 'Delete'],
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+                axios.delete(`/products/${item.id}`)
+                    .then(response => {
+                        swal('Deleted!', 'Product has been deleted.', 'success');
+                        this.fetchProducts(); // Fetch updated product list
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                        swal('Oops...', 'Something went wrong!', 'error');
+                    });
+            } else {
+                swal('Cancelled', 'Your product is safe :)', 'info');
+            }
+        });
+    },
 
 
 
@@ -245,22 +311,6 @@
         this.dialogAddPrescription = false;
         },
 
-        saveNewProduct() {
-            const newProduct = {
-                product_id: this.editedItem.product_id,
-                product_name: this.editedItem.product_name,
-                supplier: this.editedItem.supplier,
-                quantity: this.editedItem.quantity, // Change 'stock' to match your data structure
-                price: this.editedItem.price,
-            };
-
-            // Push the new product into the products array
-            this.products.push(newProduct);
-
-            // Close the dialog
-            this.dialog = false;
-        },
-
         openEditItem(item) {
             // Create a shallow copy of the item
             this.editedItem = { ...item };
@@ -272,24 +322,7 @@
             this.editItemDialog = false;
         },
 
-       saveEditedProduct() {
-            const index = this.products.findIndex(product => product.product_id === this.editedItem.product_id);
-            if (index !== -1) {
-                // Update the product at the found index with the edited data
-                this.products[index] = {
-                product_id: this.editedItem.product_id,
-                product_name: this.editedItem.product_name,
-                supplier: this.editedItem.supplier,
-                quantity: this.editedItem.quantity, 
-                price: this.editedItem.price, // Include price
-                };
-                // Close the editItemDialog
-                this.editItemDialog = false;
-            } else {
-                // Handle error: Product not found
-                console.error('Product not found for editing.');
-            }
-        },
+       
     },
 
 

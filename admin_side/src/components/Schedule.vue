@@ -48,6 +48,7 @@
                             <td>{{ item.contact_number }}</td>
                             <td>{{ item.formatted_appointment_date }}</td>
                             <td>{{ item.product_id }}</td>
+                            <td>{{ item.product_name }}</td>
                             <td>
                               <v-icon @click="acceptAppointment(item.user_id)">mdi-check</v-icon>
                               <v-icon @click="declineAppointment(item.user_id)">mdi-close</v-icon>
@@ -75,7 +76,8 @@
         <td>{{ item.full_name }}</td>
         <td>{{ item.contact_number }}</td>
         <td>{{ item.formatted_appointment_date }}</td>
-         <td>{{ item.product_id }}</td>
+        <td>{{ item.product_id }}</td>
+        <td>{{ item.product_name }}</td>
         <td>
           <v-icon size="small" style="color: #2F3F64" @click="openReservationInfo(item)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
@@ -175,6 +177,7 @@ export default {
         { title: 'Contact Number', key: 'user_contact_number' },
         { title: 'Appointment Date', key: 'appointment_date' },
         { title: 'Product ID', key: 'product_id' }, 
+        { title: 'Product Name', key: 'product_name' }, 
         { title: 'Actions', sortable: false },
       ],
 
@@ -184,6 +187,7 @@ export default {
         { title: 'Contact Number', key: 'contact_number' },
         { title: 'Appointment Date', key: 'formatted_appointment_date' }, 
         { title: 'Product ID', key: 'product_id' }, 
+        { title: 'Product Name', key: 'product_name' }, 
         { title: 'Actions', sortable: false },
       ],
 

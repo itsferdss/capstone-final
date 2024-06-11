@@ -17,16 +17,16 @@
     </v-toolbar>
 
     <!-- PRODUCT CARDS -->
-    <v-row>
-      <v-col v-for="item in dataHolder.Products" :key="item.product_id" cols="3"> <!-- Adjust the width according to your preference -->
+   <v-row>
+      <v-col v-for="product in products" :key="product.id" cols="3"> <!-- Adjust the width according to your preference -->
         <v-card class="v-card" elevation="2" style="height: 100%;">
-          <v-img :src="item.image" contain></v-img>
-          <v-card-title class="product-name">{{ item.name }}</v-card-title>
-          <v-card-text class="product-description">{{ item.description }}</v-card-text>
+          <img :src="product.image" alt="Product Image"> <!-- Display the product image here -->
+          <v-card-title class="product-name">{{ product.product_name }}</v-card-title>
+          <v-card-text class="product-description">Stock: {{ product.quantity }}</v-card-text>
           <v-card-actions class="product-price">
-            <v-btn color="primary" @click="reserve(item)">Reserve</v-btn>
+            <v-btn color="primary" @click="reserve(product)">Reserve</v-btn>
             <div class="flex-grow-1"></div> <!-- This creates space between button and price -->
-            <span class="caption">{{ item.price }}</span>
+            <span class="caption">₱{{ product.price }}</span>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -35,63 +35,48 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       search: '',
-      dataHolder: {
-        Products: [
-          { 
-            product_id: 1,
-            name: 'Product 1',
-            description: 'Description for Product 1',
-            price: '$100',
-            image: '../src/assets/product1.jpg'
-          },
-          { 
-            product_id: 2,
-            name: 'Product 2',
-            description: 'Description for Product 2',
-            price: '$200',
-            image: '../src/assets/product1.jpg'
-          },
-
-          { 
-            product_id: 2,
-            name: 'Product 2',
-            description: 'Description for Product 2',
-            price: '$200',
-            image: '../src/assets/product1.jpg'
-          },
-
-          { 
-            product_id: 1,
-            name: 'Product 1',
-            description: 'Description for Product 1',
-            price: '$100',
-            image: '../src/assets/product1.jpg'
-          },
-
-          { 
-            product_id: 1,
-            name: 'Product 1',
-            description: 'Description for Product 1',
-            price: '$100',
-            image: '../src/assets/product1.jpg'
-          },
-          // Add more products as needed
-        ]
+      editedItem:{
+        product_image: '',
+        product_id: '',
+        product_name: '',
+        supplier: '',
+        quantity: '',
+        price: '',
+        image: '',
       },
-      headers: [
-        // Define your table headers here if needed
-      ]
+
+      products: [],
+
+        
+      
     };
   },
+  mounted() {
+    this.fetchProducts();
+  },
   methods: {
-    reserve(item) {
+    reserve(product) {
       // Logic for reserving the product
-      console.log('Product reserved:', item.name);
-    }
+      console.log('Product reserved:', product.product_name);
+    },
+    fetchProducts() {
+    axios.get('/products')
+        .then(response => {
+            this.products = response.data.map(product => {
+                product.image = product.image; // Prepend '/storage/' to the image path
+                return product;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching products: ', error);
+        });
+},
   }
 };
 </script>
@@ -112,7 +97,4 @@ export default {
 .four-in-one-column {
   display: flex;
 }
-
-
-
 </style>

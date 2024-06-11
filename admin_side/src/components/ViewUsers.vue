@@ -133,7 +133,7 @@
             <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
             
             <!-- Loop through selectedUserPrescriptions -->
-            <v-card v-for="(prescription, index) in selectedUserPrescriptions" :key="index" class="mb-4">
+             <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index" class="mb-4">
               <!-- Display prescription information -->
               <v-card-title>Prescription Date: {{ formatPrescriptionDate(prescription.created_at) }}</v-card-title>
               <v-card-text>
@@ -226,14 +226,6 @@
         </v-card>
       </v-dialog>
 
-
-
-      <!--BACKEND DONE!!!-->
-
-
-
-
-
       <!--DIALOG FOR PATIENT GLASSES-->
       <template>
         <v-dialog v-model="dialogPatientGlassesInformation" max-width="1300px">
@@ -244,8 +236,8 @@
               <span>&nbsp;</span>
               <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
 
-              <v-card v-for="(glasses, index) in selectedUserGlasses" :key="index" class="mb-4">
-                <v-card-title v-if="glasses.patient_id === selectedUser.patient_id">Date Updated: {{ glasses.glasses_date_updated }}</v-card-title>
+              <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4">
+              <v-card-title>Updated At: {{ formatPrescriptionDate(glasses.created_at) }}</v-card-title>
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" md="6">
@@ -258,7 +250,7 @@
                       <strong>Remarks:</strong> {{ glasses.remarks }}
                     </v-col>
                     <v-col cols="2" md="12">
-                      <v-btn color="error" @click="deleteGlasses(index)">Delete</v-btn>
+                      <v-btn color="error" @click="deleteGlasses(selectedPatient.id, glasses.id)">Delete</v-btn>
                     </v-col>
                   </v-row>
                 </v-card-text>
@@ -299,6 +291,16 @@
         </v-card>
       </v-dialog>
 
+      
+
+
+      <!--BACKEND DONE!!!-->
+
+
+
+
+
+
       <!--DIALOG FOR MORE HISTORY-->
       <v-dialog v-model="dialogMoreHistory" max-width="1300px">
         <v-card>
@@ -308,9 +310,9 @@
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeMoreHistoryDialog">Close</v-btn>
 
-            <v-card v-for="(history, index) in selectedUserHistory" :key="index" class="mb-4">
-              <v-card-title v-if="history.patient_id === selectedUser.patient_id">Date Updates: {{ history.history_updated }}</v-card-title>
-              <v-card-text v-if="history.patient_id === selectedUser.patient_id">
+           <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4">
+             <v-card-title>Updated At: {{ formatPrescriptionDate(history.created_at) }}</v-card-title>
+              <v-card-text>
                 <v-row>
                   <v-col cols="3" md="12">
                     <strong>Medical History:</strong> {{ history.medical_history }}
@@ -318,7 +320,7 @@
                   <v-col cols="3" md="12">
                     <strong>Ocular History:</strong> {{ history.ocular_history }}
                   </v-col>
-                  <v-btn color="error" @click="deleteHistory(selectedUser, index)">Delete</v-btn>
+                  <v-btn color="error" @click="deleteHistory(selectedPatient.id, history.id)">Delete</v-btn>
                 </v-row>
               </v-card-text>
             </v-card>
@@ -357,7 +359,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="#35623D" @click="saveChildHistory">Save</v-btn>
+            <v-btn color="#35623D" @click="saveNewHistory">Save</v-btn>
             <v-btn color="error" @click="closeChildHistoryDialog">Cancel</v-btn>
           </v-card-actions>
         </v-card>
@@ -426,9 +428,27 @@ export default {
       displayedPatients: [],
       selectedUserPrescriptions: [],
       selectedUserGlasses: [],
+      selectedUserHistory: [],
     };
   },
+  computed: {
+  sortedPrescriptions() {
+    return this.selectedUserPrescriptions.slice().sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  },
+  sortedGlasses() {
+    return this.selectedUserGlasses.slice().sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  },
+  sortedHistory() {
+    return this.selectedUserHistory.slice().sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  },
   
+},
   mounted() {
     this.fetchPatients();
   },
@@ -461,18 +481,32 @@ export default {
         });
     },
     fetchGlasses(patient_id) {
-      axios.get(`/patients/${patient_id}/glasses`)
-        .then(response => {
-          if (Array.isArray(response.data)) {
-            this.selectedUserGlasses = response.data; // Update selectedUserGlasses
-          } else {
-            this.error = 'Unexpected response format';
-          }
-        })
-        .catch(error => {
-          this.error = 'Error fetching glasses: ' + error.message;
-        });
-    },
+          axios.get(`/patients/${patient_id}/glasses`)
+              .then(response => {
+                  if (Array.isArray(response.data)) {
+                      this.selectedUserGlasses = response.data; // Update selectedUserGlasses
+                  } else {
+                      this.error = 'Unexpected response format';
+                  }
+              })
+              .catch(error => {
+                  this.error = 'Error fetching glasses: ' + error.message;
+              });
+      },
+     fetchMedicalHistory(patient_id) {
+        axios.get(`/patients/${patient_id}/history`)
+          .then(response => {
+            if (Array.isArray(response.data)) {
+              this.selectedUserHistory = response.data; // Update medicalHistory state or variable
+            } else {
+              this.error = 'Unexpected response format';
+            }
+          })
+          .catch(error => {
+            this.error = 'Error fetching medical history: ' + error.message;
+          });
+      },
+
      saveNewUser() {
       axios.post('/patients', this.editedItem)
         .then(response => {
@@ -531,34 +565,150 @@ export default {
         };
 
         // Make a POST request to save the new prescription
-        axios.post(`/patients/${this.selectedPatient.id}/prescriptions`, prescriptionData)
+       axios.post(`/patients/${this.selectedPatient.id}/prescriptions`, prescriptionData)
+        .then(response => {
+          // Prescription saved successfully
+          console.log("Prescription saved successfully:", response.data);
+
+          // Prepend the newly saved prescription to the beginning of the selectedUserPrescriptions array
+          this.selectedUserPrescriptions.unshift(response.data);
+
+          // Provide feedback to the user
+          swal({
+            title: "Success",
+            text: "Prescription saved successfully!",
+            icon: "success",
+          });
+          // Close the dialog after saving
+          this.childUpdateDialog = false;
+        })
+        .catch(error => {
+          // Error occurred while saving the prescription
+          console.error("Error saving prescription:", error);
+
+          // Provide feedback to the user
+          swal({
+            title: "Error",
+            text: "Failed to save prescription. Please try again later.",
+            icon: "error",
+          });
+        });
+    },
+       saveChildGlasses() {
+          if (!this.selectedPatient || !this.selectedPatient.id) {
+          console.error("Error: No selected patient or patient ID");
+          return;
+        }
+
+        // Check if editedItem contains all necessary data
+        if (!this.editedItem) {
+          console.error("Error: No glasses information available");
+          return;
+        }
+
+        // Extract glasses information from editedItem
+        const glassesData = {
+          patient_id: this.selectedPatient.id, // Populate patient_id with selectedPatient's id
+          frame: this.editedItem.frame,
+          type_of_lens: this.editedItem.type_of_lens,
+          remarks: this.editedItem.remarks
+        };
+
+        // Make a POST request to save the new glasses information
+        axios.post(`/patients/${this.selectedPatient.id}/glasses`, glassesData)
           .then(response => {
-            // Prescription saved successfully
-            console.log("Prescription saved successfully:", response.data);
+            // Glasses information saved successfully
+            console.log("Glasses information saved successfully:", response.data);
 
             // Provide feedback to the user
             swal({
               title: "Success",
-              text: "Prescription saved successfully!",
+              text: "Glasses information saved successfully!",
               icon: "success",
             });
-            // Close the dialog after saving
-            this.childUpdateDialog = false;
 
-             this.fetchPrescriptions(this.selectedPatient.id);
+            // Close the dialog after saving
+            this.childGlassesDialog = false;
+
+            // Fetch glasses information for the selected patient
+            this.fetchGlasses(this.selectedPatient.id);
           })
           .catch(error => {
-            // Error occurred while saving the prescription
-            console.error("Error saving prescription:", error);
+            // Error occurred while saving the glasses information
+            console.error("Error saving glasses information:", error);
 
             // Provide feedback to the user
             swal({
               title: "Error",
-              text: "Failed to save prescription. Please try again later.",
+              text: "Failed to save glasses information. Please try again later.",
               icon: "error",
             });
           });
-      },
+        },
+        saveNewHistory() {
+          // Check if selectedPatient is valid
+          if (!this.selectedPatient || !this.selectedPatient.id) {
+            console.error("Error: No selected patient or patient ID");
+            return;
+          }
+
+          // Check if editedItem contains all necessary data
+          if (!this.editedItem) {
+            console.error("Error: No medical history data available");
+            return;
+          }
+
+          // Extract medical history data from editedItem
+          const historyData = {
+            patient_id: this.selectedPatient.id, // Populate patient_id with selectedPatient's id
+            medical_history: this.editedItem.medical_history,
+            ocular_history: this.editedItem.ocular_history
+          };
+
+          // Make a POST request to save the new medical history
+          axios.post(`/patients/${this.selectedPatient.id}/history`, historyData)
+            .then(response => {
+              // Medical history saved successfully
+              console.log("Medical history saved successfully:", response.data);
+
+              swal({
+              title: "Success",
+              text: "Medical Information saved successfully!",
+              icon: "success",
+            });
+              // Close the dialog after saving
+              this.childHistoryDialog = false;
+
+              // Optionally, fetch updated patient data
+              this.fetchMedicalHistory(this.selectedPatient.id);
+            })
+            .catch(error => {
+              // Error occurred while saving the medical history
+              console.error("Error saving medical history:", error);
+
+              // Provide feedback to the user
+                swal({
+                title: "Error",
+                text: "Failed to save glasses information. Please try again later.",
+                icon: "error",
+              });
+            });
+        },
+     
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
       setSelectedPatient(patient) {
         this.selectedPatient = patient;
       },
@@ -615,6 +765,54 @@ export default {
         }
     });
 },
+  deleteHistory(patient_id, history_id) {
+    console.log("History ID:", history_id);
+    // Display a SweetAlert confirmation before deleting the history
+    swal({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this medical history!",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        // If the user confirms deletion, make a DELETE request to delete the medical history
+        axios.delete(`/patients/${patient_id}/history/${history_id}`)
+        .then(response => {
+          // History deleted successfully
+          console.log("History deleted successfully:", response.data);
+
+          // Provide feedback to the user
+          swal({
+            title: "Success",
+            text: "Medical history deleted successfully!",
+            icon: "success",
+          });
+
+          this.fetchMedicalHistory(patient_id);
+
+          // Optionally, you may fetch updated patient data or update the history list
+          // this.fetchPatientData(patient_id);
+          // this.fetchHistories(patient_id);
+        })
+        .catch(error => {
+          // Error occurred while deleting the history
+          console.error("Error deleting medical history:", error);
+
+          // Provide feedback to the user
+          swal({
+            title: "Error",
+            text: "Failed to delete medical history. Please try again later.",
+            icon: "error",
+          });
+        });
+      } else {
+        // If the user cancels deletion, show a message indicating the history was not deleted
+        swal("Medical history not deleted!");
+      }
+    });
+  },
 
 
 
@@ -643,6 +841,7 @@ export default {
                 icon: "success",
               });
             })
+    
             .catch(error => {
               console.error('Error deleting patient', error);
               swal("Error", "Failed to delete patient. Please try again later.", "error");
@@ -670,7 +869,8 @@ export default {
       if (user.showPrescriptions) {
         this.selectedPatient = user;
         this.fetchPrescriptions(user.id);
-        this.fetchGlasses(user.id); // Assuming user.id is the patient_id
+        this.fetchGlasses(user.id);
+        this.fetchMedicalHistory(user.id); // Assuming user.id is the patient_id
       } else {
         this.selectedPatient = null; // Clear selected patient when hiding prescriptions
       }
@@ -679,6 +879,7 @@ export default {
     openChildUpdateDialog(prescription) {
       this.editedItem = { ...prescription };
       this.childUpdateDialog = true;
+      
     },
     closeChildUpdateDialog() {
       this.childUpdateDialog = false;
@@ -703,12 +904,53 @@ export default {
       this.childGlassesDialog = false;
       this.resetEditedItem();
     },
-    saveChildGlasses() {
-    
-    },
-    deleteGlasses(user, index) {
-     
-    },
+   
+    deleteGlasses(patient_id, glasses_id) {
+     console.log("Glasses ID:", glasses_id);
+  
+  // Display a SweetAlert confirmation before deleting the glasses information
+  swal({
+    title: "Are you sure?",
+    text: "Once deleted, you will not be able to recover this glasses information!",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  })
+  .then((willDelete) => {
+    if (willDelete) {
+      // If the user confirms deletion, make a DELETE request to delete the glasses information
+      axios.delete(`/patients/${patient_id}/glasses/${glasses_id}`)
+        .then(response => {
+          // Glasses information deleted successfully
+          console.log("Glasses information deleted successfully:", response.data);
+
+          // Provide feedback to the user
+          swal({
+            title: "Success",
+            text: "Glasses information deleted successfully!",
+            icon: "success",
+          });
+
+          // Fetch updated glasses information for the selected patient
+          this.fetchGlasses(patient_id);
+        })
+        .catch(error => {
+          // Error occurred while deleting the glasses information
+          console.error("Error deleting glasses information:", error);
+
+          // Provide feedback to the user
+          swal({
+            title: "Error",
+            text: "Failed to delete glasses information. Please try again later.",
+            icon: "error",
+          });
+        });
+    } else {
+      // If the user cancels deletion, show a message indicating the glasses information was not deleted
+      swal("Glasses information not deleted!");
+    }
+  });
+},
     openMoreHistoryDialog(user) {
       this.selectedUser = user;
       this.dialogMoreHistory = true;
@@ -725,23 +967,8 @@ export default {
       this.childHistoryDialog = false;
       this.resetEditedItem();
     },
-    saveChildHistory() {
-      const newHistory = {
-        history_updated: new Date().toISOString().slice(0, 10),
-        patient_id: this.selectedUser.patient_id,
-        medical_history: this.editedItem.medical_history,
-        ocular_history: this.editedItem.ocular_history,
-      }
-      this.selectedUserHistory.unshift(newHistory);
-      this.childHistoryDialog = false;
-    },
-    deleteHistory(user, index) {
-      user.selectedUserHistory.splice(index, 1);
-    },
-    fetchMedicalHistory(userId) {
-      // Fetch medical history from the backend or other source
-      return [];
-    },
+    
+   
      resetEditedItem() {
       this.editedItem = {
         fname: '',

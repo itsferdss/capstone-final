@@ -6,25 +6,19 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="3">
-            <strong>First Name:</strong> {{ user.firstName }}
+            <strong>First Name:</strong> {{ patient.full_name }}
           </v-col>
           <v-col cols="12" md="3">
-            <strong>Middle Name:</strong> {{ user.middleName }}
+            <strong>Middle Name:</strong> {{ patient.address }}
           </v-col>
           <v-col cols="12" md="3">
-            <strong>Last Name:</strong> {{ user.lastName }}
+            <strong>Last Name:</strong> {{ patient.contact_number }}
           </v-col>
           <v-col cols="12" md="3">
-            <strong>Suffix:</strong> {{ user.suffix }}
+            <strong>Suffix:</strong> {{ patient.email }}
           </v-col>
           <v-col cols="12">
-            <strong>Address:</strong> {{ user.address }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <strong>Phone Number:</strong> {{ user.contact_number }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <strong>Email:</strong> {{ user.email }}
+            <strong>Address:</strong> {{ patient.password }}
           </v-col>
         </v-row>
       </v-card-text>
@@ -42,22 +36,22 @@
       <v-container>
         <v-row dense>
           <v-col cols="12">
-            <v-text-field v-model="user.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
+            <v-text-field v-model="patient.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="user.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
+            <v-text-field v-model="patient.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="user.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
+            <v-text-field v-model="patient.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
           </v-col>
           <v-col cols="12">
-            <v-text-field v-model="user.email" label="Email" prepend-icon="mdi-mail" required></v-text-field>
+            <v-text-field v-model="patient.email" label="Email" prepend-icon="mdi-mail" required></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field v-model="user.password" label="Password" prepend-icon="mdi-lock" :append-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="passwordVisible ? 'text' : 'password'" @click:append="passwordVisible = !passwordVisible" required></v-text-field>
+            <v-text-field v-model="patient.password" label="Password" prepend-icon="mdi-lock" :append-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="passwordVisible ? 'text' : 'password'" @click:append="passwordVisible = !passwordVisible" required></v-text-field>
           </v-col>
           <v-col cols="6">
-            <v-text-field v-model="user.confirm_password" label="Confirm Password" prepend-icon="mdi-lock" :append-icon="confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="confirmPasswordVisible ? 'text' : 'password'" @click:append="confirmPasswordVisible = !confirmPasswordVisible" required></v-text-field>
+            <v-text-field v-model="patient.confirm_password" label="Confirm Password" prepend-icon="mdi-lock" :append-icon="confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="confirmPasswordVisible ? 'text' : 'password'" @click:append="confirmPasswordVisible = !confirmPasswordVisible" required></v-text-field>
           </v-col>
         </v-row>
       </v-container>
@@ -75,26 +69,29 @@
 </template>
 
 <script>
+
+import axios from 'axios'; 
+
 export default {
   data() {
     return {
       updateParentDialog: false,
-      user: {
-        firstName: 'Gian King',
-        middleName: 'C',
-        lastName: 'Caampued',
-        suffix: 'Jr.',
-        address: 'San Antonio, Zambales',
-        contact_number: '09668109204',
-        email: 'gian@example.com',
-        full_name: 'Gian King Caampued',
-        password: '123',
-        confirm_password: '123',
+      patient: {
+        full_name: ' ',
+        address: '',
+        contact_number: '',
+        email: '.',
+        address: '',
+        password: '',
       },
       passwordVisible: false,
       confirmPasswordVisible: false,
  
     };
+  },
+  mounted() {
+    // Call the fetchUserData method when the component is mounted
+    this.fetchPatientData();
   },
   methods:{
     openUpdateParentDialog() {
@@ -105,7 +102,26 @@ export default {
     },
     saveNewUser() {
       // Logic to save new user
-    }
+    },
+      fetchPatientData(id) {
+      // Make an AJAX request to fetch patient data
+      axios.get(`/patients/${id}`)
+        .then(response => {
+          // Assuming the response data is an object containing patient info
+          const patientData = response.data;
+          // Update the patient object with the fetched data
+          this.patient = {
+            full_name: patientData.full_name,
+            address: patientData.address,
+            contact_number: patientData.contact_number,
+            email: patientData.email,
+            password: patientData.password,
+          };
+        })
+        .catch(error => {
+          console.error('Error fetching patient data:', error);
+        });
+    },
   },
 };
 </script>
