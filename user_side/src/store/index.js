@@ -1,17 +1,21 @@
-import { createStore} from 'vuex'
+import { createStore } from 'vuex';
 
-export default createStore ({
+const store = createStore({
     state: {
-
+        patientId: null,
     },
-    mutation: {
-
+    mutations: {
+        setPatientId(state, id) {
+            state.patientId = id;
+            // Optionally save to localStorage here
+        },
     },
     actions: {
-
+        // Optional actions
     },
-    module: {
+    modules: {
+        // Optional modules
+    },
+});
 
-    }
-})
-
+export default store;

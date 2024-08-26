@@ -2,7 +2,10 @@
     <main>
         <div class="main-content">
             <div class="Products">
-                <Products/>
+                <div class="logo-container">
+                    <img src="/src/assets/MVC_logo.png" class="mvcLogo" alt="MVC Logo">
+                </div>
+                <Products />
             </div>
         </div>
     </main>
@@ -22,30 +25,53 @@ export default {
 .main-content {
     display: flex;
     flex-direction: column;
-    margin-left: 250px;
+    margin-left: 10px;
 
     .Products {
         border-radius: 10px;
         background-color: #f0f0f0;
         padding: 0.5rem;
         height: 100vh;
+        border: 1px solid #ccc; // Add border
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
+        flex: 1;
+    }
+
+    .logo-container {
+        display: none; /* Hide by default */
+    }
+
+    .mvcLogo {
+        display: none;
     }
 }
 
-.Products {
-    flex: 1;
-
-    .material-icons {
-        color: var(--dark);
-        font-size: 2.5rem;
+@media (max-width: 960px) {
+    .main-content {
+        margin-left: 0px;
+        max-width: 100%;
     }
-    .text {
-        position: relative;
-        color: var(--dark);
-        font-size: 1.5rem;
-        font-weight: 900;
-        bottom: 0.5rem;
+
+    .Products {
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        padding: 0.5rem;
+        height: 100%;
+        border: 1px solid #ccc; // Add border
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
+        flex: 1;
+    }
+
+    .logo-container {
+        display: block; /* Show on mobile */
+    }
+
+    .mvcLogo {
+        display: block;
+        max-height: 200px;
+        max-width: 235px;
+        margin-left: 40px;
+        border-radius: 10px;
     }
 }
-
 </style>

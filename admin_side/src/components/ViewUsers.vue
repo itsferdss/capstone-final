@@ -5,8 +5,15 @@
     :items="displayedPatients"
     :sort-by="[{ key: 'patient_id', order: 'asc' }]"
   >
-    <template v-slot:top>
+     <template v-slot:top>
       <v-toolbar flat>
+        <v-toolbar-title class="listOfPat">
+          <v-icon left>mdi-account-group</v-icon>
+            LIST OF PATIENTS
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+
+        <!-- Search input -->
         <v-text-field
           v-model="search"
           class="w-auto mr-4"
@@ -20,13 +27,16 @@
           style="max-width: 300px;"
         ></v-text-field>
 
-        <v-dialog v-model="dialog" max-width="1000px">
+        <v-dialog v-model="dialog" max-width="1000px" class="addPatDialog">
           <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog" color="#35623D" dark v-bind="props" style="font-weight: bold;">Add new Patient</v-btn>
+            <v-btn @click="openDialog" color="primary" dark class="styled-btn" v-bind="props">
+              <v-icon left>mdi-account-plus</v-icon>
+              <span class="styled-btn-text">Add New Patient</span>
+            </v-btn>
           </template>
           <v-card>
             <v-card-title>
-              <span class="text-h6 m-2">New User</span>
+              <span class="dialogTitle">New User</span>
             </v-card-title>
             <v-card-text>
               <v-container>
@@ -94,17 +104,17 @@
         </td>
       </tr>
 
-      <tr v-if="item.showPrescriptions">
+      <tr v-if="item.showPrescriptions" >
         <td :colspan="headers.length + 5">
           <v-row justify="space-between">
-            <v-col cols="4">
-              <v-btn @click="openDialogPatientHistory(item)" block>View Patient's Prescription History</v-btn>
+            <v-col cols="4" >
+               <v-btn @click="openDialogPatientHistory(item)" block class="operationTxt">Prescriptions</v-btn>
             </v-col>
-            <v-col cols="4">
-              <v-btn @click="openDialogPatientGlassesInformation(item)" block>View Patient's Spectacles</v-btn>
+            <v-col cols="4" >
+               <v-btn @click="openDialogPatientGlassesInformation(item)" block class="operationTxt">Spectacles</v-btn>
             </v-col>
-            <v-col cols="4">
-              <v-btn @click="openMoreHistoryDialog(item)" block>View Patient's Medical History</v-btn>
+            <v-col cols="4" >
+               <v-btn @click="openMoreHistoryDialog(item)" block class="operationTxt">Medical History</v-btn>
             </v-col>
           </v-row>
         </td>
@@ -291,16 +301,6 @@
         </v-card>
       </v-dialog>
 
-      
-
-
-      <!--BACKEND DONE!!!-->
-
-
-
-
-
-
       <!--DIALOG FOR MORE HISTORY-->
       <v-dialog v-model="dialogMoreHistory" max-width="1300px">
         <v-card>
@@ -328,14 +328,6 @@
         </v-card>
       </v-dialog>
 
-      
-      
-      
-
-
-      <!--DONE NA YUNG TAAS-->
-
-          
 
       <!--DIALOG FOR HISTORY UPDATE-->
       <v-dialog v-model="childHistoryDialog" max-width="500px">
@@ -359,8 +351,8 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="#35623D" @click="saveNewHistory">Save</v-btn>
             <v-btn color="error" @click="closeChildHistoryDialog">Cancel</v-btn>
+            <v-btn color="#35623D" @click="saveNewHistory">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -446,6 +438,9 @@ export default {
     return this.selectedUserHistory.slice().sort((a, b) => {
       return new Date(b.created_at) - new Date(a.created_at);
     });
+  },
+  screenWidth() {
+      return window.innerWidth;
   },
   
 },
@@ -694,21 +689,6 @@ export default {
               });
             });
         },
-     
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
       setSelectedPatient(patient) {
         this.selectedPatient = patient;
       },
@@ -813,9 +793,6 @@ export default {
       }
     });
   },
-
-
-
     openDialog() {
       this.dialog = true;
     },
@@ -967,8 +944,6 @@ export default {
       this.childHistoryDialog = false;
       this.resetEditedItem();
     },
-    
-   
      resetEditedItem() {
       this.editedItem = {
         fname: '',
@@ -1005,4 +980,46 @@ export default {
 </script>
 
 <style>
+.styled-btn {
+  background-color: #B3D9E6 !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+.styled-btn-text {
+  font-weight: bold;
+  color: black !important;
+}
+
+.styled-btn .v-icon {
+  margin-right: 8px; /* Add spacing between icon and text */
+  color: black;
+}
+
+@media (max-width: 960px) {
+  .operationTxt{
+    font-size: 10px !important;
+  }
+
+  .styled-btn-text {
+      display: none;
+  }
+      
+  .listOfPat{
+    display: none;
+  }
+  .v-data-table {
+    font-size: 1px;
+  }
+  .addPatDialog{
+    max-height: 700px;
+  }
+
+  .dialogTitle{
+    font-size: 15px;
+  }
+ 
+  
+}
 </style>
+

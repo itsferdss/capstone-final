@@ -1,125 +1,248 @@
 <template>
   <v-container>
-    <!-- Parent's information -->
-    <v-card class="mb-4">
-      <v-card-title>Parent's Information</v-card-title>
+    <v-card-title class="patient-info-card-title">
+      <v-avatar size="32">
+        <v-icon dark>mdi-account-circle</v-icon>
+      </v-avatar>
+      Patient's Information
+    </v-card-title>
+    <!-- Patient's information card -->
+    <v-card class="patient-info-card mb-4" elevation="2">
       <v-card-text>
-        <v-row>
-          <v-col cols="12" md="3">
-            <strong>First Name:</strong> {{ patient.full_name }}
+        <v-row class="patient-info-row">
+          <v-col cols="12" md="6">
+            <strong>Full Name:</strong> {{ patient.full_name }}
           </v-col>
-          <v-col cols="12" md="3">
-            <strong>Middle Name:</strong> {{ patient.address }}
+          <v-col cols="12" md="6">
+            <strong>Address:</strong> {{ patient.address }}
           </v-col>
-          <v-col cols="12" md="3">
-            <strong>Last Name:</strong> {{ patient.contact_number }}
+          <v-col cols="12" md="6">
+            <strong>Contact Number:</strong> {{ patient.contact }}
           </v-col>
-          <v-col cols="12" md="3">
-            <strong>Suffix:</strong> {{ patient.email }}
-          </v-col>
-          <v-col cols="12">
-            <strong>Address:</strong> {{ patient.password }}
+          <v-col cols="12" md="6">
+            <strong>Email:</strong> {{ patient.email }}
           </v-col>
         </v-row>
       </v-card-text>
     </v-card>
 
-  <v-btn @click="openUpdateParentDialog" color="#35623D" dark style="font-weight: bold;">Update Information</v-btn>
+    <!-- Button to open update dialog -->
+    <v-btn @click="openUpdateParentDialog" color="primary" dark class="mt-4">Update Information</v-btn>
 
-<!--Dialog for update parent profile-->
-<v-dialog v-model="updateParentDialog" max-width="1000px">
-  <v-card>
-    <v-card-title>
-      <span class="text-h6 m-2">Update your information</span>
-    </v-card-title>
-    <v-card-text>
-      <v-container>
-        <v-row dense>
-          <v-col cols="12">
-            <v-text-field v-model="patient.full_name" label="Parent Name*" prepend-icon="mdi-account" required></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="patient.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="patient.contact_number" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field v-model="patient.email" label="Email" prepend-icon="mdi-mail" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="patient.password" label="Password" prepend-icon="mdi-lock" :append-icon="passwordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="passwordVisible ? 'text' : 'password'" @click:append="passwordVisible = !passwordVisible" required></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <v-text-field v-model="patient.confirm_password" label="Confirm Password" prepend-icon="mdi-lock" :append-icon="confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'" :type="confirmPasswordVisible ? 'text' : 'password'" @click:append="confirmPasswordVisible = !confirmPasswordVisible" required></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-      <v-btn color="black" text @click="saveUpdatedInfo">Update</v-btn>
-    </v-card-actions>
-  </v-card> 
-</v-dialog>
+    <!-- Dialog for updating parent information -->
+    <v-dialog v-model="updateParentDialog" max-width="750px">
+      <v-card>
+        <v-card-title>
+          <span class="update-dialog-title">Update Patient Information</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="patient.address"
+                  label="Address"
+                  :prepend-icon="isMobile ? '' : 'mdi-map-marker'"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="patient.contact"
+                  label="Contact Number"
+                  :prepend-icon="isMobile ? '' : 'mdi-phone'"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="patient.email"
+                  label="Email"
+                  :prepend-icon="isMobile ? '' : 'mdi-email'"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  label="Current Password"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                  :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="showPassword = !showPassword"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" class="password-field">
+                <v-text-field
+                  v-model="newPassword"
+                  :type="showNewPassword ? 'text' : 'password'"
+                  label="New Password"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                  :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="showNewPassword = !showNewPassword"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" class="password-field">
+                <v-text-field
+                  v-model="confirmPassword"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  label="Confirm New Password"
+                  class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}"
+                  outlined
+                  :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="showConfirmPassword = !showConfirmPassword"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
 
-
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="black" text @click="closeUpdateParentDialog">Cancel</v-btn>
+          <v-btn color="primary" @click="saveUpdatedParent">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
-
-import axios from 'axios'; 
+import axios from 'axios';
+import { mapState } from 'vuex';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 export default {
   data() {
     return {
       updateParentDialog: false,
+      showPassword: false,
+      showNewPassword: false,
+      showConfirmPassword: false,
       patient: {
-        full_name: ' ',
+        full_name: '',
         address: '',
-        contact_number: '',
-        email: '.',
-        address: '',
-        password: '',
+        contact: '',
+        email: '',
       },
-      passwordVisible: false,
-      confirmPasswordVisible: false,
- 
+      password: '',
+      newPassword: '',
+      confirmPassword: '',
     };
   },
-  mounted() {
-    // Call the fetchUserData method when the component is mounted
-    this.fetchPatientData();
+  computed: {
+    ...mapState({
+      patientId: state => state.patientId || localStorage.getItem('patientId'),
+    }),
+    isMobile() {
+      return window.innerWidth <= 600;
+    },
   },
-  methods:{
+  mounted() {
+    if (this.patientId) {
+      this.fetchPatientData(this.patientId);
+    } else {
+      console.error('Patient ID is not available.');
+    }
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  methods: {
+    handleResize() {
+      this.$forceUpdate();
+    },
     openUpdateParentDialog() {
       this.updateParentDialog = true;
+      // Reset password fields when dialog is opened
+      this.password = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+      this.showPassword = false;
+      this.showNewPassword = false;
+      this.showConfirmPassword = false;
     },
-    closeDialog() {
+    closeUpdateParentDialog() {
       this.updateParentDialog = false;
+      // Reset password fields when dialog is closed
+      this.password = '';
+      this.newPassword = '';
+      this.confirmPassword = '';
+      this.showPassword = false;
+      this.showNewPassword = false;
+      this.showConfirmPassword = false;
     },
-    saveNewUser() {
-      // Logic to save new user
-    },
-      fetchPatientData(id) {
-      // Make an AJAX request to fetch patient data
+    fetchPatientData(id) {
       axios.get(`/patients/${id}`)
         .then(response => {
-          // Assuming the response data is an object containing patient info
           const patientData = response.data;
-          // Update the patient object with the fetched data
           this.patient = {
             full_name: patientData.full_name,
             address: patientData.address,
-            contact_number: patientData.contact_number,
+            contact: patientData.contact,
             email: patientData.email,
-            password: patientData.password,
           };
         })
         .catch(error => {
           console.error('Error fetching patient data:', error);
+        });
+    },
+    saveUpdatedParent() {
+      // Prepare data to send
+      const data = {
+        address: this.patient.address,
+        contact: this.patient.contact,
+        email: this.patient.email,
+        password: this.password,
+        newPassword: this.newPassword,
+      };
+
+      // Validate if newPassword is provided
+      if (this.newPassword && this.newPassword !== this.confirmPassword) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'New Password and Confirm New Password must match!',
+        });
+        return;
+      }
+
+      // Send update request to backend
+      axios.put(`/patients/${this.patientId}`, data)
+        .then(response => {
+          // Handle success
+          Swal.fire({
+            icon: 'success',
+            title: 'Information Updated',
+            text: 'Patient information has been updated successfully!',
+          });
+          // Optionally reset form or close dialog
+          this.closeUpdateParentDialog();
+        })
+        .catch(error => {
+          console.error('Error updating patient information:', error);
+          let errorMessage = 'Failed to update patient information. Please try again later.';
+          if (error.response && error.response.data && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          }
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: errorMessage,
+          });
         });
     },
   },
@@ -127,5 +250,54 @@ export default {
 </script>
 
 <style scoped>
-/* Add custom styles if needed */
+.patient-info-card {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.patient-info-card-title {
+  font-size: 1.7rem;
+  color: #333;
+}
+
+.patient-info-row {
+  margin-bottom: 10px;
+  font-size: 1.0rem;
+}
+
+.update-dialog-title {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.update-dialog-textfield {
+  width: 100%;
+}
+
+.mobile-text-field {
+  font-size: 0.8rem; /* Adjust input font size for mobile */
+}
+
+@media (max-width: 600px) {
+  .patient-info-card-title {
+    font-size: 1rem;
+    margin-left: -30px;
+  }
+  .patient-info-row {
+    margin-top: -20px;
+    margin-bottom: -20px;
+    font-size: 0.8rem;
+    margin-left: -30px;
+    margin-right: -30px;
+  }
+  .update-dialog-title {
+    font-size: 1rem;
+  }
+  .v-btn {
+    font-size: 0.7rem;
+  }
+}
 </style>

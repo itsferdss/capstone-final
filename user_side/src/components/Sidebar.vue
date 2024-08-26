@@ -1,48 +1,111 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
-    permanent
+    :permanent="!isMobile"
     class="navigation-drawer"
+    :mini-variant="miniVariant"
+    @update:mini-variant="toggleMiniVariant"
+    :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }"
+    app
   >
     <div class="admin-title">
-      <h1 class="admin-text">User</h1>
+      <v-icon class="admin-icon">mdi-account-circle-outline</v-icon>
+      <h1 class="admin-text" :class="{ 'hide-text': miniVariant }">User</h1>
     </div>
-
     <v-divider></v-divider>
 
     <v-list dense nav>
       <router-link :to="{ path: '/home' }" active-class="active-link" class="sidebar-link">
-        <span class="material-icons">home</span>
-        <span class="link-text">Home</span>
+        <v-icon class="link-icon">mdi-home</v-icon>
+        <span class="link-text" :class="{ 'hide-text': miniVariant }">Home</span>
       </router-link>
 
       <router-link :to="{ path: '/profile' }" active-class="active-link" class="sidebar-link">
-        <span class="material-icons">person</span>
-        <span class="link-text">Profile</span>
+        <v-icon class="link-icon">mdi-account</v-icon>
+        <span class="link-text" :class="{ 'hide-text': miniVariant }">Profile</span>
       </router-link>
 
       <router-link :to="{ path: '/products' }" active-class="active-link" class="sidebar-link">
-        <span class="material-icons">shopping_cart</span>
-        <span class="link-text">See Products</span>
+        <v-icon class="link-icon">mdi-cart</v-icon>
+        <span class="link-text" :class="{ 'hide-text': miniVariant }">See Products</span>
       </router-link>
     </v-list>
 
-    <!-- Logout Link -->
-    <v-list-item class="logout-link">
-      <router-link to="/" class="sidebar-link">
-        <span class="material-icons">logout</span>
-        <span class="link-text">Logout</span>
-      </router-link>
+    <v-icon class="toggle-icon" @click="toggleMiniVariant">
+      {{ miniVariant ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left' }}
+    </v-icon>
+
+    <v-list-item class="logout-link"  @click="confirmLogout">
+        <v-icon class="link-icon">mdi-logout</v-icon>
+        <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>  
     </v-list-item>
   </v-navigation-drawer>
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
+  props: {
+    miniVariant: {
+      type: Boolean,
+      default: false
+    },
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  computed: {
+    drawer: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      }
+    }
+  },
   data() {
     return {
-      drawer: true
+      isMobile: window.innerWidth <= 960,
     };
+  },
+  mounted() {
+    this.checkScreenWidth();
+    window.addEventListener('resize', this.checkScreenWidth);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkScreenWidth);
+  },
+  methods: {
+    checkScreenWidth() {
+      this.isMobile = window.innerWidth <= 960;
+      if (!this.isMobile && !this.drawer) {
+        this.drawer = true;
+      }
+    },
+    toggleMiniVariant() {
+      this.$emit('toggle-mini-variant');
+    },
+    confirmLogout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log out!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        sessionStorage.removeItem('token');
+        if (result.isConfirmed) {
+          // Handle the logout process here
+          this.$router.push('/'); // Redirect to home or login page
+        }
+      });
+    }
   }
 };
 </script>
@@ -50,51 +113,115 @@ export default {
 <style scoped>
 .navigation-drawer {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #B3D9E6; /* Light blue background */
-  border-radius: 10px; /* Rounded corners */
+  background-color: #B3D9E6;
+  border-radius: 10px;
+  transition: width 0.3s;
+  overflow-x: hidden;
 }
 
 .admin-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px; /* Ensure enough height for the text */
+  height: 100px;
+  background-color: #B3D9E6;
+  color: black;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  transition: width 0.3s;
+}
+
+.admin-icon {
+  font-size: 40px;
+  margin-right: 5px;
 }
 
 .admin-text {
   font-weight: bold;
-  font-size: 33px; /* Make the "ADMIN" text bigger */
-  margin: 0; /* Remove default margin */
+  font-size: 24px;
+  margin: 0;
 }
 
 .sidebar-link {
   display: flex;
   align-items: center;
-  color: inherit;
+  color: black;
   text-decoration: none;
   padding: 16px;
-  border-radius: 5px; /* Rounded corners */
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .sidebar-link:hover {
-  background-color: #a1becd; /* Lighter blue on hover */
+  background-color: #a1becd;
 }
 
 .active-link {
-  background-color: #E3F1F8; /* Lighter blue for active link */
+  background-color: #E3F1F8;
 }
 
-.material-icons {
-  margin-right: 8px;
+.link-icon {
+  margin-right: 20px;
+  transition: margin 0.3s;
 }
 
 .link-text {
   font-size: 16px;
+  transition: opacity 0.3s;
+}
+
+.hide-text {
+  display: none;
 }
 
 .logout-link {
-  margin-top: 300px; /* Push the logout link to the bottom */
+  margin-top: 250px;
+}
+
+.toggle-icon {
+  position: absolute;
+  bottom: 20px;
+  right: 10px;
+  z-index: 100;
+  font-size: 24px;
+  cursor: pointer;
+  color: black;
+}
+
+@media (max-width: 960px) {
+  .navigation-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 100%;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .link-icon {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+
+  .admin-icon {
+    font-size: 30px;
+  }
+
+  .admin-text {
+    font-size: 18px;
+  }
+
+  .link-text {
+    font-size: 12px;
+  }
+
+  .logout-link {
+    margin-top: 180px;
+  }
+
+  .toggle-icon {
+    display: none;
+  }
 }
 </style>

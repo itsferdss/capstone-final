@@ -1,32 +1,65 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router';
 
-
-const router = createRouter ({
+const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         {
-            path: '/',
-            component: () => import('../views/AdminLogin.vue')
-
+            path: '/login',
+            component: () => import('../views/AdminLogin.vue'),
+            meta: {
+                requiresAuthentication: false, // Login page doesn't require authentication
+            },
         },
-
         {
             path: '/home',
-            component: () => import('../views/Home.vue')
-
+            component: () => import('../views/Home.vue'),
+            meta: {
+                requiresAuthentication: true, // Home requires authentication
+            },
         },
-
         {
             path: '/profile',
-            component: () => import('../views/Profile.vue')
+            component: () => import('../views/Profile.vue'),
+            meta: {
+                requiresAuthentication: true, // Profile requires authentication
+            },
         },
-
         {
             path: '/products',
-            component: () => import('../views/Products.vue')
+            component: () => import('../views/Products.vue'),
+            meta: {
+                requiresAuthentication: true, // Products requires authentication
+            },
         },
-       
-    ]
-})
+        {
+            path: '/',
+            component: () => import('../views/LandingPage.vue'),
+            meta: {
+                requiresAuthentication: false, // Landing page doesn't require authentication
+            },
+        },
+    ],
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+    const token = getToken(); // Get token from sessionStorage
+
+    if (to.meta.requiresAuthentication && !token) {
+        // If the route requires authentication and there is no token, redirect to login
+        next('/');
+    } else if (!to.meta.requiresAuthentication && token && to.path === '/login') {
+        // If the route doesn't require authentication and there is a token, redirect to home
+        next('/home');
+    } else {
+        // Allow access to the route
+        next();
+    }
+});
+
+
+function getToken() {
+    // Retrieve the token from sessionStorage
+    return sessionStorage.getItem('token');
+}
+
+export default router;

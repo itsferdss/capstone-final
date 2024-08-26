@@ -1,10 +1,9 @@
 <template>
   <div class="container">
-
     <div class="login-form-container">
       <div id="login">
-        <h1 class="title">MVC Optical Clinic</h1>
-        <p class="subtitle">Sign in to continue</p>
+        <v-img src="src/assets/MVC_logo.png" class="mvcLogo"></v-img>
+        <p class="subtitle">Sign in to Continue</p>
         <div class="input-group">
           <label class="inputTitle" for="email">Email</label>
           <input type="text" id="email" v-model="email" required>
@@ -17,59 +16,65 @@
         <p>{{ errorMessage }}</p>
       </div>
     </div>
-
     <div class="trapezoid"></div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'; // Adjust the path to your Axios instance
 import Swal from 'sweetalert2';
 
 export default {
-    data() {
-        return {
-            email: '',
-            password: '',
-            errorMessage: ''
-        };
-    },
-    methods: {
-        login() {
-            axios.post('/login', {
-                    email: this.email,
-                    password: this.password
-                })
-                .then(response => {
-                    // If login is successful, redirect the user
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Login Successful',
-                        text: 'Welcome!',
-                    });
-                    this.$router.push('/home');
-                })
-                .catch(error => {
-                    // If login fails, display error message
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Login Failed',
-                        text: 'Invalid email or password',
-                    });
-                    console.error('Login failed:', error);
-                });
-        }
+  data() {
+    return {
+      email: '',
+      password: '',
+      errorMessage: ''
+    };
+  },
+  methods: {
+    login() {
+      axios.post('/login', {
+        email: this.email,
+        password: this.password
+      })
+      .then(response => {
+        const token = response.data.token; // Assuming the token is returned in the response
+        const id = response.data.id; 
+        localStorage.setItem('patientId', id);
+        sessionStorage.setItem('token', token); // Store the token in sessionStorage
+        this.$store.commit('setPatientId', id); 
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Welcome!',
+        });
+        this.$router.push('/home'); // Redirect to home after successful login
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: 'Invalid email or password',
+        });
+        console.error('Login failed:', error);
+      });
     }
+  }
 };
+
 </script>
 
 <style scoped>
 .container {
-  margin-top: 170px;
+  margin-top: 150px;
   display: flex;
-  justify-content: space-between; /* Align children with space between them */
+  flex-direction: column;
   align-items: center;
-  padding: 0 200px; /* Add padding to the container */
+  padding: 0 20px; /* Adjusted padding */
+  min-height: 513px; /* Make sure the container takes full height */
+  position: relative; /* Relative positioning to keep the trapezoid inside */
+  margin-right: 0px;
 }
 
 .login-form-container {
@@ -78,7 +83,8 @@ export default {
   background-color: #E3F1F8; /* Light blue background */
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  margin-left: 300px;
+  z-index: 1; /* Ensure it stays above the trapezoid */
+  margin-right: 200px;
 }
 
 .input-group {
@@ -120,7 +126,7 @@ button:hover {
 }
 
 .subtitle {
-  color: rgb(53, 53, 53); /* Light blue */
+  color: black; /* Light blue */
   margin: 0;
   font-size: 15px;
   text-align: center;
@@ -143,10 +149,14 @@ button:hover {
 .trapezoid {
   position: fixed;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  width: 200%;
   height: 70px;
   background-color: #B3D9E6; /* Light blue */
   align-items: center;
+}
+
+.mvcLogo {
+  width: 400px;
+  height: 80px;
 }
 </style>
