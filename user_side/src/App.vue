@@ -3,9 +3,8 @@
     <AdminLogin v-if="showLogin" />
     <div v-else>
       <div class="app">
-        <Sidebar v-if="showSidebar" :miniVariant="miniVariant" v-model="drawer" @toggle-mini-variant="toggleMiniVariant" />
+        <Sidebar class="header" v-if="showSidebar" :miniVariant="miniVariant" v-model="drawer" @toggle-mini-variant="toggleMiniVariant" />
         <div class="headerAndContent" :class="{ 'mini-variant': miniVariant }">
-          <Header />
           <v-icon v-if="isMobile" class="menu-icon" @click="toggleDrawer">mdi-menu</v-icon>
           <router-view v-slot="{ Component }"> 
             <transition name="fade" mode="out-in">
@@ -71,6 +70,7 @@ export default {
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
 
 .app {
     display: flex;
