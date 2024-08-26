@@ -7,6 +7,7 @@ import 'vuetify/dist/vuetify.min.css';
 import axios from "axios";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+
 window.axios = axios
 axios.defaults.withCredentials = false
 let backendUrl = "http://" + window.location.hostname.toString() + ":8000/api"

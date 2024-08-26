@@ -283,10 +283,10 @@ export default {
   flex-direction: column;
   justify-content: space-between; /* Ensures content is spaced properly */
 }
-
+/* 
 .v-card:hover {
-  background-color: #f0f0f0; /* Set the hover color here */
-}
+  background-color: #f0f0f0; 
+} */
 
 .headers {
   font-weight: bold;

@@ -44,7 +44,8 @@ export default {
     margin: 0;
     display: flex;
     flex-direction: column;
-    margin-left: 10px;
+    margin-left: -20px;
+    margin-right: -20px;
 
     .Home {
         border-radius: 10px;

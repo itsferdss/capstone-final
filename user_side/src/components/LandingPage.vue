@@ -218,7 +218,7 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss" scoped>
 html {
   scroll-behavior: smooth; /* Smooth scrolling for anchor links */
 }
@@ -374,13 +374,13 @@ footer {
  transition: background-color 0.15s ease-in-out;
 }
 
-.primary-button:hover:before {
- background-color: white;
-}
+// .primary-button:hover:before {
+//  background-color: white;
+// }
 
-.primary-button:hover:after {
- background-color: white;
-}
+// .primary-button:hover:after {
+//  background-color: white;
+// }
 
 .primary-button:after {
  content: "";
