@@ -21,7 +21,7 @@
         <!-- PRODUCT BOX OF LATESTS -->
         <v-row class="products">
           <v-col class="latestdia" v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
-            <v-card class="v-card" elevation="2" style="height: 100%;">
+            <v-card class="v-card" elevation="2" style="height: 100%;" @click="viewProduct(product.id)">
               <img :src="getProductImageUrl(product.image)" alt="Product Image" class="productPic">
               <v-card-title class="product-name">{{ product.product_name }}</v-card-title>
               <v-card-text class="product-price">
@@ -59,6 +59,10 @@ export default {
     },
     getProductImageUrl(imagePath) {
       return `http://127.0.0.1:8000/${imagePath}`;
+    },
+
+    viewProduct(productId) {
+      this.$router.push({ path: '/viewProduct', query: { id: productId } });
     },
   },
   created() {
@@ -177,6 +181,7 @@ html, body {
 .products {
   margin-right: 20px;
   margin-left: 20px;
- 
 }
+
+
 </style>

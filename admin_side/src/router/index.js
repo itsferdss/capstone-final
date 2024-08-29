@@ -24,6 +24,18 @@ const router = createRouter({
             path: '/inventory',
             component: () => import('../views/Inventory.vue')
         },
+        {
+            path: '/add/user',
+            component: () => import('../views/Forms_Adding/AddUserForm.vue')
+        },
+        {
+            path: '/add/prescription',
+            component: () => import('../views/Forms_Adding/PrescriptionForm.vue')
+        },
+        {
+            path: '/view/prescription',
+            component: () => import('../views/Forms_Viewing/FormPrescriptionView.vue')
+        },
        
         { path: '/', redirect: '/adminlogin' }
     ]

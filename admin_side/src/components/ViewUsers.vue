@@ -27,68 +27,11 @@
           style="max-width: 300px;"
         ></v-text-field>
 
-        <v-dialog v-model="dialog" max-width="1000px" class="addPatDialog">
-          <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog" color="primary" dark class="styled-btn" v-bind="props">
-              <v-icon left>mdi-account-plus</v-icon>
-              <span class="styled-btn-text">Add New Patient</span>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              <span class="dialogTitle">New User</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-row dense>
-                  <v-col cols="12">
-                    <v-text-field v-model="editedItem.full_name" label="User Name*" prepend-icon="mdi-account" required></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field v-model="editedItem.email" label="Email*" prepend-icon="mdi-email" required></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field v-model="editedItem.address" label="Address" prepend-icon="mdi-map-marker" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.contact" label="Contact Number" prepend-icon="mdi-phone" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.birthdate" label="Birthdate" type="date" prepend-icon="mdi-calendar" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      v-model="editedItem.password"
-                      label="Password"
-                      prepend-icon="mdi-lock"
-                      :append-icon="editedItem.passwordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-                      :type="editedItem.passwordVisible ? 'text' : 'password'"
-                      @click:append="editedItem.passwordVisible = !editedItem.passwordVisible"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      v-model="editedItem.confirm_password"
-                      label="Confirm Password"
-                      prepend-icon="mdi-lock"
-                      :append-icon="editedItem.confirmPasswordVisible ? 'mdi-eye' : 'mdi-eye-off'"
-                      :type="editedItem.confirmPasswordVisible ? 'text' : 'password'"
-                      @click:append="editedItem.confirmPasswordVisible = !editedItem.confirmPasswordVisible"
-                      required
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
+        <v-btn @click="openDialog" color="primary" dark class="styled-btn">
+          <v-icon left>mdi-account-plus</v-icon>
+          <span class="styled-btn-text">Add New Patient</span>
+        </v-btn>
 
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-              <v-btn color="black" text @click="saveNewUser">Save User</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-toolbar>
     </template>
 
@@ -180,59 +123,6 @@
               </v-card-text>
             </v-card>
           </v-card-text>
-        </v-card>
-      </v-dialog>
-
-
-      <!--DIALOG FOR EYE UPDATE/PRESCRIPTION-->
-      <v-dialog v-model="childUpdateDialog" max-width="500px">
-        <v-card>
-          <v-card-title>New Prescription</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="selectedPatient.id" label="Patient ID" readonly></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.left_eye_sphere" label="Left Eye Sphere" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.right_eye_sphere" label="Right Eye Sphere" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.left_eye_cylinder" label="Left Eye Cylinder" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.right_eye_cylinder" label="Right Eye Cylinder" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.left_eye_axis" label="Left Eye Axis" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.right_eye_axis" label="Right Eye Axis" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.reading_add" label="Reading Add" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.best_visual_acuity" label="Best Visual Acuity" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.PD" label="PD" required></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="error" @click="closeChildUpdateDialog">Cancel</v-btn>
-            <v-btn color="#35623D" @click="savePrescription">Save</v-btn>
-          </v-card-actions>
         </v-card>
       </v-dialog>
 
@@ -502,36 +392,6 @@ export default {
           });
       },
 
-     saveNewUser() {
-      axios.post('/patients', this.editedItem)
-        .then(response => {
-          this.displayedPatients.push(response.data);
-          this.closeDialog();
-          swal({
-            title: "Success",
-            text: "Patient created successfully!",
-            icon: "success",
-          });
-        })
-        .catch(error => {
-          console.error('Error creating patient', error);
-          swal({
-            title: "Error",
-            text: "Failed to create patient. Please try again later.",
-            icon: "error",
-          });
-        });
-    },
-      resetForm(){
-        this.editedItem = {
-          full_name: '',
-          email: '',
-          address: '',
-          contact: '',
-          birthdate: '',
-          password: '',
-        };
-      },
       savePrescription() {
         // Check if selectedPatient is valid
         if (!this.selectedPatient || !this.selectedPatient.id) {
@@ -794,7 +654,7 @@ export default {
     });
   },
     openDialog() {
-      this.dialog = true;
+      this.$router.push('/add/user')
     },
     closeDialog() {
       this.dialog = false;
@@ -854,9 +714,12 @@ export default {
     },
    
     openChildUpdateDialog(prescription) {
-      this.editedItem = { ...prescription };
-      this.childUpdateDialog = true;
-      
+      const patientId = this.selectedPatient.id; 
+      console.log('Opening child update dialog with patient_id:', patientId);
+      this.$router.push({ 
+        path: '/add/prescription', 
+        query: { patient_id: patientId } // Add patient_id as a query parameter
+      });
     },
     closeChildUpdateDialog() {
       this.childUpdateDialog = false;
