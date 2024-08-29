@@ -33,6 +33,14 @@ const router = createRouter({
             component: () => import('../views/Forms_Adding/PrescriptionForm.vue')
         },
         {
+            path: '/add/spectacles',
+            component: () => import('../views/Forms_Adding/SpectaclesForm.vue')
+        },
+        {
+            path: '/add/history',
+            component: () => import('../views/Forms_Adding/HistoryForm.vue')
+        },
+        {
             path: '/view/prescription',
             component: () => import('../views/Forms_Viewing/FormPrescriptionView.vue')
         },

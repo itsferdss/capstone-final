@@ -84,7 +84,6 @@
             <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add Prescription</v-btn>
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
-            
             <!-- Loop through selectedUserPrescriptions -->
              <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index" class="mb-4">
               <!-- Display prescription information -->
@@ -160,37 +159,6 @@
         </v-dialog>
       </template>
 
-      <!--DIALOG FOR GLASSES UPDATE-->
-      <v-dialog v-model="childGlassesDialog" max-width="500px">
-        <v-card>
-          <v-card-title>New Glasses</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.frame" label="Frame" required></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field v-model="editedItem.type_of_lens" label="Type of Lens" required></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.remarks" label="Remarks" required></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="error" @click="closeChildGlassesDialog">Cancel</v-btn>
-                 <v-btn color="#35623D" @click="saveChildGlasses">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
       <!--DIALOG FOR MORE HISTORY-->
       <v-dialog v-model="dialogMoreHistory" max-width="1300px">
         <v-card>
@@ -220,32 +188,7 @@
 
 
       <!--DIALOG FOR HISTORY UPDATE-->
-      <v-dialog v-model="childHistoryDialog" max-width="500px">
-        <v-card>
-          <v-card-title>New Medical History</v-card-title>
-          <v-divider></v-divider>
-          <v-card-text>
-            <v-form>
-              <v-container>
-                <v-row>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.medical_history" label="Medical History" required></v-textarea>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-textarea v-model="editedItem.ocular_history" label="Ocular History" required></v-textarea>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-form>
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="error" @click="closeChildHistoryDialog">Cancel</v-btn>
-            <v-btn color="#35623D" @click="saveNewHistory">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+  
     </template>
   </v-data-table>
 </template>
@@ -737,8 +680,12 @@ export default {
     
     },
     openChildGlassesDialog(glasses) {
-      this.editedItem = { ...glasses };
-      this.childGlassesDialog = true;
+       const patientId = this.selectedPatient.id; 
+      console.log('Opening child update dialog with patient_id:', patientId);
+      this.$router.push({ 
+        path: '/add/spectacles', 
+        query: { patient_id: patientId } // Add patient_id as a query parameter
+      });
     },
     closeChildGlassesDialog() {
       this.childGlassesDialog = false;
@@ -800,8 +747,12 @@ export default {
     
     },
     openChildHistoryDialog(history) {
-      this.editedItem = { ...history};
-      this.childHistoryDialog = true;
+      const patientId = this.selectedPatient.id; 
+      console.log('Opening child update dialog with patient_id:', patientId);
+      this.$router.push({ 
+        path: '/add/history', 
+        query: { patient_id: patientId } // Add patient_id as a query parameter
+      });
     },
     closeChildHistoryDialog() {
       this.childHistoryDialog = false;
