@@ -166,6 +166,7 @@ form {
 .form-group {
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem; /* Adds spacing between form groups */
 }
 
 label {
@@ -180,7 +181,7 @@ input {
   border-radius: 4px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   font-size: 1rem;
-  height: 2.5rem; /* Added height for inputs */
+  height: 5.5rem; /* Sets the height of the input boxes */
 }
 
 input:focus {
