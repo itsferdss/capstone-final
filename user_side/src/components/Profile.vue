@@ -29,6 +29,16 @@
     <!-- Button to open update dialog -->
     <v-btn @click="openUpdateParentDialog" color="primary" dark class="mt-4">Update Information</v-btn>
 
+    <v-container>
+      <v-card class="mt-4 d-flex flex-column" elevation="2">
+        <v-card-text class="agreement-reminder-text">
+          "Thank you for agreeing to our Terms and Conditions. Rest assured that your information is encrypted and stored securely to protect your privacy. We prioritize your security and confidentiality at every step. Our data protection measures comply with industry standards, ensuring that your personal details are safeguarded against unauthorized access. Should you have any concerns or require assistance, our support team is available to address your inquiries promptly. Your trust is important to us, and we are committed to maintaining the highest level of security and transparency."
+        </v-card-text>
+        <v-spacer></v-spacer> <!-- Spacer to push icon to the bottom -->
+        <v-icon class="secured-icon">mdi-lock</v-icon>
+      </v-card>
+    </v-container>
+
     <!-- Dialog for updating parent information -->
     <v-dialog v-model="updateParentDialog" max-width="750px">
       <v-card>
@@ -299,5 +309,18 @@ export default {
   .v-btn {
     font-size: 0.7rem;
   }
+
+}
+.agreement-reminder-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.secured-icon {
+  font-size: 1.5rem; /* Adjust icon size */
+  color: #0d0e0d; /* Optional: Change color to green for security */
+  margin: 16px; /* Adjust spacing as needed */
+  align-self: flex-end; /* Align icon to the end of the container */
 }
 </style>

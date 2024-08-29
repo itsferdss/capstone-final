@@ -35,7 +35,7 @@ export default {
       console.log("Username:", this.username);
       console.log("Password:", this.password);
 
-      if (this.username === 'ferdinand' && this.password === '123') {
+      if (this.username === 'admin' && this.password === '123') {
         console.log("Redirecting to /dashboard");
         this.$router.push('/dashboard'); // Use router.push to navigate
       } else {
@@ -61,7 +61,7 @@ export default {
   padding: 20px;
   background-color: #E3F1F8;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   margin-left: 300px;
 }
 

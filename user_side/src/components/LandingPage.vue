@@ -88,7 +88,7 @@
               <p class="team-text">Gian King Caampued <br> <br>Hustler</p>
             </div>
             <div class="team-member">
-              <img src="/src/assets/me.jpg" alt="Ferdinand C. Espiritu II" class="team-image">
+              <img src="/src/assets/me.png" alt="Ferdinand C. Espiritu II" class="team-image">
               <p class="team-text">Ferdinand C. Espiritu II<br> <br> Hipster</p>
             </div>
             <div class="team-member">

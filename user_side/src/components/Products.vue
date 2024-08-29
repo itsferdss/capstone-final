@@ -293,7 +293,8 @@ export default {
 }
 
 .productPic {
-  height: 280px;
+  height: 200px;
+  width: 100%; /* Ensure width is 100% to maintain aspect ratio */
   object-fit: cover;
 }
 

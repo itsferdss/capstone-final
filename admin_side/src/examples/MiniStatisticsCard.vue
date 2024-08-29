@@ -86,6 +86,7 @@ defineProps({
   border-radius: 8px;
   background-color: #ffffff;
   transition: box-shadow 0.3s ease;
+  box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .mini-statistics-card:hover {
