@@ -29,49 +29,10 @@
         ></v-text-field>
 
         <!-- Add new product button -->
-        <v-dialog v-model="dialog" max-width="750px" enctype="multipart/form-data">
-          <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog('pending')" class="mb-2 mr-4 rounded-l add-btn" elevation="2" v-bind="props">
+            <v-btn @click="openDialog('pending')" class="mb-2 mr-4 rounded-l add-btn" elevation="2">
               <v-icon left>mdi-plus</v-icon>
               <span class="add-text">Add New Product</span>
             </v-btn>
-
-            <!--DIALOG FOR ADDING PRODUCT-->
-          </template>
-            <v-card>
-                <v-card-title>
-                <span class="text-h6 m-2">New Product</span>
-                </v-card-title>
-                <v-card-text>
-                <v-container>
-                    <v-row dense>
-                    <v-col cols="6">
-                        <v-text-field v-model="editedItem.product_name" label="Product Name*" prepend-icon="mdi-package-variant-closed" required></v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery" required></v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter" required></v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash" required></v-text-field>
-                    </v-col>
-                    <!-- Image Upload -->
-                    <v-col cols="12">
-                        <v-file-input v-model="editedItem.image" label="Product Image" accept="image/*"></v-file-input>
-                    </v-col>
-                    </v-row>
-                </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="black" text @click="closeDialog">Cancel</v-btn>
-                <v-btn color="black" text @click="saveNewProduct">Save Product</v-btn>
-                </v-card-actions>
-            </v-card> 
-            </v-dialog>
       </v-toolbar>
     </template>
 
@@ -208,37 +169,44 @@
                 });
             },
        saveNewProduct() {
-            const formData = new FormData();
+          const formData = new FormData();
 
-            formData.append('product_name', this.editedItem.product_name);
-            formData.append('supplier', this.editedItem.supplier);
-            formData.append('quantity', this.editedItem.quantity);
-            formData.append('price', this.editedItem.price);
-            formData.append('product_image', this.editedItem.image);
+          formData.append('product_name', this.editedItem.product_name);
+          formData.append('supplier', this.editedItem.supplier);
+          formData.append('quantity', this.editedItem.quantity);
+          formData.append('price', this.editedItem.price);
 
-            axios.post('/products', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-            .then(response => {
-                swal('Success!', 'Product saved successfully.', 'success');
+          // Append each image file to the FormData object
+          if (this.editedItem.images && this.editedItem.images.length > 0) {
+            for (let i = 0; i < this.editedItem.images.length; i++) {
+              formData.append('product_images[]', this.editedItem.images[i]);
+            }
+          }
 
-                this.editedItem.product_name = '';
-                this.editedItem.supplier = '';
-                this.editedItem.quantity = '';
-                this.editedItem.price = '';
-                this.editedItem.image = null; 
+          axios.post('/products', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(response => {
+            swal('Success!', 'Product saved successfully.', 'success');
 
-                this.closeDialog();
+            // Reset form data
+            this.editedItem.product_name = '';
+            this.editedItem.supplier = '';
+            this.editedItem.quantity = '';
+            this.editedItem.price = '';
+            this.editedItem.images = null; 
 
-              
-                this.fetchProducts();
-            })
-            .catch(error => {
-                console.error('Error saving product:', error);
-                swal('Oops...', 'Something went wrong!', 'error');
-            });
+            this.closeDialog();
+
+            // Fetch updated product list
+            this.fetchProducts();
+          })
+          .catch(error => {
+            console.error('Error saving product:', error);
+            swal('Oops...', 'Something went wrong!', 'error');
+          });
         },
    saveEditedProduct() {
         axios.put(`http://127.0.0.1:8000/api/products/${this.editedItem.id}`, {
@@ -284,7 +252,7 @@
 
 
         openDialog() {
-        this.dialog = true;
+        this.$router.push('/add/product')
     },
         closeDialog() {
         this.dialog = false;

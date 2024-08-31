@@ -49,16 +49,21 @@ export default {
     goToProducts() {
       this.$router.push('/products');
     },
-    async fetchProducts() {
-      try {
-        const response = await axios.get('http://localhost:8000/api/products/latest');
-        this.products = response.data;
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
+    fetchProducts() {
+      axios.get('/products/latest')
+        .then(response => {
+          this.products = response.data.map(product => {
+            console.log('Product Image URL:', product.image);
+            return product;
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+        });
     },
+
     getProductImageUrl(imagePath) {
-      return `http://127.0.0.1:8000/${imagePath}`;
+      return imagePath;
     },
 
     viewProduct(productId) {
