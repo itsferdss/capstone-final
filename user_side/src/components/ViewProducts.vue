@@ -195,6 +195,7 @@ export default {
   height: 100vh;
   background-color: #f5f5f5;
   font-family: 'Arial', sans-serif;
+  margin-left: 10%;
 }
 
 .left-container {
