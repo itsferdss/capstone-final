@@ -1,31 +1,24 @@
 <template>
-    <header class="header sticky-lg-top" :class="{ 'mini-variant': miniVariant }">
-        <img class="echodeLogo" src="../assets/echode_logo.png"/>
-        <div class="logo-separator"></div>
-        <img class="mvcLogo" src="../assets/MVC_logo.png"/>
-        <div class="clock">{{ currentTime }}</div>
-    </header>
+  <header class="header">
+    <button class="menu-button" @click="toggleMenu">☰</button>
+    <div class="time-container">
+      <v-icon class="calendar-icon">mdi-calendar</v-icon>
+      <div class="clock">{{ currentTime }}</div>
+    </div>
+  </header>
 </template>
 
 <script>
-
 export default {
-    name: 'Header',
-    data() {
+  name: 'Header',
+  data() {
     return {
-       isSmallScreen: false,
-       miniVariant: false,
-       currentTime: ''
+      currentTime: '',
     };
   },
   mounted() {
     this.updateTime();
-    setInterval(this.updateTime, 1000); // Update time every second,
-    this.checkScreenSize();
-    window.addEventListener('resize', this.checkScreenSize);
-  },
-  destroyed() {
-    window.removeEventListener('resize', this.checkScreenSize);
+    setInterval(this.updateTime, 1000); // Update time every second
   },
   methods: {
     updateTime() {
@@ -37,15 +30,12 @@ export default {
         hour: 'numeric',
         minute: '2-digit',
         second: '2-digit',
-        hour12: true
+        hour12: true,
       };
       this.currentTime = now.toLocaleDateString('en-US', options);
     },
-    checkScreenSize() {
-      this.isSmallScreen = window.innerWidth <= 960;
-    },
-    toggleSidebar() {
-      this.$emit('toggle-mini-variant');
+    toggleMenu() {
+      this.$emit('toggle-menu');
     },
   },
 }
@@ -53,38 +43,66 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-    display: flex;
-    background: #374974;
-    height: var(--header-height);
-    width: 100%;
-    height: 100px;
-    margin-left: 70px;
-
-    .clock {
-        color: #e2e2e2;
-        align-self: center;
-        margin-right: 1rem;
-        margin-left: 25%;
-      }
-
-    .echodeLogo{
-        margin-top: 10px;
-        height: 80px;
-        margin-left: 20px;
-    }  
-    
-    .mvcLogo{
-        margin-top: 10px;
-        height: 80px;
-        border-radius: 20px;
-    }
-
-    .logo-separator {
-        height: 100px; /* Adjust height to match logos */
-        width: 2px; /* Line thickness */
-        background-color: black; /* Line color */
-        margin: 0 20px; /* Space around the separator */
-    }
+  display: flex;
+  align-items: center;
+  background: #B3D9E6;
+  height: 50px;
+  /* Consistent height */
+  width: 100%;
+  position: relative;
+  /* Ensure positioning context for absolute elements */
+  box-shadow: 0 4px 8px rgba(1, 1, 1, 0.4);
+  /* Add shadow effect */
+  z-index: 1;
+  /* Ensure it is above other elements */
+  padding: 0 10px;
+  /* Add padding to the header */
+  box-sizing: border-box;
+  /* Include padding in height calculation */
 }
 
+.menu-button {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 1.5rem;
+  cursor: pointer;
+  outline: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  /* Make the button circular */
+  background-color: #dce9f1;
+  /* Gray background */
+  height: 40px;
+  /* Adjust height of the button */
+  width: 40px;
+  /* Ensure the width matches the height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Center the icon in the circle */
+  margin-left: 30px;
+}
+
+.time-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  /* Push the time-container to the right */
+}
+
+.calendar-icon {
+  font-size: 24px;
+  /* Adjust size if needed */
+  margin-right: 8px;
+  /* Space between icon and clock */
+  color: #333;
+  /* Change color if needed */
+}
+
+.clock {
+  font-size: 16px;
+  /* Adjust font size if needed */
+  color: rgb(68, 67, 67);
+}
 </style>

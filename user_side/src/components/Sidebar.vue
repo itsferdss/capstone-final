@@ -31,10 +31,6 @@
       </router-link>
     </v-list>
 
-    <v-icon class="toggle-icon" @click="toggleMiniVariant">
-      {{ miniVariant ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left' }}
-    </v-icon>
-
     <v-list-item class="logout-link"  @click="confirmLogout">
         <v-icon class="link-icon">mdi-logout</v-icon>
         <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>  
@@ -86,7 +82,11 @@ export default {
       }
     },
     toggleMiniVariant() {
-      this.$emit('toggle-mini-variant');
+      if (this.isMobile) {
+        this.miniVariant = false;
+      } else {
+        this.miniVariant = !this.miniVariant;
+      }
     },
     confirmLogout() {
       Swal.fire({
@@ -115,7 +115,7 @@ export default {
   height: 100vh;
   background-color: #B3D9E6;
   border-radius: 10px;
-  transition: width 0.3s;
+  transition: width 0.2s ease, transform 0.2s ease;
   overflow-x: hidden;
   box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -129,7 +129,6 @@ export default {
   color: black;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  transition: width 0.3s;
 }
 
 .admin-icon {

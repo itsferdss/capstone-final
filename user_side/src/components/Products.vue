@@ -283,15 +283,6 @@ export default {
   flex-direction: column;
   justify-content: space-between; /* Ensures content is spaced properly */
 }
-/* 
-.v-card:hover {
-  background-color: #f0f0f0; 
-} */
-
-.headers {
-  font-weight: bold;
-}
-
 .productPic {
   height: 200px;
   width: 100%; /* Ensure width is 100% to maintain aspect ratio */
