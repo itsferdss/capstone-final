@@ -1,13 +1,5 @@
 <template>
   <div>
-    <v-toolbar flat>
-      <v-toolbar-title class="mainTitle">
-        <v-icon left>mdi-chart-bar</v-icon>
-        DASHBOARD
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-toolbar>
-
     <div class="py-4 container-fluid">
       <div class="row">
         <div class="col-lg-12">
@@ -260,6 +252,13 @@ async function fetchAccountsCreatedPerMonth() {
 .card {
   margin-bottom: 1rem;
   border-radius: 10px;
+  border-width: 1px 1px 2px 4px;
+  border-color: rgb(67, 100, 101);
+}
+
+.dashCards{
+  border-width: 1px 1px 2px 4px;
+  border-color: rgb(67, 100, 101);
 }
 
 @media (max-width: 960px) {

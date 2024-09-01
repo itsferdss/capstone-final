@@ -10,40 +10,36 @@
   >
     <div class="admin-title">
       <v-icon class="admin-icon">mdi-account-circle-outline</v-icon>
-      <h1 class="admin-text" :class="{ 'hide-text': miniVariant }">Admin</h1>
+      <h1 class="admin-text">Admin</h1>
     </div>
     <v-divider></v-divider>
 
     <v-list dense nav>
       <router-link :to="{ path: '/dashboard' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-view-dashboard</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">Dashboard</span>
+        <span class="link-text">Dashboard</span>
       </router-link>
 
       <router-link :to="{ path: '/viewusers' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-account-group</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">View Patients</span>
+        <span class="link-text">View Patients</span>
       </router-link>
 
       <router-link :to="{ path: '/schedule' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-calendar-clock</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">See Reservations</span>
+        <span class="link-text">See Reservations</span>
       </router-link>
 
       <router-link :to="{ path: '/inventory' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-package-variant-closed</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">See Products</span>
+        <span class="link-text">See Products</span>
       </router-link>
     </v-list>
-
-    <v-icon class="toggle-icon" @click="toggleMiniVariant">
-      {{ miniVariant ? 'mdi-chevron-double-right' : 'mdi-chevron-double-left' }}
-    </v-icon>
 
     <v-list-item class="logout-link">
       <router-link to="/" class="sidebar-link">
         <v-icon class="link-icon">mdi-logout</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>
+        <span class="link-text">Logout</span>
       </router-link>
     </v-list-item>
   </v-navigation-drawer>
@@ -91,7 +87,11 @@ export default {
       }
     },
     toggleMiniVariant() {
-      this.$emit('toggle-mini-variant');
+      if (this.isMobile) {
+        this.miniVariant = false;
+      } else {
+        this.miniVariant = !this.miniVariant;
+      }
     }
   }
 };
@@ -102,7 +102,7 @@ export default {
   height: 100vh;
   background-color: #B3D9E6;
   border-radius: 10px;
-  transition: width 0.3s;
+  transition: width 0.2s ease, transform 0.2s ease;
   overflow-x: hidden;
   box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -116,7 +116,6 @@ export default {
   color: black;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  transition: width 0.3s;
 }
 
 .admin-icon {
@@ -137,7 +136,7 @@ export default {
   text-decoration: none;
   padding: 16px;
   border-radius: 5px;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease;
 }
 
 .sidebar-link:hover {
@@ -150,30 +149,16 @@ export default {
 
 .link-icon {
   margin-right: 20px;
-  transition: margin 0.3s;
+  transition: margin-right 0.2s ease;
 }
 
 .link-text {
   font-size: 16px;
-  transition: opacity 0.3s;
-}
-
-.hide-text {
-  display: none;
+  transition: opacity 0.2s ease;
 }
 
 .logout-link {
-  margin-top: 200px;
-}
-
-.toggle-icon {
-  position: absolute;
-  bottom: 20px;
-  right: 10px;
-  z-index: 100;
-  font-size: 24px;
-  cursor: pointer;
-  color: black;
+  margin-top: 250px;
 }
 
 @media (max-width: 960px) {
@@ -206,10 +191,6 @@ export default {
 
   .logout-link {
     margin-top: 180px;
-  }
-
-  .toggle-icon {
-    display: none;
   }
 }
 </style>
