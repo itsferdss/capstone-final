@@ -184,8 +184,8 @@ html, body {
 }
 
 .products {
-  margin-right: 20px;
-  margin-left: 20px;
+  margin-right: 40px;
+  margin-left: 40px;
 }
 
 
