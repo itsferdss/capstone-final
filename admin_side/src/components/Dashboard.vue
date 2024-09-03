@@ -254,6 +254,7 @@ async function fetchAccountsCreatedPerMonth() {
   border-radius: 10px;
   border-width: 1px 1px 2px 4px;
   border-color: rgb(67, 100, 101);
+  box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .dashCards{

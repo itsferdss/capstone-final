@@ -156,7 +156,7 @@ export default {
 }
 
 .logout-link {
-  margin-top: 180px;
+  margin-top: 250px;
 }
 
 @media (max-width: 960px) {

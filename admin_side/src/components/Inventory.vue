@@ -116,12 +116,12 @@ export default {
 
 
       headers: [
-        { title: 'Product ID', align: 'start', key: 'product_id' },
-        { title: 'Product Name', align: 'start', key: 'product_name' },
-        { title: 'Supplier', key: 'supplier' },
-        { title: 'Stock', key: 'quantity' },
-        { title: 'Price', key: 'price' },
-        { title: 'Actions', sortable: false },
+        { title: 'Product ID', align: 'center', key: 'product_id' },
+        { title: 'Product Name', align: 'center', key: 'product_name' },
+        { title: 'Supplier', align: 'center', key: 'supplier' },
+        { title: 'Stock', align: 'center', key: 'quantity' },
+        { title: 'Price', align: 'center', key: 'price' },
+        { title: 'Actions', align: 'center', sortable: false },
       ],
 
       viewingRecords: false,
@@ -322,6 +322,9 @@ export default {
   color: black !important;
 }
 
+td{
+  text-align: center;
+}
 .add-btn .v-icon {
   margin-right: 8px;
   /* Add spacing between icon and text */

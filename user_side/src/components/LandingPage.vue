@@ -4,7 +4,7 @@
       <div class="topnav">
         <img class="logo" src="../assets/newlogo.png" />
         <div class="logo-separator"></div>
-        <img class="MVClogo" src="../assets/MVC_logo.png" />
+        <img class="MVClogo" src="../assets/MVC_logo.png" />    
         <div class="nav-links">
           <a href="#section1" class="nav-link" :class="{ active: activeSection === 'section1' }">Home</a>
           <a href="#section2" class="nav-link" :class="{ active: activeSection === 'section2' }">About</a>

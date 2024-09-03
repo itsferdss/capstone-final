@@ -3,61 +3,54 @@
     <h1 class="bg-title">Enter Product's Information</h1>
     <div class="form-container">
       <div class="form-box">
-        <!-- Update form to call correct method -->
         <form @submit.prevent="saveNewProduct">
+          <div class="form-group">
+            <label for="product_name">Product Name</label>
+            <input type="text" v-model="editedItem.product_name" id="product_name" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="supplier">Supplier</label>
+            <input type="text" v-model="editedItem.supplier" id="supplier" class="form-input" required />
+          </div>
+
           <div class="form-row">
             <div class="form-column">
               <div class="form-group">
-                <label for="product_name">Product Name</label>
-                <input
-                  type="text"
-                  v-model="editedItem.product_name"
-                  id="product_name"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="supplier">Supplier</label>
-                <input
-                  type="text"
-                  v-model="editedItem.supplier"
-                  id="supplier"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <input
-                  type="text"
-                  v-model="editedItem.quantity"
-                  id="quantity"
-                  class="form-input"
-                  required
-                />
+                <input type="number" v-model.number="editedItem.quantity" id="quantity" class="form-input" required
+                  placeholder="Enter quantity" />
               </div>
               <div class="form-group">
-                <label for="price">Price</label>
-                <input
-                  type="text"
-                  v-model="editedItem.price"
-                  id="price"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="images">Product Images</label>
-                <input
-                  type="file"
-                  id="images"
-                  class="form-input"
-                  multiple
-                  @change="handleImageUpload"
-                />
+                <label for="type">Type</label>
+                <select v-model="editedItem.type" id="type" class="form-input" required>
+                  <option value="" disabled>Select Type</option>
+                  <option value="Frames">Frames</option>
+                  <option value="Lens">Lens</option>
+                  <option value="Contact Lenses">Contact Lenses</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
               </div>
             </div>
+            <div class="form-column">
+              <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" step="0.01" v-model.number="editedItem.price" id="price" class="form-input"
+                  required placeholder="Enter price" />
+              </div>
+              <div class="form-group">
+                <label for="gender">For Who</label>
+                <select v-model="editedItem.gender" id="gender" class="form-input" required>
+                  <option value="" disabled>Select Gender</option>
+                  <option value="Men">Men</option>
+                  <option value="Women">Women</option>
+                  <option value="Unisex">Unisex</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="images">Product Images</label>
+            <input type="file" id="images" class="form-input" multiple @change="handleImageUpload" />
           </div>
           <hr />
           <div class="form-buttons">
@@ -89,6 +82,8 @@ export default {
         quantity: '',
         price: '', // Add price property
         image: [],
+        type: '',
+        gender: '',
       },
     };
   },
@@ -104,6 +99,8 @@ export default {
       formData.append('supplier', this.editedItem.supplier);
       formData.append('quantity', this.editedItem.quantity);
       formData.append('price', this.editedItem.price);
+      formData.append('type', this.editedItem.type);
+      formData.append('gender', this.editedItem.gender);
 
       // Append each image file to the FormData object
       if (this.editedItem.images.length > 0) {
@@ -117,28 +114,28 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       })
-      .then(response => {
-        Swal.fire({
-          title: 'Success!',
-          text: 'Product saved successfully.',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'OK'
-        });
+        .then(response => {
+          Swal.fire({
+            title: 'Success!',
+            text: 'Product saved successfully.',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+          });
 
-        // Reset form data
-        this.resetForm();
-      })
-      .catch(error => {
-        console.error('Error saving product:', error);
-        Swal.fire({
-          title: 'Oops...',
-          text: 'Something went wrong!',
-          icon: 'error',
-          confirmButtonColor: '#d33',
-          confirmButtonText: 'OK'
+          // Reset form data
+          this.resetForm();
+        })
+        .catch(error => {
+          console.error('Error saving product:', error);
+          Swal.fire({
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'OK'
+          });
         });
-      });
     },
     resetForm() {
       this.editedItem = {
@@ -228,6 +225,19 @@ input:focus {
   box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
 }
 
+select{
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+}
+
+select:focus {
+  border-color: #3EB489;
+  outline: none;
+  box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
+}
 .form-buttons {
   display: flex;
   justify-content: space-between;

@@ -1,6 +1,9 @@
 <template>
   <header class="header">
     <button class="menu-button" @click="toggleMenu">☰</button>
+    <img class="mvcLogo" src="../assets/MVC_logo.png" />
+    <div class="logo-separator"></div>
+    <img class="logo" src="../assets/newlogo.png"/>
     <div class="time-container">
       <v-icon class="calendar-icon">mdi-calendar</v-icon>
       <div class="clock">{{ currentTime }}</div>
@@ -71,6 +74,23 @@ export default {
   align-items: center;
   justify-content: center; /* Center the icon in the circle */
   margin-left: 30px;
+}
+
+.mvcLogo{
+  height: 40px;
+  border-radius: 10px;
+  margin-left: 30px;
+}
+
+.logo-separator {
+  height: 20px;
+  width: 2px;
+  background-color: #464646;
+  margin: 0 20px;
+}
+
+.logo{
+  height: 40px;
 }
 
 .time-container {

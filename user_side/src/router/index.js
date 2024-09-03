@@ -39,6 +39,13 @@ const router = createRouter({
             // },
         },
         {
+            path: '/newproducts',
+            component: () => import('../components/NEWPRODUCTS.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
+        {
             path: '/viewProduct',
             component: () => import('../components/ViewProducts.vue'),
             // meta: {

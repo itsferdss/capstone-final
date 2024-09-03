@@ -1,401 +1,266 @@
 <template>
-  <div>
-    <!-- HEADER -->
-    <v-toolbar flat>
-      <v-toolbar-title class="headers">
-        <v-icon class="mr-2">mdi-package-variant-closed</v-icon> Products
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <!-- SEARCH BAR -->
-      <v-text-field v-model="search" class="search-bar w-auto mr-4" density="compact" label="Search Products"
-        prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
-        style="max-width: 300px;"></v-text-field>
-      <!-- RESERVATION BUTTON -->
-      <v-btn @click="showReservations" class="reservation-btn" elevation="2">
-        <v-icon class="icon" left>mdi-information-outline</v-icon>
-        <span class="reservation-text">See your Reservations</span>
-      </v-btn>
-    </v-toolbar>
+  <div class="sunglasses-page">
+    <!-- Navigation Bar -->
+    <nav class="category-nav">
+      <ul>
+        <li><a href="#" @click.prevent="scrollToSection('sunglasses')"
+            :class="{ active: activeSection === 'sunglasses' }">FRAMES</a></li>
+        <li><a href="#" @click.prevent="scrollToSection('eyeglasses')"
+            :class="{ active: activeSection === 'eyeglasses' }">LENSES</a></li>
+        <li><a href="#" @click.prevent="scrollToSection('prescription-sunglasses')"
+            :class="{ active: activeSection === 'prescription-sunglasses' }">CONTACT LENSES</a></li>
+        <li><a href="#" @click.prevent="scrollToSection('readers')"
+            :class="{ active: activeSection === 'readers' }">ACCESSORIES</a></li>
+      </ul>
+    </nav>
 
-    <!-- PRODUCT CARDS -->
-    <v-row>
-      <v-col class="productBox" v-for="product in products" :key="product.id" cols="6" sm="6" md="4" lg="3">
-        <v-card elevation="2" @click="viewProduct(product.id)">
-          <img :src="getProductImageUrl(product.image)" alt="Product Image" class="productPic">
-          <v-card-title class="product-name">{{ product.product_name }}</v-card-title>
-          <v-card-text class="product-description">Stock: {{ product.quantity }}</v-card-text>
-          <v-card-actions class="product-price">
-            <div class="flex-grow-1"></div>
-            <span class="caption">₱{{ product.price }}</span>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+    <!-- FRAMES Section -->
+    <section id="sunglasses" class="category-section">
+      <h1 class="title">FRAMES</h1>
+      <div class="product-grid">
+        <div @click="viewProduct(product.id)" class="product-card" v-for="product in framesProducts" :key="product.id">
+          <div class="sale-badge" v-if="product.onSale">SALE</div>
+          <img :src="product.currentImage" :alt="product.name" class="main-image"
+            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <div class="product-details">
+            <span class="product-name">{{ product.product_name }}</span>
+            <span class="price">
+              <span v-if="product.onSale" class="original-price">{{ product.originalPrice }}</span>
+              <span class="sale-price">₱{{ product.price }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- RESERVATIONS DIALOG -->
-    <v-dialog v-model="dialog" max-width="800px">
-      <v-card>
-        <v-card-title class="headline">Your Reservations</v-card-title>
-        <v-card-text>
-          <v-data-table :headers="reservationHeaders" :items="reservations" item-key="id" class="elevation-1">
-            <template v-slot:item="{ item }">
-              <tr>
-                <td>{{ item.product.product_name }}</td>
-                <td>{{ formatCreatedDate(item.created_at) }}</td>
-                <td>₱{{ item.product.price }}</td>
-                <td :class="getStatusClass(item.status)">{{ displayStatus(item.status) }}</td>
-                <td>
-                  <v-btn v-if="showCancelButton(item.status)" @click="cancelReservation(item.id)" class="cancel-btn"
-                    elevation="2">
-                    <span class="reservation-text">Cancel</span>
-                  </v-btn>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="black" text @click="dialog = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- LENSES Section -->
+    <section id="eyeglasses" class="category-section">
+      <h1 class="title">LENSES</h1>
+      <div class="product-grid">
+        <div class="product-card" v-for="product in lensesProducts" :key="product.id">
+          <img :src="product.currentImage" :alt="product.name" class="main-image"
+            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <div class="product-details">
+            <span class="product-name">{{ product.product_name }}</span>
+            <span class="price">
+              <span v-if="product.onSale" class="original-price">{{ product.originalPrice }}</span>
+              <span class="sale-price">₱{{ product.price }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT LENSES Section -->
+    <section id="prescription-sunglasses" class="category-section">
+      <h1 class="title">CONTACT LENSES</h1>
+      <div class="product-grid">
+        <div class="product-card" v-for="product in contactLensesProducts" :key="product.id">
+          <img :src="product.currentImage" :alt="product.name" class="main-image"
+            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <div class="product-details">
+            <span class="product-name">{{ product.product_name }}</span>
+            <span class="price">
+              <span v-if="product.onSale" class="original-price">{{ product.originalPrice }}</span>
+              <span class="sale-price">₱{{ product.price }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCESSORIES Section -->
+    <section id="readers" class="category-section">
+      <h1 class="title">ACCESSORIES</h1>
+      <div class="product-grid">
+        <div class="product-card" v-for="product in accessoriesProducts" :key="product.id">
+          <img :src="product.currentImage" :alt="product.name" class="main-image"
+            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <div class="product-details">
+            <span class="product-name">{{ product.product_name }}</span>
+            <span class="price">
+              <span v-if="product.onSale" class="original-price">{{ product.originalPrice }}</span>
+              <span class="sale-price">₱{{ product.price }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
+
 <script>
 import axios from 'axios';
-import { mapState } from 'vuex';
-import Swal from 'sweetalert2/dist/sweetalert2.js';
-import 'sweetalert2/dist/sweetalert2.css';
 
 export default {
   data() {
     return {
-      search: '',
-      dialog: false,
-      reservations: [],
       products: [],
-      reservationHeaders: [
-        { title: 'Product Name', value: 'product.product_name' },
-        { title: 'Reservation Date', value: 'created_at' },
-        { title: 'Price', value: 'product.price' },
-        { title: 'Status', value: 'status' },
-        { title: '', value: 'actions', sortable: false },
-      ],
+      activeSection: 'sunglasses'
     };
   },
-
-  computed: {
-    ...mapState({
-      patientId: state => state.patientId || localStorage.getItem('patientId'),
-    }),
-  },
-
-  mounted() {
-    if (this.patientId) {
-      console.log('ID:', this.patientId);
-      this.fetchProducts();
-    } else {
-      console.error('Patient ID is not available.');
-    }
-  },
-
   methods: {
     fetchProducts() {
-      axios.get('/products')
+      axios.get('/allProducts')
         .then(response => {
-          this.products = response.data.map(product => {
-            console.log('Product Image URL:', product.image);
-            return product;
-          });
+          this.products = response.data.map(product => ({
+            ...product,
+            currentImage: product.images[0] // Set the default image
+          }));
         })
         .catch(error => {
           console.error('Error fetching products:', error);
         });
     },
-    
+    changeImage(product, action) {
+      if (action === 'hover' && product.images.length > 1) {
+        product.currentImage = product.images[1]; // Use second image on hover
+      } else {
+        product.currentImage = product.images[0]; // Use default image otherwise
+      }
+    },
+    scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        this.activeSection = sectionId;
+      }
+    },
     viewProduct(productId) {
       this.$router.push({ path: '/viewProduct', query: { id: productId } });
     },
-
-    getProductImageUrl(imagePath) {
-      return imagePath;
-    },
-
-    reserve(product) {
-      if (!this.patientId) {
-        console.error('User ID not available.');
-        return;
-      }
-      
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to reserve this product?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, reserve it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.post('/reserve', {
-            product_id: product.id,
-            product_name: product.product_name,
-            user_id: this.patientId,
-          }, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-            }
-          })
-          .then(response => {
-            console.log('Reservation created:', response.data);
-            Swal.fire(
-              'Reserved!',
-              'Product has been reserved successfully.',
-              'success'
-            );
-          })
-          .catch(error => {
-            console.error('Error reserving product:', error);
-            Swal.fire(
-              'Error!',
-              'Failed to reserve product.',
-              'error'
-            );
-          });
-        }
-      });
-    },
-
-    showReservations() {
-      this.fetchReservations();
-      this.dialog = true;
-    },
-
-    fetchReservations() {
-      if (!this.patientId) {
-        console.error('User ID not available.');
-        return;
-      }
-
-      axios.get(`/reservations/${this.patientId}`)
-        .then(response => {
-          this.reservations = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching reservations:', error);
-        });
-    },
-
-    formatCreatedDate(dateString) {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      const date = new Date(dateString);
-      return date.toLocaleDateString(undefined, options);
-    },
-
-    showCancelButton(status) {
-      const statusesToHide = ['accepted', 'declined', 'picked_up'];
-      return !statusesToHide.includes(status);
-    },
-
-    cancelReservation(reservationId) {
-      this.dialog = false; // Close the dialog before showing the confirmation
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you really want to cancel the reservation?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, cancel it!',
-        cancelButtonText: 'No, go back'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.delete(`/reservations/${reservationId}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-            }
-          })
-          .then(response => {
-            this.fetchReservations();
-            Swal.fire(
-              'Cancelled!',
-              'Your reservation has been cancelled.',
-              'success'
-            );
-          })
-          .catch(error => {
-            console.error('Error cancelling reservation:', error);
-            Swal.fire(
-              'Error!',
-              'Failed to cancel reservation.',
-              'error'
-            );
-          });
-        } else {
-          this.dialog = true; // Reopen the dialog if the user chooses not to cancel
-        }
-      });
-    },
-
-    getStatusClass(status) {
-      switch (status.toLowerCase()) {
-        case 'pending':
-          return 'status-pending';
-        case 'accepted':
-          return 'status-accepted';
-        case 'declined':
-          return 'status-declined';
-        case 'picked_up':
-          return 'status-picked-up';
-        default:
-          return '';
-      }
-    },
-
-    displayStatus(status) {
-      switch (status.toLowerCase()) {
-        case 'picked_up':
-          return 'PICKED UP';
-        default:
-          return status.toUpperCase();
-      }
-    },
   },
+  computed: {
+    framesProducts() {
+      return this.products.filter(product => product.type === 'Frames');
+    },
+    lensesProducts() {
+      return this.products.filter(product => product.type === 'Lens');
+    },
+    contactLensesProducts() {
+      return this.products.filter(product => product.type === 'Contact Lenses');
+    },
+    accessoriesProducts() {
+      return this.products.filter(product => product.type === 'Accessories');
+    }
+  },
+  created() {
+    this.fetchProducts();
+  }
 };
 </script>
 
-<style>
-.v-card {
-  background-color: #000000;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+<style scoped>
+.sunglasses-page {
+  padding: 20px;
   text-align: center;
-
-}
-.productPic {
-  height: 200px;
-  width: 100%; /* Ensure width is 100% to maintain aspect ratio */
-  object-fit: cover;
-  border: 4px solid #016888;
 }
 
-.reservation-btn {
-  background-color: #B3D9E6 !important;
-  color: white !important;
-  font-weight: bold !important;
+.category-nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.reservation-text {
-  font-weight: bold;
-  color: black !important;
+.category-nav li {
+  margin: 0 10px;
 }
 
-.reservation-btn .v-icon {
-  margin-right: 8px; /* Add spacing between icon and text */
-  color: black;
+.category-nav a {
+  text-decoration: none;
+  color: #333;
 }
 
-.cancel-btn {
-  background-color: rgb(209, 19, 19) !important;
-  color: white !important;
-  font-weight: bold !important;
+.category-nav a.active {
+  border-bottom: 2px solid #000;
 }
 
-.status-pending {
-  color: blue;
-  text-transform: uppercase;
+.category-section {
+  margin-top: 50px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
 }
 
-.status-accepted {
-  color: green;
-  text-transform: uppercase;
+.title {
+  margin: 20px 0;
+  background-color: #e4e1e1;
+  padding: 50px;
+  margin-right: 100px;
+  margin-left: 100px;
+  font-size: 35px;
+  font-style: italic;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.status-declined {
-  color: red;
-  text-transform: uppercase;
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-.status-picked-up {
-  color: rgb(162, 154, 4);
-  text-transform: uppercase;
+.product-card {
+  position: relative;
+  padding: 10px;
+  text-align: center;
+  border: none;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: scale(1.03);
+}
+
+.product-card img.main-image {
+  max-width: 100%;
+  height: 300px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.sale-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: red;
+  color: white;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
 }
 
 .product-name {
-  overflow-wrap: break-word; /* Ensures long text wraps to the next line */
-  word-wrap: break-word;
-  hyphens: auto; /* Adjust card title font size */
-  background-color: #016888;
-  color: white;
+  font-size: 16px;
+  color: #333;
 }
 
- .product-description {
-  background-color: #016888;
-  color: white;
+.price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.product-price{
-  background-color: #016888;
-  color: white;
+.price .original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-bottom: 5px;
 }
 
-.caption{
-  text-align: center;
-}
-
-.rsrvBtn{
-  background-color: #1f373f;
-}
-@media (max-width: 960px) {
-  .product-name {
-    overflow-wrap: break-word; /* Ensures long text wraps to the next line */
-    word-wrap: break-word;
-    hyphens: auto; /* Adjust card title font size */
-  }
-  .headers {
-    display: none;
-  }
-
-  .search-bar {
-    max-width: 100%; /* Make search bar full width on small screens */
-    margin-left: -80px;
-  }
-
-  .productPic {
-    height: 100px; /* Adjust image height on small screens */
-  }
-
-  .v-card {
-    margin-bottom: 16px; /* Add space between cards */
-  }
-  
-  .reservation-btn {
-    font-size: 0.8rem; /* Adjust button font size */
-  }
-  
-  .reservation-text {
-    display: none;
-  }
-  .product-description{
-    font-size: 1px;
-  }
-  .product-name {
-   font-size: 1rem;
-  }
-  
-  .v-card-text {
-    font-size: 0.9rem; /* Adjust card text size */
-  }
-  .productBox{
-    margin-top: 10px;
-    max-height: 400px;
-    flex: 1 1 48%; /* Two items per row on mobile screens with some space in between */
-    width: 50%;
-  }
+.price .sale-price {
+  color: #e74c3c;
+  font-size: 18px;
 }
 </style>

@@ -75,18 +75,7 @@ export default {
     margin-left: 30px;
     margin-right: 30px;
 
-    .Products {
-        border-radius: 10px;
-        background-color: #f0f0f0;
-        padding: 0.5rem;
-        height: 100%;
-        border: 1px solid #ccc; // Add border
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
-        flex: 1;
-        border-width: 2px 2px 2px 2px;
-        border-color: rgb(178, 177, 177);
-        margin-bottom: 20px;
-    }
+
 
     .logo-container {
         display: none; /* Hide by default */
