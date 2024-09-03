@@ -28,99 +28,15 @@
         ></v-text-field>
 
         <!-- Pending Reservations Dialog -->
-        <v-dialog v-model="dialogPending" max-width="1200px">
-          <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2" v-bind="props">
+            <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2" >
               <v-icon left>mdi-clock-outline</v-icon>
               <span class="pending-text">Pending Reservations</span>
             </v-btn>
-          </template>
-          
-          <v-card>
-            <v-card-title>
-              <span class="text-h6 m-2">List of Pending Reservations</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col>
-                    <v-data-table
-                      :headers="pendingHeaders"
-                      :items="pendingAppointments"
-                      item-key="id"
-                      class="elevation-1"
-                    >
-                      <template v-slot:item="{ item: pendingAppointments }">
-                        <tr>
-                          <td>{{ pendingAppointments.user_id }}</td>
-                          <td>{{ pendingAppointments.patient.full_name }}</td>
-                          <td>{{ pendingAppointments.patient.contact }}</td>
-                          <td>{{ formatPrescriptionDate(pendingAppointments.created_at) }}</td>
-                          <td>{{ pendingAppointments.product_id }}</td>
-                          <td>{{ pendingAppointments.product.product_name }}</td>
-                          <td>
-                            <v-icon @click="acceptAppointment(pendingAppointments.id)">mdi-check</v-icon>
-                            <v-icon @click="declineAppointment(pendingAppointments.id)">mdi-close</v-icon>
-                          </td>
-                        </tr>
-                      </template>
-                    </v-data-table>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="black" text @click="closeDialog('pending')">Cancel</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
+  
         <!-- Picked Up Reservations Dialog -->
-        <v-dialog v-model="dialogPickedUp" max-width="1200px">
-          <template v-slot:activator="{ props }">
-            <v-btn @click="openDialog('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
+            <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
               <span class="picked-up-text">Picked Up Reservations</span>
             </v-btn>
-          </template>
-          
-          <v-card>
-            <v-card-title>
-              <span class="text-h6 m-2">List of Picked Up Reservations</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col>
-                    <v-data-table
-                      :headers="doneHeaders"
-                      :items="pickedUpAppointments"
-                      item-key="user_id"
-                      class="elevation-1"
-                    >
-                      <template v-slot:item="{ item: pickedUpAppointments }">
-                        <tr>
-                          <td>{{ pickedUpAppointments.user_id }}</td>
-                          <td>{{ pickedUpAppointments.patient.full_name }}</td>
-                          <td>{{ pickedUpAppointments.patient.contact }}</td>
-                          <td>{{ formatPrescriptionDate(pickedUpAppointments.created_at) }}</td>
-                          <td>{{ pickedUpAppointments.product_id }}</td>
-                          <td>{{ pickedUpAppointments.product.product_name }}</td>
-                          <td>{{ formatPrescriptionDate(pickedUpAppointments.picked_up_date) }}</td>
-                        </tr>
-                      </template>
-                    </v-data-table>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="black" text @click="closeDialog('pickedUp')">Cancel</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
       </v-toolbar>
     </template>
 
@@ -151,49 +67,31 @@ export default {
   data() {
     return {
       search: '',
-      dialogPending: false,
-      dialogPickedUp: false,
-      pendingHeaders: [
-        { title: 'User ID', align: 'start', key: 'user_id' },
-        { title: 'User Name', align: 'start', key: 'full_name' },
-        { title: 'Contact Number', key: 'contact_number' },
-        { title: 'Appointment Date', key: 'formatted_appointment_date' },
-        { title: 'Product ID', key: 'product_id' },
-        { title: 'Product Name', key: 'product_name' },
-        { title: 'Actions', sortable: false },
-      ],
-      doneHeaders: [
-        { title: 'User ID', align: 'start', key: 'user_id' },
-        { title: 'User Name', align: 'start', key: 'full_name' },
-        { title: 'Contact Number', key: 'contact_number' },
-        { title: 'Appointment Date', key: 'formatted_appointment_date' },
-        { title: 'Product ID', key: 'product_id' },
-        { title: 'Product Name', key: 'product_name' },
-        { title: 'Picked Up Date', key: 'picked_up_date' },
-      ],
       headers: [
-        { title: 'User ID', align: 'start', key: 'user_id' },
-        { title: 'User Name', align: 'start', key: 'full_name' },
-        { title: 'Contact Number', key: 'contact_number' },
-        { title: 'Appointment Date', key: 'formatted_appointment_date' },
-        { title: 'Product ID', key: 'product_id' },
-        { title: 'Product Name', key: 'product_name' },
-        { title: 'Actions', sortable: false },
+        { title: 'User ID', align: 'center', key: 'user_id' },
+        { title: 'User Name', align: 'center', key: 'full_name' },
+        { title: 'Contact Number', align: 'center', key: 'contact_number' },
+        { title: 'Appointment Date', align: 'center', key: 'formatted_appointment_date' },
+        { title: 'Product ID', align: 'center', key: 'product_id' },
+        { title: 'Product Name', align: 'center', key: 'product_name' },
+        { title: 'Actions', align: 'center', sortable: false },
       ],
-
       appointments: [],
-      pendingAppointments: [],
-      pickedUpAppointments: [],
-    
       dialogDelete: false,
       deleteRecordIndex: -1,
     };
   },
   created() {
-    // Fetch all appointments when component is created
     this.fetchAppointments();
-    this.fetchPendingAppointments();
-    this.fetchPickedUpAppointments();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.fetchAppointments();
+    });
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.fetchAppointments();
+    next();
   },
   methods: {
     fetchAppointments() {
@@ -206,133 +104,12 @@ export default {
           console.error('Error fetching appointments:', error);
         });
     },
-    fetchPendingAppointments() {
-      axios.get('/reservations/pending') // Update the URL to match Laravel route
-        .then(response => {
-          this.pendingAppointments = response.data;
-          console.log('Pending Appointments:', this.pendingAppointments);
-        })
-        .catch(error => {
-          console.error('Error fetching pending appointments:', error);
-        });
-    },
-    fetchPickedUpAppointments() {
-      axios.get('/reservations/picked_up') // Update the URL to match Laravel route
-        .then(response => {
-          this.pickedUpAppointments = response.data;
-          console.log('Picked Up Appointments:', this.pickedUpAppointments);
-        })
-        .catch(error => {
-          console.error('Error fetching picked up appointments:', error);
-        });
-    },
-    acceptAppointment(id) {
-      axios.put(`/reservations/${id}/accept`)
-        .then(response => {
-          const updatedAppointment = response.data;
-
-          // Add the updated appointment to appointments
-          this.appointments.push(updatedAppointment);
-
-          // Remove the accepted appointment from pendingAppointments
-          const index = this.pendingAppointments.findIndex(appointment => appointment.id === id);
-          if (index !== -1) {
-            this.pendingAppointments.splice(index, 1);
-          }
-
-          this.dialogPending = false;
-          
-          this.fetchAppointments();
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Reservation Accepted',
-            text: 'The reservation has been accepted successfully!',
-            customClass: {
-              popup: 'swal-popup',
-              title: 'swal-title',
-              text: 'swal-text',
-              confirmButton: 'swal-confirm-button',
-              cancelButton: 'swal-cancel-button'
-            }
-          });
-        })
-        .catch(error => {
-          console.error('Error accepting reservation:', error);
-          this.dialogPending = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Failed to accept the reservation. Please try again later.',
-            customClass: {
-              popup: 'swal-popup',
-              title: 'swal-title',
-              text: 'swal-text'
-            }
-          });
-        });
+    openDialogPr() {
+      this.$router.push('/view/pending')
     },
 
-    
-    declineAppointment(id) {
-      axios.put(`/reservations/${id}/decline`)
-        .then(response => {
-          // Handle success if needed
-          const index = this.pendingAppointments.findIndex(appointment => appointment.id === id);
-          if (index !== -1) {
-            this.pendingAppointments.splice(index, 1);
-          }
-
-          this.dialogPending = false;
-
-          // Show SweetAlert success message
-          Swal.fire({
-            icon: 'error',
-            title: 'Reservation Declined',
-            text: 'The reservation has been declined successfully!',
-          });
-        })
-        .catch(error => {
-          console.error('Error declining reservation:', error);
-
-          // Show SweetAlert error message
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Failed to decline the reservation. Please try again later.',
-          });
-        });
-    },
-    
-    openDialog(type) {
-      if (type === 'pending') {
-        this.dialogPending = true;
-      } else if (type === 'pickedUp') {
-        this.dialogPickedUp = true;
-      }
-    },
-    closeDialog(type) {
-      if (type === 'pending') {
-        this.dialogPending = false;
-      } else if (type === 'pickedUp') {
-        this.dialogPickedUp = false;
-      }
-    },
-
-    openDialog(type) {
-      if (type === 'pending') {
-        this.dialogPending = true;
-        this.fetchPendingAppointments();
-      } else if (type === 'pickedUp') {
-        this.dialogPickedUp = true;
-      }
-    },
-    closeDialog(type) {
-      if (type === 'pending') {
-        this.dialogPending = false;
-      } else if (type === 'pickedUp') {
-        this.dialogPickedUp = false;
-      }
+    openDialogPu() {
+      this.$router.push('/view/pickedup')
     },
   formatPrescriptionDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -457,6 +234,10 @@ export default {
 
 .swal-confirm-button, .swal-cancel-button {
   color: white !important;
+}
+
+td{
+  text-align: center;
 }
 
 @media (max-width: 960px) {

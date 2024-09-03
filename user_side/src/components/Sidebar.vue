@@ -175,7 +175,7 @@ export default {
 }
 
 .logout-link {
-  margin-top: 250px;
+  margin-top:250px;
 }
 
 .toggle-icon {

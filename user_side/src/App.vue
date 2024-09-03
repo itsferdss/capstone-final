@@ -6,7 +6,7 @@
       <div class="app">
         <Sidebar v-if="showSidebar" :miniVariant="miniVariant" v-model="drawer" />
         <div class="headers" :class="{ 'mini-variant': miniVariant, 'sidebar-open': drawer && !isMobile, 'sidebar-closed': !drawer || isMobile }">
-          <Header class="header" @toggle-menu="toggleDrawer" />
+          <Header v-if="showSidebar" class="header" @toggle-menu="toggleDrawer" />
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <Component :is="Component" />
@@ -22,7 +22,6 @@
 import Header from './components/Header.vue';
 import Sidebar from './components/Sidebar.vue';
 import AdminLogin from './views/AdminLogin.vue';
-import LandingPage from './views/LandingPage.vue';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -31,7 +30,6 @@ export default {
   components: {
     Sidebar,
     AdminLogin,
-    LandingPage,
     Header
   },
   setup() {

@@ -149,16 +149,14 @@ export default {
 
 .link-icon {
   margin-right: 20px;
-  transition: margin-right 0.2s ease;
 }
 
 .link-text {
   font-size: 16px;
-  transition: opacity 0.2s ease;
 }
 
 .logout-link {
-  margin-top: 250px;
+  margin-top: 180px;
 }
 
 @media (max-width: 960px) {

@@ -7,18 +7,9 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- SEARCH BAR -->
-      <v-text-field
-        v-model="search"
-        class="search-bar w-auto mr-4"
-        density="compact"
-        label="Search Products"
-        prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        flat
-        hide-details
-        single-line
-        style="max-width: 300px;"
-      ></v-text-field>
+      <v-text-field v-model="search" class="search-bar w-auto mr-4" density="compact" label="Search Products"
+        prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
+        style="max-width: 300px;"></v-text-field>
       <!-- RESERVATION BUTTON -->
       <v-btn @click="showReservations" class="reservation-btn" elevation="2">
         <v-icon class="icon" left>mdi-information-outline</v-icon>
@@ -27,14 +18,13 @@
     </v-toolbar>
 
     <!-- PRODUCT CARDS -->
-    <v-row >
+    <v-row>
       <v-col class="productBox" v-for="product in products" :key="product.id" cols="6" sm="6" md="4" lg="3">
-        <v-card  elevation="2" >
+        <v-card elevation="2" @click="viewProduct(product.id)">
           <img :src="getProductImageUrl(product.image)" alt="Product Image" class="productPic">
           <v-card-title class="product-name">{{ product.product_name }}</v-card-title>
           <v-card-text class="product-description">Stock: {{ product.quantity }}</v-card-text>
           <v-card-actions class="product-price">
-            <v-btn color="primary" @click="reserve(product)">Reserve</v-btn>
             <div class="flex-grow-1"></div>
             <span class="caption">₱{{ product.price }}</span>
           </v-card-actions>
@@ -47,12 +37,7 @@
       <v-card>
         <v-card-title class="headline">Your Reservations</v-card-title>
         <v-card-text>
-          <v-data-table
-            :headers="reservationHeaders"
-            :items="reservations"
-            item-key="id"
-            class="elevation-1"
-          >
+          <v-data-table :headers="reservationHeaders" :items="reservations" item-key="id" class="elevation-1">
             <template v-slot:item="{ item }">
               <tr>
                 <td>{{ item.product.product_name }}</td>
@@ -60,7 +45,8 @@
                 <td>₱{{ item.product.price }}</td>
                 <td :class="getStatusClass(item.status)">{{ displayStatus(item.status) }}</td>
                 <td>
-                  <v-btn v-if="showCancelButton(item.status)" @click="cancelReservation(item.id)" class="cancel-btn" elevation="2">
+                  <v-btn v-if="showCancelButton(item.status)" @click="cancelReservation(item.id)" class="cancel-btn"
+                    elevation="2">
                     <span class="reservation-text">Cancel</span>
                   </v-btn>
                 </td>
@@ -127,6 +113,10 @@ export default {
         .catch(error => {
           console.error('Error fetching products:', error);
         });
+    },
+    
+    viewProduct(productId) {
+      this.$router.push({ path: '/viewProduct', query: { id: productId } });
     },
 
     getProductImageUrl(imagePath) {
@@ -278,15 +268,20 @@ export default {
 
 <style>
 .v-card {
-  height: 100%;
+  background-color: #000000;
+  color: white;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Ensures content is spaced properly */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
 }
 .productPic {
   height: 200px;
   width: 100%; /* Ensure width is 100% to maintain aspect ratio */
   object-fit: cover;
+  border: 4px solid #016888;
 }
 
 .reservation-btn {
@@ -335,6 +330,26 @@ export default {
   overflow-wrap: break-word; /* Ensures long text wraps to the next line */
   word-wrap: break-word;
   hyphens: auto; /* Adjust card title font size */
+  background-color: #016888;
+  color: white;
+}
+
+ .product-description {
+  background-color: #016888;
+  color: white;
+}
+
+.product-price{
+  background-color: #016888;
+  color: white;
+}
+
+.caption{
+  text-align: center;
+}
+
+.rsrvBtn{
+  background-color: #1f373f;
 }
 @media (max-width: 960px) {
   .product-name {

@@ -1,38 +1,30 @@
 <template>
   <div class="container">
+    <button class="back-button" @click="goBack">
+      ◀ Back
+    </button>
     <aside class="left-container">
       <div class="photo-grid">
-        <a
-          v-for="(photo, index) in photos"
-          :key="index"
-          @click="updateRightPhoto(index)"
-          :class="{ selected: currentIndex === index }"
-        >
+        <a v-for="(photo, index) in photos" :key="index" @click="updateRightPhoto(index)"
+          :class="{ selected: currentIndex === index }">
           <img :src="photo" :alt="'Photo ' + (index + 1)" />
         </a>
       </div>
     </aside>
     <main class="right-container">
       <div class="image-description-container">
-        <div
-          class="image-container"
-          @mousemove="handleMouseMove"
-          @mouseleave="hideZoom"
-        >
+        <div class="image-container" @mousemove="handleMouseMove" @mouseleave="hideZoom">
           <button class="nav-button prev" @click="prevPhoto">◀</button>
           <img :src="currentPhoto" alt="Selected Photo" v-if="currentPhoto" />
           <button class="nav-button next" @click="nextPhoto">▶</button>
 
           <!-- Larger Zoomed area container -->
-          <div
-            class="zoomed-container"
-            v-if="zoomed"
-            :style="{
+          <div class="zoomed-container" v-if="zoomed" :style="{
               backgroundImage: `url(${currentPhoto})`,
               backgroundPosition: zoomPosition,
               backgroundSize: '300%'
-            }"
-          ></div>
+            }">
+          </div>
         </div>
 
         <div class="description-container">
@@ -45,14 +37,11 @@
           <div class="color-options">
             <p>Available Colors:</p>
             <div class="colors">
-              <div
-                v-for="color in product.colors"
-                :key="color"
-                class="color-circle"
-                :style="{ backgroundColor: color }"
-              ></div>
+              <div v-for="color in product.colors" :key="color" class="color-circle"
+                :style="{ backgroundColor: color }"></div>
             </div>
           </div>
+
           <div class="offers">
             <p><strong>Special Offers:</strong></p>
             <ul>
@@ -176,6 +165,9 @@ export default {
         }
       });
     },
+    goBack() {
+      this.$router.go(-1);
+    }
   },
   
   mounted() {
@@ -193,14 +185,32 @@ export default {
 .container {
   display: flex;
   height: 100vh;
-  background-color: #f5f5f5;
   font-family: 'Arial', sans-serif;
   margin-left: 10%;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 250px;
+  background-color: #99b3c6;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #2e425d;
+  color: rgb(203, 202, 202);
 }
 
 .left-container {
   width: 200px;
-  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,6 +276,7 @@ export default {
   overflow: hidden;
   padding: 10px;
   position: relative;
+  margin-top: 150px;
 }
 
 .right-container img {
@@ -282,6 +293,7 @@ export default {
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 400px;
+  margin-top: 150px;
 }
 
 .description-text {

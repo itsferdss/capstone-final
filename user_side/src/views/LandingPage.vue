@@ -22,12 +22,9 @@ export default {
 .main-content {
     display: flex;
     flex-direction: column;
-    margin-left: -250px;
-    margin-top: -20px;
 
     .landingPage {
-        margin-left: -15px;
-        margin-right: -15px;
+        
        
     }
 }

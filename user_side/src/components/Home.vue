@@ -1,192 +1,283 @@
 <template>
-  <div>
-    <div class="section1">
-     <div class="model-container">
-        <!-- Image with overlay -->
-        <img class="model" src="../assets/bgModel.jpg" alt="Model"/>
-        <!-- Black overlay with opacity -->
-        <div class="overlay"></div>
-        <!-- Text on top of the overlay -->
-        <div class="overlay-text">
-          <h2 class="sec3Title">Welcome to <br>MVC Optical Clinic Website!</h2>
+  <div class="wrapper">
+    <div class="header-banner">
+      <img class="header-image" src="../assets/MVC_logo.png" alt="MVC Optical Clinic Banner" />
+    </div>
+
+    <div class="banner-section">
+      <div class="banner-card">
+        <div class="overlay">
+          <p class="banner-text">MEN</p>
+          <img src="../assets/men-model.jpg" alt="Men Model">
+        </div>
+      </div>
+      <div class="banner-card">
+        <div class="overlay">
+          <p class="banner-text">WOMEN</p>
+          <img src="../assets/women-model2.jpg" alt="Women Model">
         </div>
       </div>
     </div>
- 
-      <!-- LATEST PRODUCT -->
-      <div >
-        <div class="latestprod">
-          <p class="newP">NEW PRODUCTS!</p>
+
+    <div class="product-section">
+      <h2>New-In Eye Wear</h2>
+      <div class="product-grid">
+        <div class="product-card">
+          <img src="../assets/product2.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Salamin</p>
+          </div>
         </div>
-        <!-- PRODUCT BOX OF LATESTS -->
-        <v-row class="products">
-          <v-col class="latestdia" v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
-            <v-card class="v-card" elevation="2" style="height: 100%;" @click="viewProduct(product.id)">
-              <img :src="getProductImageUrl(product.image)" alt="Product Image" class="productPic">
-              <v-card-title class="product-name">{{ product.product_name }}</v-card-title>
-              <v-card-text class="product-price">
-                ₱{{ product.price }}
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+        <div class="product-card">
+          <img src="../assets/product1.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sports Eye Glass</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product3.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Contact Lense</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product4.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sun Glass</p>
+          </div>
+        </div>
       </div>
     </div>
+
+    <div class="product-section">
+      <h2>Featured Products</h2>
+      <div class="product-grid">
+        <div class="product-card">
+          <img src="../assets/product2.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Salamin</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product1.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sports Eye Glass</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product3.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Contact Lense</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product4.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sun Glass</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-section">
+      <h2>Best Sellers</h2>
+      <div class="product-grid">
+        <div class="product-card">
+          <img src="../assets/product2.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Salamin</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product1.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sports Eye Glass</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product3.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Contact Lense</p>
+          </div>
+        </div>
+        <div class="product-card">
+          <img src="../assets/product4.jpg" class="product-image">
+          <div class="product-name-container">
+            <p class="product-name">Sun Glass</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-
 <script>
-import axios from 'axios';
-
 export default {
   name: 'WelcomePage',
-  data() {
-    return {
-      products: []
-    };
-  },
-  methods: {
-    goToProducts() {
-      this.$router.push('/products');
-    },
-    fetchProducts() {
-      axios.get('/products/latest')
-        .then(response => {
-          this.products = response.data.map(product => {
-            console.log('Product Image URL:', product.image);
-            return product;
-          });
-        })
-        .catch(error => {
-          console.error('Error fetching products:', error);
-        });
-    },
-
-    getProductImageUrl(imagePath) {
-      return imagePath;
-    },
-
-    viewProduct(productId) {
-      this.$router.push({ path: '/viewProduct', query: { id: productId } });
-    },
-  },
-  created() {
-    this.fetchProducts();
-  }
 };
 </script>
 
 <style scoped>
-#section1 {
-  max-height: 500px;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+.wrapper {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 30px;
+  font-family: 'Lora', serif;
+  color: #333;
 }
 
-.model-container {
+.header-banner {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.header-image {
+  width: 100%;
+  max-height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.banner-card {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  /* Ensure content is contained within the card */
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.banner-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.overlay {
   position: relative;
   width: 100%;
-  height: 300px; /* Height of the model image container */
-  margin-top: -20px;
-  margin-right: -20px;
-  box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 50px 0 rgba(0, 0, 0, 0.19);
-}
-
-/* Model image styling */
-.model {
-  width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the image covers the container */
 }
 
-/* Black overlay styling */
-.overlay {
+.overlay img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.overlay::after {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Black with 50% opacity */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Black overlay */
+  border-radius: 10px;
 }
 
-/* Text on top of the overlay */
-.overlay-text {
+.banner-text {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Center text */
-  color: white; /* Text color */
-  text-align: center; /* Center align text */
-  font-size: 24px; /* Adjust font size */
-  font-weight: bold; /* Optional: Make the text bold */
-}
-
-.sec3Title {
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 50px;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
-.full-height {
-  height: 100vh;
-}
-
-.btnCheck {
-  margin-top: 50px;
-  margin-left: 200px;
-}
-
-.latestprod {
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
   font-weight: bold;
-  font-size: 32px;
   text-align: center;
-  margin-top: 20px;
-  border:rgba(0, 0, 0, 0.19)
+  z-index: 1;
+  /* Ensure text is above the overlay */
 }
 
-.newP {
-  font-family: 'Playfair Display', serif;
-  font-weight: bold;
+.banner-card p {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
 }
 
-.productPic {
-  height: 200px;
-  width: 100%; /* Ensure width is 100% to maintain aspect ratio */
-  object-fit: cover; /* Ensures the image covers the container */
-  border: 7px solid #0e0c0a;
+.product-section {
+  margin-top: 40px;
 }
 
-.v-card {
-  background-color: #0e0c0a; /* Black background for the product box */
-  color: white; /* White text color for contrast */
+.product-section h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.product-card {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
-  justify-content: center; /* Center vertically */
-  text-align: center; /* Center text within the card */
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.latestdia {
-  margin-top: 20px;
-  
+.product-card:hover {
+  animation: continuousBounce 1s ease-in-out infinite;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease;
 }
 
-.product-name{
-  font-family: 'Playfair Display', serif;
-  font-weight: bold;
-  color: rgb(255, 255, 255);
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
 }
 
-.product-price{
-  color: rgb(255, 255, 255);
+.product-name-container {
+  background: #6baff8;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.products {
-  margin-right: 40px;
-  margin-left: 40px;
+.product-name {
+  font-size: 18px;
+  color: #fafcff;
+  font-weight: 600;
 }
 
+@keyframes continuousBounce {
 
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
 </style>

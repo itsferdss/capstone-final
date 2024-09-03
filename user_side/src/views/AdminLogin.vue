@@ -17,8 +17,17 @@
       </div>
     </div>
     <div class="trapezoid"></div>
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2">
+      <img class="graphics" src="../assets/graphics.png" alt="Graphics" />
+      <img class="logo" src="../assets/newlogo.png" alt="New Logo" />
+      <img class="echode_logo" src="../assets/echode_logo.png" alt="New Logo" />
+    </div>
   </div>
 </template>
+
+
+
 
 <script>
 import axios from 'axios'; // Adjust the path to your Axios instance
@@ -66,25 +75,39 @@ export default {
 </script>
 
 <style scoped>
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  /* Prevent scrolling */
+}
+
 .container {
-  margin-top: 150px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 0 20px; /* Adjusted padding */
-  min-height: 513px; /* Make sure the container takes full height */
-  position: relative; /* Relative positioning to keep the trapezoid inside */
-  margin-right: 0px;
+  align-items: center;  
+  padding: 0 20px;
+  height: 100vh;
+  box-sizing: border-box;
+  position: fixed;
+  
 }
 
 .login-form-container {
-  max-width: 500px; /* Adjust the max-width as needed */
+  max-width: 500px;
   padding: 20px;
-  background-color: #E3F1F8; /* Light blue background */
+  background-color: #E3F1F8;
   border-radius: 10px;
   box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  z-index: 1; /* Ensure it stays above the trapezoid */
-  margin-right: 200px;
+  z-index: 1;
+  position: relative;
+  margin-top: 150px;
+  margin-left: 1200px;
+  animation: slideInFromBottom 1s ease-out forwards;
+  transform: translateY(100%);
 }
 
 .input-group {
@@ -94,24 +117,24 @@ export default {
 label {
   display: block;
   margin-bottom: 5px;
-  color: #B3D9E6; /* Light blue */
+  color: #B3D9E6;
 }
 
 input[type="text"],
 input[type="password"] {
-  width: 100%; /* Adjust the width as needed */
+  width: 100%;
   height: 35px;
   padding: 10px;
-  border: 1px solid #B3D9E6; /* Light blue border */
-  background-color: #E3F1F8; /* Light blue background */
+  border: 1px solid #B3D9E6;
+  background-color: #E3F1F8;
 }
 
 button {
-  width: 100%; /* Adjust the width as needed */
-  background-color: #92d1e7; /* Light blue */
-  color: black; /* White */
+  width: 100%;
+  background-color: #92d1e7;
+  color: black;
   border: none;
-  padding: 5px;
+  padding: 10px;
   border-radius: 5px;
   cursor: pointer;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -121,42 +144,136 @@ button {
 }
 
 button:hover {
-  background-color: #207BA6; /* Darker blue on hover */
-  color:white;
+  background-color: #207BA6;
+  color: white;
 }
 
 .subtitle {
-  color: black; /* Light blue */
+  color: black;
   margin: 0;
   font-size: 15px;
   text-align: center;
 }
 
 .inputTitle {
-  color: rgb(53, 53, 53); /* Light blue */
+  color: rgb(53, 53, 53);
   text-align: left;
-  margin-left: 0px;
 }
 
 .title {
   font-weight: bold;
   margin: 0;
   font-size: 40px;
-  color: rgb(53, 53, 53); /* Light blue */
+  color: rgb(53, 53, 53);
   text-align: center;
 }
 
 .trapezoid {
   position: fixed;
   bottom: 0;
-  width: 200%;
+  width: 100%;
   height: 70px;
-  background-color: #B3D9E6; /* Light blue */
-  align-items: center;
+  background-color: #B3D9E6;
+  z-index: 0;
+  animation: slideUpFromBottom 1s ease-out forwards;
+  transform: translateY(100%);
+  margin-right: -200px;
 }
 
 .mvcLogo {
-  width: 400px;
-  height: 80px;
+  width: 300px;
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+}
+
+.circle-1 {
+  top: -200px;
+  left: -499px;
+  width: 1350px;
+  height: 1000px;
+  background-color: #B3D9E6;
+  animation-name: slideInCircle1;
+}
+
+.circle-2 {
+  top: -200px;
+  left: -500px;
+  width: 1300px;
+  height: 1000px;
+  background-color: #016888;
+  animation-name: slideInCircle2;
+}
+
+@keyframes slideInCircle1 {
+  from {
+    left: -1100px;
+  }
+
+  to {
+    left: -38%;
+  }
+}
+
+@keyframes slideInCircle2 {
+  from {
+    left: -1100px;
+  }
+
+  to {
+    left: -38%;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.graphics {
+  position: absolute;
+  top: 25%;
+  left: 40%;
+  height: 60%;
+  width: auto;
+}
+
+.logo {
+  position: absolute;
+  bottom: 17%;
+  left: 108%;
+  height: 100px;
+  width: auto;
+}
+
+.echode_logo {
+  position: absolute;
+  bottom: 17%;
+  left: 96%;
+  height: 140px;
+  width: auto;
 }
 </style>
+

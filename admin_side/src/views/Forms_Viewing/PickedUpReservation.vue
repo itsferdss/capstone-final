@@ -1,0 +1,171 @@
+<template>
+    <div class="title-container">
+        <h1 class="ghostTitle">Picked Up Reservation</h1>
+        <div class="dash">
+            <span class="material-icons">inventory</span>
+            <span class="text">Picked Up Reservations</span>
+        </div>
+    </div>
+    <hr class="divider">
+    <v-btn @click="goBack()" class="mb-2 mr-4 rounded-l add-btn" elevation="2">
+        <v-icon left>mdi-chevron-left</v-icon>
+        <span class="add-text">Back</span>
+    </v-btn>
+    <v-container class="content">
+        <v-card>
+            <v-card-title>
+                <v-toolbar-title class="text-uppercase grey--text">
+                    <v-icon left>mdi-check-outline</v-icon> <!-- Icon added here -->
+                    Picked Up Reservations
+                </v-toolbar-title>
+                <v-text-field v-model="search" append-icon="mdi-magnify" label="Search Appointments" single-line
+                    hide-details></v-text-field>
+            </v-card-title>
+
+            <v-data-table :headers="headers" :items="pickedUpAppointments" :search="search" class="elevation-1"
+                no-data-text="No pending appointments found">
+                <template v-slot:item="{ item }">
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.patient.full_name }}</td>
+                        <td>{{ formatPrescriptionDate(item.created_at) }}</td>
+                        <td>{{ formatPrescriptionDate(item.updated_at) }}</td>
+                        <td>{{ item.product.product_name }}</td>
+                        <td>{{ item.product.quantity }}</td>
+                        <td>₱{{ item.product.price }}</td>
+                    </tr>
+                </template>
+            </v-data-table>
+        </v-card>
+    </v-container>
+</template>
+
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+export default {
+    data() {
+        return {
+            search: '',
+            pickedUpAppointments: [],
+            headers: [
+                { title: 'ID', align: 'center' },
+                { title: 'Name', align: 'center' },
+                { title: 'Date of Reservation', align: 'center' },
+                { title: 'Pick Up Date', align: 'center' },
+                { title: 'Product Name', align: 'center' },
+                { title: 'Stock', align: 'center' },
+                { title: 'Price', align: 'center' },
+            ],
+        };
+    },
+    created() {
+        this.fetchPickedUpAppointments();
+    },
+    methods: {
+        fetchPickedUpAppointments() {
+            axios.get('/reservations/picked_up') // Update the URL to match Laravel route
+                .then(response => {
+                    this.pickedUpAppointments = response.data;
+                    console.log('Picked Up Appointments:', this.pickedUpAppointments);
+                })
+                .catch(error => {
+                    console.error('Error fetching picked up appointments:', error);
+                });
+        },
+        goBack() {
+            this.$router.go(-1);
+        },
+        formatPrescriptionDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString(undefined, options);
+        },
+    },
+};
+</script>
+
+<style scoped>
+.ghostTitle {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.1;
+    top: 0px;
+    right: 50px;
+    font-size: 120px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: #848484;
+}
+
+.title-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #ffffff;
+    position: relative;
+    z-index: 1;
+}
+
+.dash {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.material-icons {
+    color: #1a1a1a;
+    font-size: 2.5rem;
+}
+
+.add-btn {
+    background-color: #B3D9E6 !important;
+    color: white !important;
+    font-weight: bold !important;
+    width: 100px;
+    margin-left: 50px;
+}
+
+.add-text {
+    font-weight: bold;
+    color: black !important;
+}
+
+.add-btn .v-icon {
+    margin-right: 8px;
+    /* Add spacing between icon and text */
+    color: black;
+}
+
+.content {
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    height: 100%;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-width: 2px 1px 2px 4px;
+    border-color: rgb(43, 75, 105);
+    margin-bottom: 20px;
+}
+
+.text {
+    margin-left: 0.5rem;
+    color: #151515;
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.v-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+td {
+    text-align: center;
+}
+</style>

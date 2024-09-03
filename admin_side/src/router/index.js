@@ -40,7 +40,14 @@ const router = createRouter({
             path: '/add/history',
             component: () => import('../views/Forms_Adding/HistoryForm.vue')
         },
-        
+        {
+            path: '/view/pending',
+            component: () => import('../views/Forms_Viewing/PendingReservation.vue')
+        },
+        {
+            path: '/view/pickedup',
+            component: () => import('../views/Forms_Viewing/PickedUpReservation.vue')
+        },
         {
             path: '/view/prescription',
             component: () => import('../views/Forms_Viewing/FormPrescriptionView.vue')
