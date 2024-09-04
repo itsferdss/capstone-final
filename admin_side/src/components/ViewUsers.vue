@@ -243,11 +243,11 @@ export default {
         ocular_history: '',
       },
       headers: [
-        { title: 'User ID',  key: 'id' },
-        { title: 'User Name', key: 'full_name' },
-        { title: 'Contact Number', key: 'contact' },
-        { title: 'Address', key: 'address' }, 
-        { title: 'Actions', sortable: false },
+        { title: 'User ID', align: 'center', key: 'id' },
+        { title: 'User Name', align: 'center', key: 'full_name' },
+        { title: 'Contact Number', align: 'center', key: 'contact' },
+        { title: 'Address', align: 'center', key: 'address' }, 
+        { title: 'Actions', align: 'center', sortable: false },
       ],
       patients: [],
       displayedPatients: [],
@@ -808,6 +808,10 @@ export default {
 .styled-btn .v-icon {
   margin-right: 8px; /* Add spacing between icon and text */
   color: black;
+}
+
+td{
+  text-align: center;
 }
 
 @media (max-width: 960px) {
