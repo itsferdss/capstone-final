@@ -368,17 +368,14 @@ html {
 
 .background-overlay {
   position: absolute;
-  /* Position it absolutely to fill its parent */
   top: 0;
   left: 0;
   width: 100%;
   height: 120%;
   background-image: url('../assets/eyesbackground.jpg');
-  /* Your background image */
   background-size: cover;
   background-position: center;
   opacity: 0.9;
-  /* Adjust opacity here */
   z-index: -1;
   margin-bottom: 40px;
 }

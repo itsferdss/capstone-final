@@ -29,8 +29,10 @@ export default {
     border-radius: 10px;
     padding: 0.5rem;
     height: 100%;
-    margin-top: -38px;
-    width: 100%;
+    margin-bottom: 20px;
+    margin-top: -10px;
+    margin-left: -60px;
+    margin-right: -60px;
   }
 }
 

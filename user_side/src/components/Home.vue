@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="container">
     <div class="header-banner">
       <div class="logo-container">
@@ -16,12 +16,16 @@
 
     <div class="banner-section">
       <div class="banner-card">
-        <p>MEN</p>
-        <img src="../assets/bgm.jpg" alt="Men's Glasses">
+        <img src="../assets/men-model.jpg" alt="Men's Glasses">
+        <div class="overlay">
+          <p>MEN</p>
+        </div>
       </div>
       <div class="banner-card">
-        <p>WOMEN</p>
-        <img src="../assets/bgfm.jpg" alt="Women's Glasses">
+        <img src="../assets/women-model.jpg" alt="Women's Glasses">
+        <div class="overlay">
+          <p>WOMEN</p>
+        </div>
       </div>
     </div>
 
@@ -37,31 +41,31 @@
       </div>
     </div>
 
-    <div class="product-section">
-      <h2>Categories</h2>
-      <div class="product-grid">
-        <div class="product-card">
-          <img src="../assets/product2.jpg" class="product-image" alt="Salamin">
-          <div class="product-name-container">
-            <p class="product-name">FRAMES</p>
+    <div class="categories-section">
+      <h2 class="categories-title">Explore Our Categories</h2>
+      <div class="categories-grid">
+        <div class="categories-card">
+          <img src="../assets/frames.jpg" class="categories-image" alt="Frames">
+          <div class="category-overlay">
+            <button class="category-button">FRAMES</button>
           </div>
         </div>
-        <div class="product-card">
-          <img src="../assets/product1.jpg" class="product-image" alt="Sports Eye Glass">
-          <div class="product-name-container">
-            <p class="product-name">LENSES</p>
+        <div class="categories-card">
+          <img src="../assets/lens.jpg" class="categories-image" alt="Lens">
+          <div class="category-overlay">
+            <button class="category-button">LENS</button>
           </div>
         </div>
-        <div class="product-card">
-          <img src="../assets/product3.jpg" class="product-image" alt="Contact Lense">
-          <div class="product-name-container">
-            <p class="product-name">Contact Lense</p>
+        <div class="categories-card">
+          <img src="../assets/contact-lens.jpg" class="categories-image" alt="Contact Lenses">
+          <div class="category-overlay">
+            <button class="category-button">CONTACT LENSES</button>
           </div>
         </div>
-        <div class="product-card">
-          <img src="../assets/5.jpg" class="product-image" alt="Sun Glass">
-          <div class="product-name-container">
-            <p class="product-name">ACCESSORIES</p>
+        <div class="categories-card">
+          <img src="../assets/accessories.jpg" class="categories-image" alt="Accessories">
+          <div class="category-overlay">
+            <button class="category-button">ACCESSORIES</button>
           </div>
         </div>
       </div>
@@ -78,30 +82,17 @@
     </div>
 
     <div class="product-section">
-      <h2>New Products</h2>
-      <div class="product-grid">
-        <div class="product-card">
-          <img src="../assets/product2.jpg" class="product-image" alt="Salamin">
-          <div class="product-name-container">
-            <p class="product-name">Salamin</p>
-          </div>
-        </div>
-        <div class="product-card">
-          <img src="../assets/product1.jpg" class="product-image" alt="Sports Eye Glass">
-          <div class="product-name-container">
-            <p class="product-name">Sports Eye Glass</p>
-          </div>
-        </div>
-        <div class="product-card">
-          <img src="../assets/product3.jpg" class="product-image" alt="Contact Lense">
-          <div class="product-name-container">
-            <p class="product-name">Contact Lense</p>
-          </div>
-        </div>
-        <div class="product-card">
-          <img src="../assets/product4.jpg" class="product-image" alt="Sun Glass">
-          <div class="product-name-container">
-            <p class="product-name">Sun Glass</p>
+      <h2 class="newProds">New Products</h2>
+      <div class="product-container">
+        <div v-for="product in products" :key="product.id" class="product-card" @click="viewProduct(product.id)">
+          <img :src="product.currentImage" :alt="product.product_name" class="main-image"
+            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <div class="product-details">
+            <span class="product-name">{{ product.product_name }}</span>
+            <span class="price">
+              <span v-if="product.onSale" class="original-price">{{ product.originalPrice }}</span>
+              <span class="sale-price">₱{{ product.price }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -120,9 +111,38 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
+  data() {
+    return {
+      products: [],
+    };
+  },
   name: 'WelcomePage',
   methods: {
+    fetchProducts() {
+      axios.get('/products/latest')
+        .then(response => {
+          this.products = response.data.map(product => ({
+            ...product,
+            currentImage: product.image // Set the default image
+          }));
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+        });
+    },
+    changeImage(product, action) {
+      if (action === 'hover' && product.images.length > 1) {
+        product.currentImage = product.images[1]; // Use second image on hover
+      } else {
+        product.currentImage = product.images[0]; // Use default image otherwise
+      }
+    },
+    viewProduct(productId) {
+      this.$router.push({ path: '/viewProduct', query: { id: productId } });
+    },
     playVideo() {
       if (this.$refs.headerVideo) {
         this.$refs.headerVideo.play().catch(error => {
@@ -152,6 +172,7 @@ export default {
       video.addEventListener('mouseover', this.playVideo);
       video.addEventListener('mouseout', this.pauseVideo);
     }
+    this.fetchProducts();
   },
   beforeDestroy() {
     const video = this.$refs.headerVideo;
@@ -167,23 +188,22 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px; /* Increase padding */
+  max-width: 100%;
+
 }
 
 .header-banner {
   position: relative;
   text-align: center;
-  margin-bottom: 30px; /* Increase bottom margin */
-  border-radius: 12px;
+  margin-bottom: 50px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Increase shadow size */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .logo-container {
   position: relative;
-  width: 100%;
+  /* width: 100%; */
   height: 500px; /* Increase height */
   overflow: hidden;
   border-radius: 12px;
@@ -193,19 +213,26 @@ export default {
   align-items: center;
 }
 
+.background-image{
+  width: 100%;
+}
+
 .welcome {
   position: absolute;
-  bottom: 120px; /* Increase bottom position */
-  left: 30px; /* Increase left position */
-  padding: 40px; /* Increase padding */
+  bottom: 140px;
+  left: 40px;
+  padding: 50px;
   z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
 }
 
 .welcome h1 {
-  font-size: 36px; /* Increase font size */
+  font-size: 48px;
   font-weight: 700;
   margin: 0;
-  color: #89f070;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .button-container {
@@ -231,14 +258,12 @@ export default {
 }
 
 .shop-button:hover {
-  background-color: #6baff8;
+  background-color: #374f2d;
   color: #fafcff;
 }
 
 .header-video {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -252,108 +277,192 @@ export default {
   display: flex;
   gap: 30px; /* Increase gap between banners */
   margin-bottom: 50px; /* Increase bottom margin */
-  margin-left: 30px;
+  margin-left: 60px;
+  margin-right: 50px;
   margin-top: 80px; /* Increase top margin */
 }
 
 .banner-card {
-  flex: 1;
   position: relative;
-  padding: 30px; /* Increase padding */
-  background-color: #fff;
-  border-radius: 12px; /* Increase border-radius */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Increase shadow size */
-  text-align: center;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.banner-card:hover {
-  transform: scale(1.08); /* Increase scale effect */
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Increase shadow size */
+.categories-section {
+  text-align: center;
+  margin-top: 50px;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.categories-title {
+  font-size: 34px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+.categories-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.categories-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.categories-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.categories-card:hover .category-overlay {
+  opacity: 1;
+}
+
+.category-button {
+  background-color: #ffffff;
+  color: #2c3e50;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-button:hover {
+  background-color: #2c3e50;
+  color: #ffffff;
 }
 
 .banner-card img {
   width: 100%;
-  height: 400px; /* Increase height */
+  height: 400px; /* Adjust as needed */
   object-fit: cover;
   border-radius: 12px;
-  margin-top: 15px; /* Increase top margin */
 }
 
-.banner-card p {
-  font-size: 24px; /* Increase font size */
-  font-weight: 700;
-  color: #2c3e50;
-}
-
-.product-section {
-  margin-top: 80px; /* Increase top margin */
-  margin-left: 60px; /* Increase left margin */
-  margin-right: 60px; /* Increase right margin */
-}
-
-.product-section h2 {
-  font-size: 28px; /* Increase font size */
-  margin-bottom: 25px; /* Increase bottom margin */
-  color: #2c3e50;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px; /* Increase gap between grid items */
-}
-
-.product-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  padding: 30px; /* Increase padding */
-  border-radius: 12px; /* Increase border-radius */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Increase shadow size */
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.product-card:hover {
-  animation: continuousBounce 1s ease-in-out infinite;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Increase shadow size */
-  transition: box-shadow 0.3s ease;
-}
-
-.product-image {
+.banner-card .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 250px; /* Increase height */
-  object-fit: cover;
-  border-radius: 12px; /* Increase border-radius */
-  transition: transform 0.3s ease;
-}
-
-.product-name-container {
-  background: #6baff8;
-  padding: 15px; /* Increase padding */
-  border-radius: 8px; /* Increase border-radius */
-  margin-top: 20px; /* Increase top margin */
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); 
   display: flex;
+  justify-content: center;
   align-items: center;
-  cursor: pointer;
-  border: none;
+  color: #fff;
+  font-size: 36px;
+  font-weight: bold;
+  text-transform: uppercase;
   transition: background-color 0.3s ease;
 }
 
-.product-name-container:hover {
-  background-color: #5a9cd7;
+.banner-card:hover .overlay {
+  background-color: rgba(0, 0, 0, 0.6); 
+}
+
+.banner-card p {
+  margin: 0;
+}
+
+.product-section{
+  margin-right: 30px;
+  margin-left: 30px;
+}
+
+.newProds{
+  text-align: center;
+  font-size: 34px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.product-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.product-card {
+  flex: 1 1 2%;
+  max-width: 22%;
+  margin: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.main-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.product-details {
+  padding: 15px;
+  text-align: center;
 }
 
 .product-name {
-  font-size: 20px; /* Increase font size */
-  color: #fafcff;
-  font-weight: 600;
-  margin: 0;
-  display: flex;
-  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.price {
+  display: block;
+  font-size: 16px;
+  color: #333;
+}
+
+.sale-price {
+  color: red;
 }
 
 .ratings {
@@ -366,7 +475,6 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-left: 50px; /* Increase left margin */
   margin-top: 80px; /* Increase top margin */
 }
 
