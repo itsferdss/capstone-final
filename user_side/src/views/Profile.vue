@@ -10,9 +10,6 @@
         <hr class="divider">
         <div class="main-content">
             <div class="Profile">
-                <div class="logo-container">
-                    <img src="/src/assets/MVC_logo.png" class="mvcLogo" alt="MVC Logo">
-                </div>
                 <Profile />
             </div>
         </div>
@@ -25,7 +22,7 @@ import Profile from '../components/Profile.vue';
 export default {
   components: {
     Profile
-  }
+  },
 };
 </script>
 
@@ -85,13 +82,6 @@ export default {
         border-width: 2px 2px 2px 2px;
         border-color: rgb(178, 177, 177);
         margin-bottom: 20px;
-    }
-    .logo-container {
-        display: none; /* Hide by default */
-    }
-
-    .mvcLogo {
-        display: none;
     }
 }
 

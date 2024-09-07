@@ -5,8 +5,8 @@
         <v-img src="src/assets/MVC_logo.png" class="mvcLogo"></v-img>
         <p class="subtitle">Sign in as ADMIN</p>
         <div class="input-group">
-          <label class="inputTitle" for="username">Name</label>
-          <input type="text" id="username" v-model="username" required>
+          <label class="inputTitle" for="email">email</label>
+          <input type="text" id="email" v-model="email" required>
         </div>
         <div class="input-group">
           <label class="inputTitle" for="password">Password</label>
@@ -20,28 +20,45 @@
   </div>
 </template>
 
-<script scoped>
+<script>
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 export default {
   data() {
     return {
-      username: '',
+      email: '',
       password: '',
       errorMessage: ''
     };
   },
   methods: {
     login() {
-      console.log("Clicked login button");
-      console.log("Username:", this.username);
-      console.log("Password:", this.password);
-
-      if (this.username === 'admin' && this.password === '123') {
-        console.log("Redirecting to /dashboard");
-        this.$router.push('/dashboard'); // Use router.push to navigate
-      } else {
-        console.log("Invalid username or password");
-        this.errorMessage = 'Invalid username or password';
-      }
+      axios.post('http://127.0.0.1:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
+        email: this.email,
+        password: this.password
+      })
+        .then(response => {
+          const token = response.data.token; // Assuming the token is returned in the response
+          const id = response.data.id;
+          localStorage.setItem('patientId', id);
+          sessionStorage.setItem('token', token); // Store the token in sessionStorage
+          this.$store.commit('setPatientId', id);
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: 'Welcome!',
+          });
+          this.$router.push('/dashboard'); // Redirect to home after successful login
+        })
+        .catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Invalid email or password',
+          });
+          console.error('Login failed:', error);
+        });
     }
   }
 };

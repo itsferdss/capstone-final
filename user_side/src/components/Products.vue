@@ -37,7 +37,7 @@
     <section id="eyeglasses" class="category-section">
       <h1 class="title">LENSES</h1>
       <div class="product-grid">
-        <div class="product-card" v-for="product in lensesProducts" :key="product.id">
+        <div @click="viewProduct(product.id)" class="product-card" v-for="product in lensesProducts" :key="product.id">
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -55,7 +55,8 @@
     <section id="prescription-sunglasses" class="category-section">
       <h1 class="title">CONTACT LENSES</h1>
       <div class="product-grid">
-        <div class="product-card" v-for="product in contactLensesProducts" :key="product.id">
+        <div @click="viewProduct(product.id)" class="product-card" v-for="product in contactLensesProducts"
+          :key="product.id">
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -73,7 +74,8 @@
     <section id="readers" class="category-section">
       <h1 class="title">ACCESSORIES</h1>
       <div class="product-grid">
-        <div class="product-card" v-for="product in accessoriesProducts" :key="product.id">
+        <div @click="viewProduct(product.id)" class="product-card" v-for="product in accessoriesProducts"
+          :key="product.id">
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">

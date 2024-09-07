@@ -1,5 +1,5 @@
-<template>
-  <div class="wrapper">
+<template> 
+  <div class="container">
     <div class="header-banner">
       <div class="logo-container">
         <div class="welcome">
@@ -9,8 +9,7 @@
           <source src="../assets/vid.mp4" type="video/mp4">
         </video>
         <div class="button-container">
-          <button class="shop-button" @click="shopSunglass">Shop Sunglass</button>
-          <button class="shop-button" @click="shopPrescription">Shop Prescription</button>
+          <button class="shop-button" @click="shopSunglass">Shop Now</button>
         </div>
       </div>
     </div>
@@ -167,23 +166,27 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px; /* Increase padding */
+}
+
 .header-banner {
   position: relative;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px; /* Increase bottom margin */
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  margin-left: 30px;
-  margin-right: 30px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Increase shadow size */
 }
 
 .logo-container {
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 500px; /* Increase height */
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -192,14 +195,14 @@ export default {
 
 .welcome {
   position: absolute;
-  bottom: 90px;
-  left: 20px;
-  padding: 30px;
+  bottom: 120px; /* Increase bottom position */
+  left: 30px; /* Increase left position */
+  padding: 40px; /* Increase padding */
   z-index: 10;
 }
 
 .welcome h1 {
-  font-size: 28px;
+  font-size: 36px; /* Increase font size */
   font-weight: 700;
   margin: 0;
   color: #89f070;
@@ -207,10 +210,10 @@ export default {
 
 .button-container {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
+  bottom: 30px; /* Increase bottom position */
+  left: 30px; /* Increase left position */
   display: flex;
-  gap: 10px;
+  gap: 15px; /* Increase gap between buttons */
   padding: 30px;
   z-index: 10;
 }
@@ -219,10 +222,10 @@ export default {
   background-color: transparent;
   color: #89f070;
   border: 2px solid #89f070;
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: 15px 30px; /* Increase padding */
+  border-radius: 8px; /* Increase border-radius */
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px; /* Increase font size */
   font-weight: bold;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -247,58 +250,58 @@ export default {
 
 .banner-section {
   display: flex;
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 30px; /* Increase gap between banners */
+  margin-bottom: 50px; /* Increase bottom margin */
   margin-left: 30px;
-  margin-top: 70px;
+  margin-top: 80px; /* Increase top margin */
 }
 
 .banner-card {
   flex: 1;
   position: relative;
-  padding: 20px;
+  padding: 30px; /* Increase padding */
   background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px; /* Increase border-radius */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Increase shadow size */
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .banner-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: scale(1.08); /* Increase scale effect */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Increase shadow size */
 }
 
 .banner-card img {
   width: 100%;
-  height: 350px;
+  height: 400px; /* Increase height */
   object-fit: cover;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: 12px;
+  margin-top: 15px; /* Increase top margin */
 }
 
 .banner-card p {
-  font-size: 20px;
+  font-size: 24px; /* Increase font size */
   font-weight: 700;
   color: #2c3e50;
 }
 
 .product-section {
-  margin-top: 60px;
-  margin-left: 45px;
-  margin-right: 45px;
+  margin-top: 80px; /* Increase top margin */
+  margin-left: 60px; /* Increase left margin */
+  margin-right: 60px; /* Increase right margin */
 }
 
 .product-section h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px; /* Increase font size */
+  margin-bottom: 25px; /* Increase bottom margin */
   color: #2c3e50;
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 30px; /* Increase gap between grid items */
 }
 
 .product-card {
@@ -306,9 +309,9 @@ export default {
   flex-direction: column;
   justify-content: space-between;
   background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  padding: 30px; /* Increase padding */
+  border-radius: 12px; /* Increase border-radius */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Increase shadow size */
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -316,23 +319,23 @@ export default {
 
 .product-card:hover {
   animation: continuousBounce 1s ease-in-out infinite;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); /* Increase shadow size */
   transition: box-shadow 0.3s ease;
 }
 
 .product-image {
   width: 100%;
-  height: 200px;
+  height: 250px; /* Increase height */
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px; /* Increase border-radius */
   transition: transform 0.3s ease;
 }
 
 .product-name-container {
   background: #6baff8;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 15px;
+  padding: 15px; /* Increase padding */
+  border-radius: 8px; /* Increase border-radius */
+  margin-top: 20px; /* Increase top margin */
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -345,7 +348,7 @@ export default {
 }
 
 .product-name {
-  font-size: 18px;
+  font-size: 20px; /* Increase font size */
   color: #fafcff;
   font-weight: 600;
   margin: 0;
@@ -356,76 +359,76 @@ export default {
 .ratings {
   position: relative;
   width: 100%;
-  height: 450px;
+  height: 500px; /* Increase height */
   overflow: hidden;
-  border-radius: 10px;
+  border-radius: 12px; /* Increase border-radius */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-left: 40px;
-  margin-top: 60px;
+  margin-left: 50px; /* Increase left margin */
+  margin-top: 80px; /* Increase top margin */
 }
 
 .rate {
   position: absolute;
-  bottom: 30px;
-  left: 20px;
-  padding: 30px;
+  bottom: 40px; /* Increase bottom position */
+  left: 30px; /* Increase left position */
+  padding: 40px; /* Increase padding */
   z-index: 10;
 }
 
 .rate h1 {
-  font-size: 35px;
+  font-size: 40px; /* Increase font size */
   font-weight: 700;
-  margin-bottom: 20;
+  margin-bottom: 25px; /* Increase bottom margin */
   color: #f7f7f7;
 }
 
 .rate p {
-  font-size: 18px;
+  font-size: 20px; /* Increase font size */
   font-weight: 700;
   margin: 0;
   color: #f7f7f7;
 }
 
 @keyframes continuousBounce {
-
   0%,
   100% {
     transform: translateY(0);
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-15px); /* Increase bounce height */
   }
 }
 
 .description-section {
-  padding: 40px;
+  padding: 50px; /* Increase padding */
   background-color: #f9f9f9;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  margin: 40px auto;
+  border-radius: 15px; /* Increase border-radius */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Increase shadow size */
+  margin: 50px auto; /* Increase margin */
   max-width: 1000px;
   text-align: center;
 }
 
 .description-section h2 {
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 32px; /* Increase font size */
+  margin-bottom: 25px; /* Increase bottom margin */
   color: #2c3e50;
 }
 
 .description-section p {
-  font-size: 18px;
+  font-size: 20px; /* Increase font size */
   color: #333;
-  line-height: 1.6;
+  line-height: 1.8; /* Increase line height */
 }
 
 .description-logo {
-  width: 100px;
+  width: 120px; /* Increase width */
   height: auto;
-  margin: 15px;
+  margin: 20px; /* Increase margin */
 }
+
 </style>

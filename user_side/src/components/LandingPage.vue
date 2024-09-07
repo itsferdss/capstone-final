@@ -4,11 +4,12 @@
       <div class="topnav">
         <img class="logo" src="../assets/newlogo.png" />
         <div class="logo-separator"></div>
-        <img class="MVClogo" src="../assets/MVC_logo.png" />    
+        <img class="MVClogo" src="../assets/MVC_logo.png" />
         <div class="nav-links">
           <a href="#section1" class="nav-link" :class="{ active: activeSection === 'section1' }">Home</a>
-          <a href="#section2" class="nav-link" :class="{ active: activeSection === 'section2' }">About</a>
-          <a href="#section3" class="nav-link" :class="{ active: activeSection === 'section3' }">Contact Us</a>
+          <a href="#section2" class="nav-link" :class="{ active: activeSection === 'section2' }">Offer</a>
+          <a href="#section3" class="nav-link" :class="{ active: activeSection === 'section3' }">Team</a>
+          <a href="#section4" class="nav-link" :class="{ active: activeSection === 'section4' }">Contact Us</a>
         </div>
       </div>
     </header>
@@ -26,44 +27,81 @@
           </button>
         </div>
       </div>
-      <footer>
-        <div class="footer">
-          <div class="footer-item">
-            <div class="icon-box">
-              <i class="mdi mdi-stethoscope"></i>
-            </div>
-            <div class="text-content">
-              <p class="miniTitle">Free Check-Up</p>
-              <p class="miniSubTitle">Check now and you will know</p>
-            </div>
-          </div>
-          <div class="footer-item">
-            <div class="icon-box">
-              <i class="mdi mdi-headset"></i>
-            </div>
-            <div class="text-content">
-              <p class="miniTitle">24/7 Support</p>
-              <p class="miniSubTitle">Check now and you will know</p>
-            </div>
-          </div>
-          <div class="footer-item">
-            <div class="icon-box">
-              <i class="mdi mdi-cogs"></i>
-            </div>
-            <div class="text-content">
-              <p class="miniTitle">Free Adjustment</p>
-              <p class="miniSubTitle">Check now and you will know</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+
     </div>
   </div>
 
-  <!--SECTION 2-->
+
   <div class="full-height" id="section2">
     <div class="about">
-      <h1>About us</h1>
+    </div>
+
+    <div class="offers-section">
+      <div class="offer-header">
+        <h2>Our Services</h2>
+        <p>What Service We Offer</p>
+        <button class="all-services-button">All Services</button>
+      </div>
+
+      <div class="offers">
+        <div class="offer-box">
+          <img src="/src/assets/gian.png" alt="Eye Care" class="offer-image">
+          <p class="offer-title">Eye Care</p>
+          <p class="offer-text">"Comprehensive eye care services aimed at maintaining optimal vision health. Our expert
+            team provides routine eye exams, personalized treatments, and preventive care to protect your eyes and
+            improve
+            your overall well-being."</p>
+        </div>
+        <div class="offer-box">
+          <img src="/src/assets/me.png" alt="Retina Repair" class="offer-image">
+          <p class="offer-title">Retina Repair</p>
+          <p class="offer-text">"Advanced retina repair services that address conditions such as retinal detachment,
+            macular degeneration, and other retinal disorders. Our specialized procedures are designed to restore and
+            preserve your vision, utilizing the latest in medical technology and expertise."</p>
+
+        </div>
+        <div class="offer-box">
+          <img src="/src/assets/dm.jpg" alt="Vision Check" class="offer-image">
+          <p class="offer-title">Vision Check</p>
+          <p class="offer-text">"Regular vision checks to ensure your eyes are in optimal condition. We provide thorough
+            eye exams to detect vision problems early, helping you maintain clear and comfortable sight through
+            personalized recommendations and treatments."</p>
+
+        </div>
+        <div class="offer-box">
+          <img src="/src/assets/gian.png" alt="Cornea Transplant" class="offer-image">
+          <p class="offer-title">Cornea Transplant</p>
+          <p class="offer-text">"Expert cornea transplant services to restore clear vision for patients with damaged or
+            diseased corneas. Our skilled surgeons use advanced techniques to replace the cornea, improving vision and
+            enhancing your quality of life."</p>
+
+        </div>
+        <div class="offer-box">
+          <img src="/src/assets/me.png" alt="Laser Surgery" class="offer-image">
+          <p class="offer-title">Laser Surgery</p>
+          <p class="offer-text">"Precise and minimally invasive laser surgery to correct various vision issues,
+            including
+            nearsightedness, farsightedness, and astigmatism. Our state-of-the-art technology ensures quick recovery and
+            excellent results, giving you the freedom of clear vision without glasses or contacts."</p>
+
+        </div>
+        <div class="offer-box">
+          <img src="/src/assets/dm.jpg" alt="Dry Eye Surgery" class="offer-image">
+          <p class="offer-title">Dry Eye Surgery</p>
+          <p class="offer-text">"Specialized dry eye surgery to relieve persistent discomfort and improve tear
+            production.
+            Our advanced procedures target the underlying causes of chronic dry eye, providing long-lasting relief and
+            enhancing your eye health and comfort."</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="full-height" id="section3">
+    <div class="about">
+      <h1>About Us</h1>
     </div>
     <img class="echode" src="../assets/echode_logo.png" />
     <div class="intro">
@@ -106,8 +144,10 @@
     </div>
   </div>
 
+
+
   <!--SECTION 3-->
-  <div class="full-height" id="section3">
+  <div class="full-height" id="section4">
     <div class="model-container">
       <!-- Image with overlay -->
       <img class="model" src="../assets/model3.jpg" alt="Model" />
@@ -340,7 +380,7 @@ html {
   opacity: 0.9;
   /* Adjust opacity here */
   z-index: -1;
-  /* Ensure it is behind the content */
+  margin-bottom: 40px;
 }
 
 .content {
@@ -352,40 +392,6 @@ html {
   color: white;
   /* Adjust text color for better visibility on the background */
   flex: 1;
-}
-
-footer {
-  background-color: #016888;
-  color: white;
-  text-align: center;
-  padding: 40px;
-  width: 100%;
-  position: relative;
-  bottom: 0;
-  overflow: hidden;
-  margin-top: 85px;
-  height: 120px;
-  display: flex;
-  /* Aligns the footer content horizontally */
-  justify-content: center;
-  /* Centers the content horizontally */
-}
-
-.footer {
-  display: flex;
-  justify-content: space-around;
-  /* Evenly distributes the footer items */
-  align-items: center;
-  /* Centers items vertically */
-  width: 100%;
-  height: 100%;
-}
-
-.footer-item {
-  display: flex;
-  align-items: center;
-  margin: 0 20px;
-  /* Adds horizontal spacing between items */
 }
 
 .icon-box {
@@ -428,7 +434,7 @@ footer {
   font-weight: bold;
   font-size: 50px;
   margin-left: 30px;
-  margin-top: 40px;
+  margin-top: 200px;
 }
 
 .subtitle {
@@ -503,7 +509,8 @@ footer {
   left: -0.3em;
   top: -0.3em;
   border: 1px solid #0E1822;
-  border-bottom: 0px;}
+  border-bottom: 0px;
+}
 
 .button-borders:after {
   content: "";
@@ -513,25 +520,127 @@ footer {
   left: -0.3em;
   bottom: -0.3em;
   border: 1px solid #0E1822;
-  border-top: 0px;  z-index: 0;
+  border-top: 0px;
+  z-index: 0;
 }
 
 .shape {
   fill: #0E1822;
 }
 
-#section2 {
-  position: relative;  
+/* General Styles */
+.offers-section {
+  padding: 40px;
+  background-color: #ffffff;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.offer-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.offer-header h2 {
+  font-size: 24px;
+  color: #00af87;
+  margin-bottom: 10px;
+}
+
+.offer-header p {
+  font-size: 36px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.all-services-button {
+  background-color: #00af87;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.offers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.offer-box {
+  width: 30%;
+  margin-bottom: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: left;
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.offer-box:hover {
+  transform: translateY(-5px);
+}
+
+.offer-image {
+  width: 100%;
+  height: auto;
+  border-bottom: 2px solid #00af87;
+  margin-bottom: 15px;
+}
+
+.offer-title {
+  font-size: 20px;
+  color: #00af87;
+  margin-bottom: 10px;
+}
+
+.offer-text {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.offer-link {
+  font-size: 14px;
+  color: #00af87;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .offer-box {
+    width: 48%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .offer-box {
+    width: 100%;
+  }
+}
+
+
+#section3 {
+  position: relative;
   height: 750px;
   background-color: white;
   margin: 0;
   padding: 0;
-  overflow: hidden;}
+  overflow: hidden;
+}
+
 
 .about {
   font-family: 'Times New Roman', Times, serif;
   text-align: center;
-  position: relative;  z-index: 1;  margin-top: 100px;
+  position: relative;
+  z-index: 1;
+  margin-top: 100px;
 }
 
 
@@ -551,7 +660,7 @@ footer {
   height: 600px;
   object-fit: cover;
   opacity: 0.3;
- 
+
   margin-left: 450px;
 }
 
@@ -591,7 +700,8 @@ footer {
   font-weight: bold;
   color: #333;
 }
-#section3 {
+
+#section4 {
   height: 600px;
 }
 
