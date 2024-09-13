@@ -6,77 +6,40 @@
         <form @submit.prevent="saveNewUser">
           <div class="form-group">
             <label for="full_name">Patient Name</label>
-            <input
-              type="text"
-              v-model="editedItem.full_name"
-              id="full_name"
-              class="form-input"
-              required
-            />
+            <input type="text" v-model="editedItem.full_name" id="full_name" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" v-model="editedItem.address" id="address" class="form-input" required />
           </div>
           <div class="form-row">
             <div class="form-column">
               <div class="form-group">
                 <label for="email">Email</label>
-                <input
-                  type="email"
-                  v-model="editedItem.email"
-                  id="email"
-                  class="form-input"
-                  required
-                />
+                <input type="email" v-model="editedItem.email" id="email" class="form-input" required />
               </div>
               <div class="form-group">
-                <label for="address">Address</label>
-                <input
-                  type="text"
-                  v-model="editedItem.address"
-                  id="address"
-                  class="form-input"
-                  required
-                />
+                <label for="birthdate">Birthdate</label>
+                <input type="date" v-model="editedItem.birthdate" id="birthdate" class="form-input" required />
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
-                <input
-                  type="password"
-                  v-model="editedItem.password"
-                  id="password"
-                  class="form-input"
-                  required
-                />
+                <input type="password" v-model="editedItem.password" id="password" class="form-input" required />
               </div>
             </div>
             <div class="form-column">
               <div class="form-group">
                 <label for="contact">Contact Number</label>
-                <input
-                  type="tel"
-                  v-model="editedItem.contact"
-                  id="contact"
-                  class="form-input"
-                  required
-                />
+                <input type="tel" v-model="editedItem.contact" id="contact" class="form-input" required />
               </div>
               <div class="form-group">
-                <label for="birthdate">Birthdate</label>
-                <input
-                  type="date"
-                  v-model="editedItem.birthdate"
-                  id="birthdate"
-                  class="form-input"
-                  required
-                />
+                <label for="age">Age</label>
+                <input type="text" v-model="age" id="age" class="form-input" readonly />
               </div>
               <div class="form-group">
                 <label for="confirm_password">Confirm Password</label>
-                <input
-                  type="password"
-                  v-model="editedItem.confirm_password"
-                  id="confirm_password"
-                  class="form-input"
-                  required
-                />
+                <input type="password" v-model="editedItem.confirm_password" id="confirm_password" class="form-input"
+                  required />
               </div>
             </div>
           </div>
@@ -85,7 +48,7 @@
             <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
               Add Patient
             </v-btn>
-            <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white'}" @click="goBack">
+            <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white' }" @click="goBack">
               Back
             </v-btn>
           </div>
@@ -111,10 +74,37 @@ export default {
         password: '',
         confirm_password: '',
       },
+      age: '', // New field for storing the calculated age
     };
+  },
+  watch: {
+    'editedItem.birthdate'(newDate) {
+      if (newDate) {
+        const today = new Date();
+        const birthDate = new Date(newDate);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        this.age = age;
+      } else {
+        this.age = '';
+      }
+    },
   },
   methods: {
     saveNewUser() {
+      // Validate age
+      if (this.age < 5) {
+        Swal.fire({
+          title: 'Error',
+          text: 'The patient is too young for validation. Age must be at least 5 years old.',
+          icon: 'error',
+        });
+        return; // Prevent form submission
+      }
+
       // Validate password match
       if (this.editedItem.password !== this.editedItem.confirm_password) {
         Swal.fire({
@@ -125,6 +115,7 @@ export default {
         return;
       }
 
+      // Send data to backend if validation passes
       axios.post('/patients', this.editedItem)
         .then(response => {
           this.resetForm();
@@ -153,13 +144,15 @@ export default {
         password: '',
         confirm_password: '',
       };
+      this.age = ''; // Reset the age
     },
     goBack() {
       this.$router.go(-1);
     }
-  },
+  }
 };
 </script>
+
 
 <style scoped>
 .bg-title {

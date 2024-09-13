@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     login() {
-      axios.post('http://127.0.0.1:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
+      axios.post('http://26.135.189.53:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
         email: this.email,
         password: this.password
       })

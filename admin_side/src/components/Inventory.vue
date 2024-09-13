@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     fetchProducts() {
-      axios.get('http://127.0.0.1:8000/api/products')
+      axios.get('http://26.135.189.53:8000/api/products')
         .then(response => {
           if (Array.isArray(response.data)) {
             this.products = response.data;
@@ -200,7 +200,7 @@ export default {
         });
     },
     saveEditedProduct() {
-      axios.put(`http://127.0.0.1:8000/api/products/${this.editedItem.id}`, {
+      axios.put(`http://26.135.189.53:8000/api/products/${this.editedItem.id}`, {
         product_name: this.editedItem.product_name,
         supplier: this.editedItem.supplier,
         quantity: this.editedItem.quantity,

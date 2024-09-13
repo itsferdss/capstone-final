@@ -1,11 +1,21 @@
 <template>
   <v-container>
-    <v-card-title class="patient-info-card-title">
-      <v-avatar size="32">
-        <v-icon dark>mdi-account-circle</v-icon>
-      </v-avatar>
-      Patient's Information
-    </v-card-title>
+    <v-row class="d-flex justify-space-between align-items-center">
+      <v-col class="d-flex align-items-center" cols="6">
+        <v-avatar size="32" class="mr-2">
+          <v-icon dark>mdi-account-circle</v-icon>
+        </v-avatar>
+        <v-card-title class="patient-info-card-title">
+          Patient's Information
+        </v-card-title>
+      </v-col>
+      <v-col class="text-left" cols="6">
+        <v-btn @click="openUpdateParentDialog" color="primary" dark class="showRes">
+          <v-icon left>mdi-cart</v-icon> See Your Reservations
+        </v-btn>
+      </v-col>
+    </v-row>
+
     <!-- Patient's information card -->
     <v-card class="patient-info-card mb-4" elevation="2">
       <v-card-text>
@@ -27,15 +37,21 @@
     </v-card>
 
     <!-- Button to open update dialog -->
-    <v-btn @click="openUpdateParentDialog" color="primary" dark class="mt-4">Update Information</v-btn>
+
 
     <v-container>
       <v-card class="mt-4 d-flex flex-column" elevation="2">
         <v-card-text class="agreement-reminder-text">
-          "Thank you for agreeing to our Terms and Conditions. Rest assured that your information is encrypted and stored securely to protect your privacy. We prioritize your security and confidentiality at every step. Our data protection measures comply with industry standards, ensuring that your personal details are safeguarded against unauthorized access. Should you have any concerns or require assistance, our support team is available to address your inquiries promptly. Your trust is important to us, and we are committed to maintaining the highest level of security and transparency."
+          "Thank you for agreeing to our Terms and Conditions. Rest assured that your information is encrypted and
+          stored securely to protect your privacy. We prioritize your security and confidentiality at every step. Our
+          data protection measures comply with industry standards, ensuring that your personal details are safeguarded
+          against unauthorized access. Should you have any concerns or require assistance, our support team is available
+          to address your inquiries promptly. Your trust is important to us, and we are committed to maintaining the
+          highest level of security and transparency."
         </v-card-text>
         <v-spacer></v-spacer> <!-- Spacer to push icon to the bottom -->
-        <v-icon class="secured-icon">mdi-lock</v-icon>
+        <v-btn @click="openUpdateParentDialog" color="primary" dark class="updateBtn">Update
+          Information</v-btn>
       </v-card>
     </v-container>
 
@@ -49,70 +65,35 @@
           <v-container>
             <v-row dense>
               <v-col cols="12">
-                <v-text-field
-                  v-model="patient.address"
-                  label="Address"
-                  :prepend-icon="isMobile ? '' : 'mdi-map-marker'"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
-                ></v-text-field>
+                <v-text-field v-model="patient.address" label="Address" :prepend-icon="isMobile ? '' : 'mdi-map-marker'"
+                  class="update-dialog-textfield" :class="{'mobile-text-field': isMobile}" outlined></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field
-                  v-model="patient.contact"
-                  label="Contact Number"
-                  :prepend-icon="isMobile ? '' : 'mdi-phone'"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
-                ></v-text-field>
+                <v-text-field v-model="patient.contact" label="Contact Number"
+                  :prepend-icon="isMobile ? '' : 'mdi-phone'" class="update-dialog-textfield"
+                  :class="{'mobile-text-field': isMobile}" outlined></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field
-                  v-model="patient.email"
-                  label="Email"
-                  :prepend-icon="isMobile ? '' : 'mdi-email'"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
-                ></v-text-field>
+                <v-text-field v-model="patient.email" label="Email" :prepend-icon="isMobile ? '' : 'mdi-email'"
+                  class="update-dialog-textfield" :class="{'mobile-text-field': isMobile}" outlined></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  label="Current Password"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
+                <v-text-field v-model="password" :type="showPassword ? 'text' : 'password'" label="Current Password"
+                  class="update-dialog-textfield" :class="{'mobile-text-field': isMobile}" outlined
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append="showPassword = !showPassword"
-                ></v-text-field>
+                  @click:append="showPassword = !showPassword"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" class="password-field">
-                <v-text-field
-                  v-model="newPassword"
-                  :type="showNewPassword ? 'text' : 'password'"
-                  label="New Password"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
+                <v-text-field v-model="newPassword" :type="showNewPassword ? 'text' : 'password'" label="New Password"
+                  class="update-dialog-textfield" :class="{'mobile-text-field': isMobile}" outlined
                   :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append="showNewPassword = !showNewPassword"
-                ></v-text-field>
+                  @click:append="showNewPassword = !showNewPassword"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" class="password-field">
-                <v-text-field
-                  v-model="confirmPassword"
-                  :type="showConfirmPassword ? 'text' : 'password'"
-                  label="Confirm New Password"
-                  class="update-dialog-textfield"
-                  :class="{'mobile-text-field': isMobile}"
-                  outlined
-                  :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append="showConfirmPassword = !showConfirmPassword"
-                ></v-text-field>
+                <v-text-field v-model="confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
+                  label="Confirm New Password" class="update-dialog-textfield" :class="{'mobile-text-field': isMobile}"
+                  outlined :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="showConfirmPassword = !showConfirmPassword"></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -322,5 +303,16 @@ export default {
   color: #0d0e0d; /* Optional: Change color to green for security */
   margin: 16px; /* Adjust spacing as needed */
   align-self: flex-end; /* Align icon to the end of the container */
+}
+
+.updateBtn{
+  width: 250px;
+  margin-top: 20px;
+  margin-left: 850px;
+  margin-bottom: 30px;
+}
+
+.showRes{
+  margin-left: 300px;
 }
 </style>

@@ -283,7 +283,7 @@ export default {
   methods: {
     
     fetchPatients() {
-      axios.get('http://127.0.0.1:8000/api/patients')
+      axios.get('http://26.135.189.53:8000/api/patients')
         .then(response => {
           if (Array.isArray(response.data)) {
             this.displayedPatients = response.data;

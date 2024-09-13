@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     fetchProductData(productId) {
-      axios.get(`http://127.0.0.1:8000/api/viewProduct/${productId}`)
+      axios.get(`http://26.135.189.53:8000/api/viewProduct/${productId}`)
         .then(response => {
           const product = response.data;
           this.product = product;
