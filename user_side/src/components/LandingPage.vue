@@ -45,7 +45,7 @@
 
       <div class="offers">
         <div class="offer-box">
-          <img src="/src/assets/gian.png" alt="Eye Care" class="offer-image">
+          <img src="/src/assets/eyecare.jpg" alt="Eye Care" class="offer-image">
           <p class="offer-title">Eye Care</p>
           <p class="offer-text">"Comprehensive eye care services aimed at maintaining optimal vision health. Our expert
             team provides routine eye exams, personalized treatments, and preventive care to protect your eyes and
@@ -53,7 +53,7 @@
             your overall well-being."</p>
         </div>
         <div class="offer-box">
-          <img src="/src/assets/me.png" alt="Retina Repair" class="offer-image">
+          <img src="/src/assets/retina-repair.jpg" alt="Retina Repair" class="offer-image">
           <p class="offer-title">Retina Repair</p>
           <p class="offer-text">"Advanced retina repair services that address conditions such as retinal detachment,
             macular degeneration, and other retinal disorders. Our specialized procedures are designed to restore and
@@ -61,7 +61,7 @@
 
         </div>
         <div class="offer-box">
-          <img src="/src/assets/dm.jpg" alt="Vision Check" class="offer-image">
+          <img src="/src/assets/vision-check.jpg" alt="Vision Check" class="offer-image">
           <p class="offer-title">Vision Check</p>
           <p class="offer-text">"Regular vision checks to ensure your eyes are in optimal condition. We provide thorough
             eye exams to detect vision problems early, helping you maintain clear and comfortable sight through
@@ -69,7 +69,7 @@
 
         </div>
         <div class="offer-box">
-          <img src="/src/assets/gian.png" alt="Cornea Transplant" class="offer-image">
+          <img src="/src/assets/cornea-transplant.jpg" alt="Cornea Transplant" class="offer-image">
           <p class="offer-title">Cornea Transplant</p>
           <p class="offer-text">"Expert cornea transplant services to restore clear vision for patients with damaged or
             diseased corneas. Our skilled surgeons use advanced techniques to replace the cornea, improving vision and
@@ -77,7 +77,7 @@
 
         </div>
         <div class="offer-box">
-          <img src="/src/assets/me.png" alt="Laser Surgery" class="offer-image">
+          <img src="/src/assets/laser-surgery.jpg" alt="Laser Surgery" class="offer-image">
           <p class="offer-title">Laser Surgery</p>
           <p class="offer-text">"Precise and minimally invasive laser surgery to correct various vision issues,
             including
@@ -86,7 +86,7 @@
 
         </div>
         <div class="offer-box">
-          <img src="/src/assets/dm.jpg" alt="Dry Eye Surgery" class="offer-image">
+          <img src="/src/assets/dry-eye-surgery.jpg" alt="Dry Eye Surgery" class="offer-image">
           <p class="offer-title">Dry Eye Surgery</p>
           <p class="offer-text">"Specialized dry eye surgery to relieve persistent discomfort and improve tear
             production.
@@ -584,7 +584,7 @@ html {
 
 .offer-image {
   width: 100%;
-  height: auto;
+  height: 400px;
   border-bottom: 2px solid #00af87;
   margin-bottom: 15px;
 }
