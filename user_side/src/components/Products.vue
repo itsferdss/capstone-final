@@ -19,7 +19,7 @@
       <h1 class="title">FRAMES</h1>
       <div class="product-grid">
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in framesProducts" :key="product.id">
-          <div class="sale-badge" v-if="product.onSale">SALE</div>
+          <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -38,6 +38,7 @@
       <h1 class="title">LENSES</h1>
       <div class="product-grid">
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in lensesProducts" :key="product.id">
+          <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -57,6 +58,7 @@
       <div class="product-grid">
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in contactLensesProducts"
           :key="product.id">
+          <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -76,6 +78,7 @@
       <div class="product-grid">
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in accessoriesProducts"
           :key="product.id">
+          <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
@@ -131,6 +134,14 @@ export default {
     },
     viewProduct(productId) {
       this.$router.push({ path: '/viewProduct', query: { id: productId } });
+    },
+    isNewProduct(createdAt) {
+      const createdDate = new Date(createdAt);
+      const today = new Date();
+      const diffTime = Math.abs(today - createdDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      console.log(diffDays); 
+      return diffDays <= 14;
     },
   },
   computed: {
@@ -199,7 +210,8 @@ export default {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
+  /* Set 4 columns per row */
   gap: 20px;
 }
 
@@ -265,4 +277,16 @@ export default {
   color: #e74c3c;
   font-size: 18px;
 }
+
+.new-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: green;
+  color: white;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 3px;
+}
 </style>
+

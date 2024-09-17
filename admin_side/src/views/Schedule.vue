@@ -103,45 +103,41 @@ export default {
     }
 }
 @media (max-width: 960px) {
-  .header {
-    display: block;
-    font-size: 18px;
-    margin-right: 25%;
-    border-radius: 10px;
-    background-color: rgb(165, 215, 225);
-    padding: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: bold;
-   }
    .v-data-table {
     font-size: 12px;
    }
-   .v-card-title {
-    flex-wrap: wrap;
-    }
-    .v-card-title .v-text-field {
-     flex: 1 1 100%;
-     margin-bottom: 8px;
-    }
-     .v-card-title .v-btn {
-        flex: 1 1 100%;
-    }
-
   .main-content {
-    display: flex;
-    flex-direction: column;
-    margin-left: 0px;
-    margin-right: 80px;
+    margin-left: 0;
+    max-width: 100%;
+    margin-right: 0;
 
     .schedules {
-        border-radius: 10px;
-        background-color: #f0f0f0;
-        padding: 0.5rem;
-        height: 100%;
-        border: 1px solid #ccc; // Add border
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
+      padding: 0.5rem;
+      height: 100%;
     }
+ }
+
+ .dash {
+   margin-left: -10px;
+   margin-bottom: -20px;
+ }
+
+ .title-container {
+   height: 60px;
+ }
+
+ .material-icons {
+   font-size: 28px;
+ }
+
+ .text {
+   font-size: 25px;
+ }
+
+
+ .ghostTitle {
+   font-size: 60px;
+   margin-top: 30px;
  }
 }
 

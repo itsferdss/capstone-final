@@ -2,7 +2,7 @@ import axios from 'axios';
 import router from './router/index'; // Ensure this path is correct
 
 const instance = axios.create({
-    baseURL: 'http://26.135.189.53:8000',
+    baseURL: 'http://127.0.0.1:8000',
 });
 
 instance.interceptors.request.use(

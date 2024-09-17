@@ -14,7 +14,7 @@
     <v-container class="content">
         <v-card>
             <v-card-title>
-                <v-toolbar-title class="text-uppercase grey--text">
+                <v-toolbar-title class="text-uppercase grey--text pckdText">
                     <v-icon left>mdi-check-outline</v-icon> <!-- Icon added here -->
                     Picked Up Reservations
                 </v-toolbar-title>
@@ -167,5 +167,37 @@ export default {
 
 td {
     text-align: center;
+}
+@media (max-width: 960px) {
+    .v-data-table {
+        font-size: 12px;
+   }
+
+   .pckdText{
+    display: none;
+   }
+
+   .dash {
+       margin-left: -10px;
+       margin-bottom: -20px;
+   }
+
+   .title-container {
+       height: 60px;
+   }
+
+   .material-icons {
+       font-size: 28px;
+   }
+
+   .text {
+       font-size: 25px;
+   }
+
+
+   .ghostTitle {
+       display: none;
+   }
+    
 }
 </style>

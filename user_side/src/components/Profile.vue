@@ -10,7 +10,7 @@
         </v-card-title>
       </v-col>
       <v-col class="text-left" cols="6">
-        <v-btn @click="openUpdateParentDialog" color="primary" dark class="showRes">
+        <v-btn @click="openReservation" color="primary" dark class="showRes">
           <v-icon left>mdi-cart</v-icon> See Your Reservations
         </v-btn>
       </v-col>
@@ -235,6 +235,19 @@ export default {
             text: errorMessage,
           });
         });
+    },
+    openReservation() {
+      const patientId = this.patientId;
+
+      if (patientId) {
+        // Navigate to the viewReservation route with the patient ID as a query parameter
+        this.$router.push({
+          path: '/viewReservation',
+          query: { patient_id: patientId } // Add patient_id as a query parameter
+        });
+      } else {
+        console.error('Patient ID is not available.');
+      }
     },
   },
 };

@@ -121,11 +121,35 @@ export default {
   .main-content {
     margin-left: 0;
     max-width: 100%;
+    margin-right: 0;
 
     .dashboard {
       padding: 0.5rem;
       height: 100%;
     }
+  }
+
+  .dash{
+    margin-left: -10px;
+    margin-bottom: -20px;
+  }
+
+  .title-container{
+    height: 60px;
+  }
+
+  .material-icons{
+    font-size: 28px;
+  }
+
+  .text{
+    font-size: 25px;
+  }
+  
+
+  .ghostTitle{
+    font-size: 60px;
+    margin-top: 30px;
   }
 }
 </style>

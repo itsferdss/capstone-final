@@ -8,9 +8,46 @@
             </div>
         </div>
         <hr class="divider">
+        <div class="tab-content">
+            <button class="buttons" @click="handleTabClick('Inventory')"
+                :class="{ active: activeTab === 'Inventory' }">All
+                Products</button>
+            <!-- <button @click="handleTabClick('FollowUp')" :class="{ active: activeTab === 'FollowUp' }">Serious Cases</button> -->
+            <button class="buttons" @click="handleTabClick('Frame')"
+                :class="{ active: activeTab === 'Frame' }">Frames</button>
+            <button class="buttons" @click="handleTabClick('Lens')"
+                :class="{ active: activeTab === 'Lens' }">Lenses</button>
+            <button class="buttons" @click="handleTabClick('Contacts')"
+                :class="{ active: activeTab === 'Contacts' }">Contact
+                Lens</button>
+            <button class="buttons" @click="handleTabClick('Accessories')"
+                :class="{ active: activeTab === 'Accessories' }">Accessories</button>
+        </div>
         <div class="main-content">
-            <div class="inventory">
-                <Inventory />
+            <div v-if="activeTab === 'Inventory'">
+                <div class="inventory">
+                    <Inventory />
+                </div>
+            </div>
+            <div v-if="activeTab === 'Frame'">
+                <div class="frame">
+                    <Frame />
+                </div>
+            </div>
+            <div v-if="activeTab === 'Lens'">
+                <div class="lens">
+                    <Lens />
+                </div>
+            </div>
+            <div v-if="activeTab === 'Contacts'">
+                <div class="contacts">
+                    <Contacts />
+                </div>
+            </div>
+            <div v-if="activeTab === 'Accessories'">
+                <div class="accessories">
+                    <Accessories />
+                </div>
             </div>
         </div>
     </main>
@@ -18,11 +55,30 @@
 
 <script>
 import Inventory from '../components/Inventory.vue';
+import Frame from '../components/InventoryComponents/Frame.vue';
+import Lens from '../components/InventoryComponents/Lens.vue';
+import Contacts from '../components/InventoryComponents/ContactLens.vue';
+import Accessories from '../components/InventoryComponents/Accessories.vue';
 
 export default {
-  components: {
-    Inventory
-  }
+    data() {
+        return {
+            activeTab: 'Inventory'
+        };
+    },
+    methods: {
+        handleTabClick(tab) {
+            this.activeTab = tab; // Update active tab
+            this.$emit('tab-clicked', tab); // Emit event with tab name
+        }
+    },
+    components: {
+        Inventory,
+        Frame,
+        Lens,
+        Contacts,
+        Accessories
+    }
 };
 </script>
 
@@ -66,22 +122,129 @@ export default {
     font-weight: 600;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
+
 .main-content {
     display: flex;
     flex-direction: column;
     margin-left: 30px;
     margin-right: 30px;
 
-    .inventory {
-        border-radius: 10px;
+    .inventory,
+    .frame,
+    .lens,
+    .contacts,
+    .accessories {
+        border-radius: 5px;
         background-color: #f0f0f0;
         padding: 0.5rem;
         height: 100%;
-        border: 1px solid #ccc; // Add border
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
-        border-width: 2px 2px 2px 2px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border-color: rgb(178, 177, 177);
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+    }
+}
+
+.tab-content {
+    display: flex;
+    gap: 2rem; // Gap between buttons
+    padding: 1rem;
+    margin-left: 20px;
+}
+
+.tab-content button {
+    position: relative;
+    color: var(--dark);
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid transparent;
+    transition: border-bottom 0.2s;
+}
+
+.tab-content button:hover,
+.tab-content button:active,
+.tab-content button.active {
+    border-bottom: 3px solid black;
+}
+
+.tab-content-display {
+    margin-top: 2rem;
+}
+
+@media (max-width: 960px) {
+    .v-data-table {
+        font-size: 12px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .dash {
+        margin-left: -10px;
+        margin-bottom: -20px;
+    }
+
+    .title-container {
+        height: 60px;
+    }
+
+    .material-icons {
+        font-size: 28px;
+    }
+
+    .text {
+        font-size: 25px;
+    }
+
+
+    .ghostTitle {
+        font-size: 65px;
+        margin-top: 30px;
+    }
+
+    .tab-content {
+        display: flex;
+        gap: 1rem;
+        padding: 0.5rem;
+        margin-left: 0px;
+    }
+
+    .tab-content button {
+        position: relative;
+        color: var(--dark);
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding-bottom: 0.25rem;
+        border-bottom: 2px solid transparent;
+        transition: border-bottom 0.2s;
+    }
+
+    .tab-content button:hover,
+    .tab-content button:active,
+    .tab-content button.active {
+        border-bottom: 2px solid black;
+    }
+
+    .tab-content-display {
+        margin-top: 1rem;
+    }
+
+    .inventory,
+    .frame,
+    .lens,
+    .contacts,
+    .accessories {
+        padding: 0.25rem;
+        margin-bottom: 5px;
     }
 }
 </style>

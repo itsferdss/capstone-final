@@ -4,102 +4,79 @@
     <div class="form-container">
       <div class="form-box">
         <form @submit.prevent="savePrescription">
-          <div class="form-row">
-            <div class="form-column">
-              <div class="form-group">
-                <label for="left_eye_sphere">Left Eye Sphere</label>
-                <input
-                  type="text"
-                  v-model="editedItem.left_eye_sphere"
-                  id="left_eye_sphere"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="left_eye_cylinder">Left Eye Cylinder</label>
-                <input
-                  type="text"
-                  v-model="editedItem.left_eye_cylinder"
-                  id="left_eye_cylinder"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="left_eye_axis">Left Eye Axis</label>
-                <input
-                  type="text"
-                  v-model="editedItem.left_eye_axis"
-                  id="left_eye_axis"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="reading_add">Reading Add</label>
-                <input
-                  type="text"
-                  v-model="editedItem.reading_add"
-                  id="reading_add"
-                  class="form-input"
-                  required
-                />
-              </div>
-            </div>
-            <div class="form-column">
-              <div class="form-group">
-                <label for="right_eye_sphere">Right Eye Sphere</label>
-                <input
-                  type="text"
-                  v-model="editedItem.right_eye_sphere"
-                  id="right_eye_sphere"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="right_eye_cylinder">Right Eye Cylinder</label>
-                <input
-                  type="text"
-                  v-model="editedItem.right_eye_cylinder"
-                  id="right_eye_cylinder"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="right_eye_axis">Right Eye Axis</label>
-                <input
-                  type="text"
-                  v-model="editedItem.right_eye_axis"
-                  id="right_eye_axis"
-                  class="form-input"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="best_visual_acuity">Best Visual Acuity</label>
-                <input
-                  type="text"
-                  v-model="editedItem.best_visual_acuity"
-                  id="best_visual_acuity"
-                  class="form-input"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="PD">PD</label>
-            <input
-              type="text"
-              v-model="editedItem.PD"
-              id="PD"
-              class="form-input"
-              required
-            />
-          </div>
+          <table class="form-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Sphere</th>
+                <th>Cylinder</th>
+                <th>Axis</th>
+                <th>Best VA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1: Right Eye -->
+              <tr>
+                <td class="label-cell"><label for="right_eye_sphere">Right Eye</label></td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.right_eye_sphere" id="right_eye_sphere" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.right_eye_cylinder" id="right_eye_cylinder" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.right_eye_axis" id="right_eye_axis" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.right_eye_best_visual_acuity" id="right_eye_best_visual_acuity"
+                    class="form-input" />
+                </td>
+              </tr>
+
+              <!-- Row 2: Left Eye -->
+              <tr>
+                <td class="label-cell"><label for="left_eye_sphere">Left Eye</label></td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.left_eye_sphere" id="left_eye_sphere" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.left_eye_cylinder" id="left_eye_cylinder" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.left_eye_axis" id="left_eye_axis" class="form-input"
+                    required />
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.left_eye_best_visual_acuity" id="left_eye_best_visual_acuity"
+                    class="form-input" />
+                </td>
+              </tr>
+
+              <!-- Row 3: Reading Ads and PD -->
+              <tr>
+                <td class="label-cell">
+                  <label for="reading_add">Reading Add</label>
+                </td>
+                <td class="input-cell" colspan="2">
+                  <!-- Add custom class for larger size -->
+                  <input type="text" v-model="editedItem.reading_add" id="reading_add" class="form-input large-input"
+                    required />
+                </td>
+                <td class="label-cell pd-label">
+                  <label for="pd">PD</label>
+                </td>
+                <td class="input-cell">
+                  <input type="text" v-model="editedItem.PD" id="pd" class="form-input pd-input" required />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
           <hr />
           <div class="form-buttons">
             <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
@@ -113,7 +90,8 @@
       </div>
     </div>
   </main>
-</template>
+</template> 
+
 
 <script>
 import axios from 'axios';
@@ -123,87 +101,74 @@ export default {
   data() {
     return {
       editedItem: {
-        left_eye_sphere: '',
         right_eye_sphere: '',
-        left_eye_cylinder: '',
+        left_eye_sphere: '',
         right_eye_cylinder: '',
-        left_eye_axis: '',
+        left_eye_cylinder: '',
         right_eye_axis: '',
+        left_eye_axis: '',
+        left_eye_best_visual_acuity: '',
+        right_eye_best_visual_acuity: '',
         reading_add: '',
-        best_visual_acuity: '',
         PD: '',
-        patient_id: '', // Static patient ID for testing
-        prescription_id: '',
       },
     };
   },
   methods: {
     savePrescription() {
-      if (!this.editedItem) {
-        console.error("Error: No prescription data available");
-        return;
-      }
-
-    const patientId = this.$route.query.patient_id;
+      const patientId = this.$route.query.patient_id;
 
       const prescriptionData = {
         patient_id: patientId,
-        left_eye_sphere: this.editedItem.left_eye_sphere,
         right_eye_sphere: this.editedItem.right_eye_sphere,
-        left_eye_cylinder: this.editedItem.left_eye_cylinder,
+        left_eye_sphere: this.editedItem.left_eye_sphere,
         right_eye_cylinder: this.editedItem.right_eye_cylinder,
-        left_eye_axis: this.editedItem.left_eye_axis,
+        left_eye_cylinder: this.editedItem.left_eye_cylinder,
         right_eye_axis: this.editedItem.right_eye_axis,
+        left_eye_axis: this.editedItem.left_eye_axis,
+        left_eye_best_visual_acuity: this.editedItem.left_eye_best_visual_acuity,
+        right_eye_best_visual_acuity: this .editedItem.right_eye_best_visual_acuity,
         reading_add: this.editedItem.reading_add,
-        best_visual_acuity: this.editedItem.best_visual_acuity,
-        PD: this.editedItem.PD
+        PD: this.editedItem.PD,
       };
 
-      // Sending data to backend
       axios.post(`/patients/${patientId}/prescriptions`, prescriptionData)
         .then(response => {
-          console.log("Prescription saved successfully:", response.data);
-          
           Swal.fire({
             title: "Success",
             text: "Prescription saved successfully!",
             icon: "success",
           });
-
-          this.resetForm(); // Reset form after success
+          this.resetForm();
         })
         .catch(error => {
-          console.error("Error saving prescription:", error);
-
           Swal.fire({
             title: "Error",
-            text: "Failed to save prescription. Please try again later.",
+            text: "Failed to save prescription.",
             icon: "error",
           });
         });
     },
     resetForm() {
       this.editedItem = {
-        left_eye_sphere: '',
         right_eye_sphere: '',
-        left_eye_cylinder: '',
+        left_eye_sphere: '',
         right_eye_cylinder: '',
-        left_eye_axis: '',
+        left_eye_cylinder: '',
         right_eye_axis: '',
+        left_eye_axis: '',
         reading_add: '',
-        best_visual_acuity: '',
+        left_eye_best_visual_acuity: '',
+        right_eye_best_visual_acuity: '',
         PD: '',
-        patient_id: '', // Reset static patient ID for testing
-        prescription_id: '',
       };
     },
     goBack() {
       this.$router.go(-1);
-    }
+    },
   },
 };
 </script>
-
 
 <style scoped>
 .bg-title {
@@ -228,41 +193,52 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.large-input {
+  width: 90%;
 }
 
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+.pd-input {
+  width: 170%;
+  margin-left: -120px;
 }
 
-.form-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.pd-label {
+  padding-right: 5px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
 }
 
-label {
-  margin-bottom: 0.5rem;
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #007BFF;
+  color: white;
+}
+
+.label-cell {
+  width: 10%;
   font-weight: bold;
   color: #333;
 }
 
+.input-cell {
+  width: 15%;
+}
+
 input {
-  padding: 0.75rem;
+  width: 100%;
+  padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -299,5 +275,62 @@ input:focus {
 
 .close:hover {
   background-color: #93222b;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .form-box {
+    padding: 1.5rem;
+  }
+
+  .form-table th, .form-table td {
+    padding: 0.5rem;
+  }
+
+  .input-cell {
+    width: 100%;
+  }
+
+  .large-input {
+    width: 100%;
+  }
+
+  .pd-input {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .v-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .bg-title {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+
+  .form-box {
+    padding: 1rem;
+  }
+
+  .form-table th, .form-table td {
+    font-size: 0.9rem;
+  }
+
+  .v-btn {
+    padding: 0.5rem 1rem;
+  }
 }
 </style>

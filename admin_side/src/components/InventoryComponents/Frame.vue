@@ -4,9 +4,9 @@
     <template v-slot:top>
       <v-toolbar flat>
         <!-- Title with icon -->
-        <v-toolbar-title class="text-uppercase grey--text productTitle">
+        <v-toolbar-title class="text-uppercase grey--text">
           <v-icon left>mdi-package-variant</v-icon> <!-- Icon added here -->
-          List of Products
+          Frames
         </v-toolbar-title>
         <v-spacer></v-spacer>
 
@@ -153,7 +153,8 @@ export default {
       axios.get('http://127.0.0.1:8000/api/products')
         .then(response => {
           if (Array.isArray(response.data)) {
-            this.products = response.data;
+            // Filter products where type is 'Frames'
+            this.products = response.data.filter(product => product.type === 'Frames');
           } else {
             this.error = 'Unexpected response format';
           }
@@ -332,15 +333,5 @@ td{
   margin-right: 8px;
   /* Add spacing between icon and text */
   color: black;
-}
-
-@media (max-width: 960px) {
-  .add-text{
-    display: none;
-  }
-
-  .productTitle{
-    display: none;
-  }
 }
 </style>

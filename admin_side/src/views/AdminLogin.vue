@@ -3,14 +3,17 @@
     <div class="login-form-container">
       <div id="login">
         <v-img src="src/assets/MVC_logo.png" class="mvcLogo"></v-img>
-        <p class="subtitle">Sign in as ADMIN</p>
+        <p class="subtitle">Sign in as Admin</p>
         <div class="input-group">
-          <label class="inputTitle" for="email">email</label>
+          <label class="inputTitle" for="email">Email</label>
           <input type="text" id="email" v-model="email" required>
         </div>
         <div class="input-group">
           <label class="inputTitle" for="password">Password</label>
-          <input type="password" id="password" v-model="password" required>
+          <input :type="passwordType" id="password" v-model="password" required>
+          <i class="eye-icon" @click="togglePasswordVisibility">
+            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+          </i>
         </div>
         <button @click="login">Log in</button>
         <p>{{ errorMessage }}</p>
@@ -29,12 +32,18 @@ export default {
     return {
       email: '',
       password: '',
-      errorMessage: ''
+      errorMessage: '',
+      showPassword: false,
     };
   },
+  computed: {
+    passwordType() {
+      return this.showPassword ? 'text' : 'password';
+    },
+  },  
   methods: {
     login() {
-      axios.post('http://26.135.189.53:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
+      axios.post('http://127.0.0.1:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
         email: this.email,
         password: this.password
       })
@@ -59,7 +68,10 @@ export default {
           });
           console.error('Login failed:', error);
         });
-    }
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
   }
 };
 </script>
@@ -156,6 +168,13 @@ button:hover {
   height: 80px;
 }
 
+.eye-icon{
+  position: absolute;
+  margin-top: 35px;
+  right: 0;
+  margin-right: 10px;
+}
+
 @media (max-width: 960px) {
   .container {
     flex-direction: column;
@@ -171,6 +190,10 @@ button:hover {
   .mvcLogo {
     width: 100%;
     height: auto;
+  }
+  
+  .eye-icon{
+    margin-top: 30px
   }
 }
 

@@ -249,4 +249,49 @@ input:focus {
 .close:hover {
   background-color: #93222b;
 }
+
+/* Media queries for smaller devices */
+
+@media (max-width: 768px) {
+  .form-box {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .v-btn {
+    padding: 0.5rem 1rem;
+    width: 100%;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bg-title {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+
+  input {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
 </style>

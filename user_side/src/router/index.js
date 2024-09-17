@@ -51,6 +51,13 @@ const router = createRouter({
             // meta: {
             //     requiresAuthentication: false, // Landing page doesn't require authentication
             // },
+        },
+        {
+            path: '/viewReservation',
+            component: () => import('../views/Viewing/ViewReservation.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
         }
     ],
 });

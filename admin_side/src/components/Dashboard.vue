@@ -163,7 +163,7 @@ onMounted(() => {
 
 async function fetchPatients() {
   try {
-    const response = await axios.get('http://26.135.189.53:8000/api/patients');
+    const response = await axios.get('http://127.0.0.1:8000/api/patients');
     if (Array.isArray(response.data)) {
       totalPatients.value = response.data.length;
     } else {
@@ -176,7 +176,7 @@ async function fetchPatients() {
 
 async function fetchProducts() {
   try {
-    const response = await axios.get('http://26.135.189.53:8000/api/products');
+    const response = await axios.get('http://127.0.0.1:8000/api/products');
     if (Array.isArray(response.data)) {
       totalProducts.value = response.data.length;
     } else {
@@ -189,7 +189,7 @@ async function fetchProducts() {
 
 async function fetchTotalReservations() {
   try {
-    const response = await axios.get('http://26.135.189.53:8000/api/reservations/total');
+    const response = await axios.get('http://127.0.0.1:8000/api/reservations/total');
     totalReservations.value = response.data;
   } catch (error) {
     console.error('Error fetching total reservations:', error.message);
@@ -208,7 +208,7 @@ async function fetchAppointments() {
 
 async function fetchReservationStatusCounts() {
   try {
-    const response = await axios.get('http://26.135.189.53:8000/api/reservations/counts');
+    const response = await axios.get('http://127.0.0.1:8000/api/reservations/counts');
     const data = response.data;
     console.log('Fetched status counts:', data);
     statusCounts.value = [data.declined, data.accepted, data.picked_up, data.pending];
@@ -219,7 +219,7 @@ async function fetchReservationStatusCounts() {
 
 async function fetchAccountsCreatedPerMonth() {
   try {
-    const response = await axios.get('http://26.135.189.53:8000/api/accounts/created-per-month');
+    const response = await axios.get('http://127.0.0.1:8000/api/accounts/created-per-month');
     const data = response.data;
     console.log('Fetched status dates:', data);
 

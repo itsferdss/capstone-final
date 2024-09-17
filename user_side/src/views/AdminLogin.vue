@@ -10,7 +10,10 @@
         </div>
         <div class="input-group">
           <label class="inputTitle" for="password">Password</label>
-          <input type="password" id="password" v-model="password" required>
+          <input :type="passwordType" id="password" v-model="password" required>
+          <i class="eye-icon" @click="togglePasswordVisibility">
+            <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+          </i>
         </div>
         <button @click="login">Log in</button>
         <p>{{ errorMessage }}</p>
@@ -26,9 +29,6 @@
   </div>
 </template>
 
-
-
-
 <script>
 import axios from 'axios'; // Adjust the path to your Axios instance
 import Swal from 'sweetalert2';
@@ -38,8 +38,14 @@ export default {
     return {
       email: '',
       password: '',
-      errorMessage: ''
+      errorMessage: '',
+      showPassword: false,
     };
+  },
+  computed: {
+    passwordType() {
+      return this.showPassword ? 'text' : 'password';
+    },
   },
   methods: {
     login() {
@@ -68,7 +74,10 @@ export default {
         });
         console.error('Login failed:', error);
       });
-    }
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
   }
 };
 
@@ -274,6 +283,13 @@ button:hover {
   left: 96%;
   height: 140px;
   width: auto;
+}
+
+.eye-icon {
+  position: absolute;
+  margin-top: 35px;
+  right: 0;
+  margin-right: 10px;
 }
 </style>
 

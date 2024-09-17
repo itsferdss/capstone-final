@@ -1,42 +1,30 @@
 <template>
-  <v-data-table
-    :search="search"
-    :headers="headers"
-    :items="acceptedAppointments"
-    :sort-by="[{ key: 'user_id', order: 'asc' }]"
-  >
+  <v-data-table :search="search" :headers="headers" :items="acceptedAppointments"
+    :sort-by="[{ key: 'user_id', order: 'asc' }]">
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title class="text-uppercase grey--text">
+        <v-toolbar-title class="text-uppercase grey--text reservationTitle">
           <v-icon left>mdi-calendar-clock</v-icon>
           Reservations
         </v-toolbar-title>
         <v-spacer></v-spacer>
 
         <!-- Search input -->
-        <v-text-field
-          v-model="search"
-          class="w-auto mr-4"
-          density="compact"
-          label="Search User"
-          prepend-inner-icon="mdi-magnify"
-          variant="solo-filled"
-          flat
-          hide-details
-          single-line
-          style="max-width: 300px;"
-        ></v-text-field>
+        <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search User"
+          prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
+          style="max-width: 300px;"></v-text-field>
 
         <!-- Pending Reservations Dialog -->
-            <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2" >
-              <v-icon left>mdi-clock-outline</v-icon>
-              <span class="pending-text">Pending Reservations</span>
-            </v-btn>
-  
+        <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
+          <v-icon left>mdi-clock-outline</v-icon>
+          <span class="pending-text">Pending Reservations</span>
+        </v-btn>
+
         <!-- Picked Up Reservations Dialog -->
-            <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
-              <span class="picked-up-text">Picked Up Reservations</span>
-            </v-btn>
+        <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
+          <v-icon left>mdi-check-outline</v-icon>
+          <span class="picked-up-text">Picked Up Reservations</span>
+        </v-btn>
       </v-toolbar>
     </template>
 
@@ -49,6 +37,11 @@
         <td>{{ formatPrescriptionDate(appointments.created_at) }}</td>
         <td>{{ appointments.product_id }}</td>
         <td>{{ appointments.product.product_name }}</td>
+        <td>
+          <span :style="{ color: appointments.color, textTransform: 'uppercase' }">
+            {{ appointments.color }}
+          </span>
+        </td>
         <td>
           <v-icon size="small" style="color: #2F3F64" @click="pickedUp(appointments)">mdi-truck</v-icon>
         </td>
@@ -74,6 +67,7 @@ export default {
         { title: 'Appointment Date', align: 'center', key: 'formatted_appointment_date' },
         { title: 'Product ID', align: 'center', key: 'product_id' },
         { title: 'Product Name', align: 'center', key: 'product_name' },
+        { title: 'Color', align: 'center', key: 'color' },
         { title: 'Actions', align: 'center', sortable: false },
       ],
       appointments: [],
@@ -166,8 +160,6 @@ export default {
             }
           });
 
-          // Refresh picked up appointments
-          this.fetchPickedUpAppointments();
         })
         .catch(error => {
           console.error('Error picking up reservation:', error.response ? error.response.data : error);
@@ -241,7 +233,17 @@ td{
 }
 
 @media (max-width: 960px) {
-  
+  .pending-text{
+    display: none;
+  }
+
+  .picked-up-text{
+    display: none;
+  }
+
+  .reservationTitle{
+    display: none;
+  }
 }
 </style>
   

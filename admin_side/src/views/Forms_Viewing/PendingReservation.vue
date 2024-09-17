@@ -14,7 +14,7 @@
     <v-container class="content">
         <v-card>
             <v-card-title>
-                <v-toolbar-title class="text-uppercase grey--text">
+                <v-toolbar-title class="text-uppercase grey--text pendText">
                     <v-icon left>mdi-clock-outline</v-icon> <!-- Icon added here -->
                     Pending Reservations
                 </v-toolbar-title>
@@ -30,6 +30,11 @@
                         <td>{{ item.patient.full_name}}</td>
                         <td>{{ formatPrescriptionDate(item.created_at) }}</td>
                         <td>{{ item.product.product_name }}</td>
+                        <td>
+                            <span :style="{ color: item.color, textTransform: 'uppercase' }">
+                                {{ item.color }}
+                            </span>
+                        </td>
                         <td>{{ item.product.quantity }}</td>
                         <td>₱{{ item.product.price }}</td>
                         <td>
@@ -60,6 +65,7 @@ export default {
                 { title: 'Name', align: 'center' },
                 { title: 'Date', align: 'center' },
                 { title: 'Product Name', align: 'center' },
+                { title: 'Color', align: 'center' },
                 { title: 'Stock', align: 'center' },
                 { title: 'Price', align: 'center' },
                 { title: 'Actions', align: 'center', sortable: false },
@@ -222,5 +228,38 @@ export default {
 
 td{
     text-align: center;
+}
+
+@media (max-width: 960px) {
+    .v-data-table {
+        font-size: 12px;
+   }
+
+   .pendText{
+    display: none;
+   }
+
+   .dash {
+       margin-left: -10px;
+       margin-bottom: -20px;
+   }
+
+   .title-container {
+       height: 60px;
+   }
+
+   .material-icons {
+       font-size: 28px;
+   }
+
+   .text {
+       font-size: 25px;
+   }
+
+
+   .ghostTitle {
+       display: none;
+   }
+    
 }
 </style>

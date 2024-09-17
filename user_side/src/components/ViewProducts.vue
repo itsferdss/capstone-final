@@ -20,10 +20,10 @@
 
           <!-- Larger Zoomed area container -->
           <div class="zoomed-container" v-if="zoomed" :style="{
-              backgroundImage: `url(${currentPhoto})`,
-              backgroundPosition: zoomPosition,
-              backgroundSize: '300%'
-            }">
+            backgroundImage: `url(${currentPhoto})`,
+            backgroundPosition: zoomPosition,
+            backgroundSize: '300%'
+          }">
           </div>
         </div>
 
@@ -37,8 +37,9 @@
           <div class="color-options">
             <p>Available Colors:</p>
             <div class="colors">
-              <div v-for="color in product.colors" :key="color" class="color-circle"
-                :style="{ backgroundColor: color }"></div>
+              <div v-for="item in product.color_stock" :key="item.color" class="color-palette"
+                :style="{ backgroundColor: item.color }">
+              </div>
             </div>
           </div>
 
@@ -74,8 +75,8 @@ export default {
         price: '',
         rating: '',
         reviews: '',
-        colors: [],
-        offers: []
+        color_stock: [],
+        offers: [],
       }
     };
   },
@@ -89,12 +90,13 @@ export default {
   },
   methods: {
     fetchProductData(productId) {
-      axios.get(`http://26.135.189.53:8000/api/viewProduct/${productId}`)
+      axios.get(`http://127.0.0.1:8000/api/viewProduct/${productId}`)
         .then(response => {
           const product = response.data;
+          // Parse color_stock JSON string into an array
+          product.color_stock = JSON.parse(product.color_stock);
           this.product = product;
           this.photos = product.images; // Ensure this is an array of image URLs
-          console.log('Fetched product images:', this.photos); // Debugging line
         })
         .catch(error => {
           console.error('Error fetching product data:', error);
@@ -126,50 +128,82 @@ export default {
         console.error('User ID not available.');
         return;
       }
-      
+
+      if (!Array.isArray(product.color_stock) || !product.color_stock.every(item => item.color)) {
+        console.error('Color stock is not available or invalid.');
+        return;
+      }
+
+      // Create color options with event listeners
+      const colorOptions = product.color_stock.map(item => {
+        return `
+      <div class="color-palette" 
+           style="background-color:${item.color}; width: 40px; height: 40px; border-radius: 50%; margin: 5px; cursor: pointer;" 
+           data-color="${item.color}"></div>
+    `;
+      }).join('');
+
+      // Show SweetAlert with color palette
       Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to reserve this product?",
-        icon: 'question',
+        title: 'Please select a color',
+        html: `<div id="color-picker" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">${colorOptions}</div>`,
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, reserve it!'
+        confirmButtonText: 'Reserve Now',
+        preConfirm: () => {
+          const selectedColorElement = document.querySelector('#color-picker .color-palette.selected');
+          if (!selectedColorElement) {
+            Swal.showValidationMessage('Please select a color.');
+            return false;
+          }
+          return selectedColorElement.getAttribute('data-color');
+        }
       }).then((result) => {
         if (result.isConfirmed) {
+          const selectedColor = result.value;
+
+          // Proceed with reservation request
           axios.post('/reserve', {
             product_id: product.id,
             product_name: product.product_name,
             user_id: this.patientId,
+            color: selectedColor  // Include selected color
           }, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('auth_token')}`
             }
           })
-          .then(response => {
-            console.log('Reservation created:', response.data);
-            Swal.fire(
-              'Reserved!',
-              'Product has been reserved successfully.',
-              'success'
-            );
-          })
-          .catch(error => {
-            console.error('Error reserving product:', error);
-            Swal.fire(
-              'Error!',
-              'Failed to reserve product.',
-              'error'
-            );
-          });
+            .then(response => {
+              console.log('Reservation created:', response.data);
+              Swal.fire(
+                'Reserved!',
+                `Product (${selectedColor}) has been reserved successfully.`,
+                'success'
+              );
+            })
+            .catch(error => {
+              console.error('Error reserving product:', error);
+              Swal.fire(
+                'Error!',
+                'Failed to reserve product.',
+                'error'
+              );
+            });
         }
+      });
+
+      // Add event listeners for color selection after SweetAlert2 is displayed
+      Swal.getHtmlContainer().querySelectorAll('.color-palette').forEach(element => {
+        element.addEventListener('click', () => {
+          document.querySelectorAll('#color-picker .color-palette').forEach(el => el.classList.remove('selected'));
+          element.classList.add('selected');
+        });
       });
     },
     goBack() {
       this.$router.go(-1);
     }
   },
-  
+
   mounted() {
     const productId = this.$route.query.id;
     if (productId) {
@@ -193,20 +227,26 @@ export default {
 .back-button {
   position: absolute;
   top: 20px;
-  left: 250px;
-  background-color: #99b3c6;
+  left: 20px;
+  /* Adjusted for better alignment */
+  background-color: #007bff;
+  /* Updated color for better contrast */
   border: none;
-  padding: 10px 15px;
+  padding: 10px 20px;
   font-size: 16px;
   font-weight: bold;
   border-radius: 5px;
+  color: #fff;
+  /* White text for better readability */
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .back-button:hover {
-  background-color: #2e425d;
-  color: rgb(203, 202, 202);
+  background-color: #0056b3;
+  /* Darker shade for hover effect */
+  transform: scale(1.05);
+  /* Slightly enlarge button on hover */
 }
 
 .left-container {
@@ -253,7 +293,8 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   padding: 30px;
-  background-color: #ffffff;
+  background-color: #f8f9fa;
+  /* Lighter background for better contrast */
 }
 
 .image-description-container {
@@ -324,14 +365,30 @@ export default {
 
 .colors {
   display: flex;
+  flex-wrap: nowrap;
   gap: 10px;
 }
 
-.color-circle {
-  width: 30px;
-  height: 30px;
+.color-palette {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid #ccc;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-palette.selected {
+  border: 2px solid #000; /* Border for selected color */
+}
+
+.color-label {
+  color: white;
+  font-size: 12px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .offers {
@@ -351,7 +408,8 @@ export default {
 }
 
 .select-button {
-  background-color: #e53935;
+  background-color: #28a745;
+  /* Updated color for button */
   color: #ffffff;
   border: none;
   padding: 15px 20px;
@@ -363,7 +421,8 @@ export default {
 }
 
 .select-button:hover {
-  background-color: #c62828;
+  background-color: #218838;
+  /* Darker shade for hover effect */
 }
 
 /* New styles for the zoomed container */
@@ -377,8 +436,10 @@ export default {
   pointer-events: none;
   border-radius: 8px;
   z-index: 100;
-  top: 10px; /* Adjusted top position */
-  right: 10px; /* Adjusted right position */
+  top: 10px;
+  /* Adjusted top position */
+  right: 10px;
+  /* Adjusted right position */
   transition: background-position 0.1s ease;
 }
 </style>

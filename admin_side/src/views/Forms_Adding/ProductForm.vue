@@ -17,8 +17,7 @@
             <div class="form-column">
               <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <input type="number" v-model.number="editedItem.quantity" id="quantity" class="form-input" required
-                  placeholder="Enter quantity" />
+                <input type="number" v-model.number="editedItem.quantity" id="quantity" class="form-input" disabled />
               </div>
               <div class="form-group">
                 <label for="type">Type</label>
@@ -52,6 +51,16 @@
             <label for="images">Product Images</label>
             <input type="file" id="images" class="form-input" multiple @change="handleImageUpload" />
           </div>
+          <div class="form-group">
+            <label for="colorStock">Color Stock</label>
+            <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="form-row">
+              <input type="text" v-model="colorStock.color" placeholder="Color" class="form-input" required />
+              <input type="number" v-model.number="colorStock.stock" @input="updateQuantity" placeholder="Stock"
+                class="form-input" required />
+              <button type="button" @click="removeColorStock(index)">Remove</button>
+            </div>
+            <button type="button" @click="addColorStock">Add Color Stock</button>
+          </div>
           <hr />
           <div class="form-buttons">
             <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
@@ -79,31 +88,41 @@ export default {
         product_id: '',
         product_name: '',
         supplier: '',
-        quantity: '',
-        price: '', // Add price property
+        quantity: 0,
+        price: '',
         image: [],
         type: '',
         gender: '',
+        color_stock: [{ color: '', stock: 0 }]
       },
     };
   },
   methods: {
+    addColorStock() {
+      this.editedItem.color_stock.push({ color: '', stock: 0 });
+    },
+    removeColorStock(index) {
+      this.editedItem.color_stock.splice(index, 1);
+      this.updateQuantity(); // Update quantity after removal
+    },
+    updateQuantity() {
+      const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
+      this.editedItem.quantity = totalStock;
+    },
     handleImageUpload(event) {
-      // Store the selected files in `editedItem.images`
       this.editedItem.images = Array.from(event.target.files);
     },
     saveNewProduct() {
       const formData = new FormData();
-
       formData.append('product_name', this.editedItem.product_name);
       formData.append('supplier', this.editedItem.supplier);
       formData.append('quantity', this.editedItem.quantity);
       formData.append('price', this.editedItem.price);
       formData.append('type', this.editedItem.type);
       formData.append('gender', this.editedItem.gender);
+      formData.append('color_stock', JSON.stringify(this.editedItem.color_stock)); // Add color stock
 
-      // Append each image file to the FormData object
-      if (this.editedItem.images.length > 0) {
+      if (this.editedItem.images && this.editedItem.images.length > 0) {
         this.editedItem.images.forEach(image => {
           formData.append('product_images[]', image);
         });
@@ -122,8 +141,6 @@ export default {
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'OK'
           });
-
-          // Reset form data
           this.resetForm();
         })
         .catch(error => {
@@ -143,17 +160,21 @@ export default {
         product_id: '',
         product_name: '',
         supplier: '',
-        quantity: '',
-        price: '', // Add price property
-        image: '',
+        quantity: 0,
+        price: '',
+        image: [],
+        type: '',
+        gender: '',
+        color_stock: [{ color: '', stock: 0 }]
       };
     },
     goBack() {
       this.$router.go(-1);
     }
-  },
+  }
 };
 </script>
+
 
 <style scoped>
 .bg-title {
@@ -262,5 +283,48 @@ select:focus {
 
 .close:hover {
   background-color: #93222b;
+}
+
+@media (max-width: 768px) {
+  .form-box {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .v-btn {
+    padding: 0.5rem 1rem;
+    width: 100%;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bg-title {
+    font-size: 1.25rem;
+    padding: 0.5rem;
+  }
+
+  .form-container {
+    padding:0rem;
+  }
+
+  input {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 </style>

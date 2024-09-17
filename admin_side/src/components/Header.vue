@@ -109,4 +109,26 @@ export default {
   font-size: 16px; /* Adjust font size if needed */
   color: rgb(68, 67, 67);
 }
+
+@media (max-width: 960px) {
+  .menu-button{
+    font-size: 15px;
+    margin-left: 0px;  
+  }
+
+  .mvcLogo{
+    display: none;
+  }
+
+  .logo{
+    display: none;
+  }
+
+  .calendar-icon{
+    font-size: 12px;
+  }
+  .clock{
+    font-size: 10px;
+  }
+}
 </style>

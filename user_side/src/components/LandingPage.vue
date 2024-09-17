@@ -54,10 +54,9 @@
         </div>
         <div class="offer-box">
           <img src="/src/assets/retina-repair.jpg" alt="Retina Repair" class="offer-image">
-          <p class="offer-title">Retina Repair</p>
-          <p class="offer-text">"Advanced retina repair services that address conditions such as retinal detachment,
-            macular degeneration, and other retinal disorders. Our specialized procedures are designed to restore and
-            preserve your vision, utilizing the latest in medical technology and expertise."</p>
+          <p class="offer-title">Comprehensive Eye Refraction</p>
+          <p class="offer-text">"An eye exam that measures a person's prescription for eyeglasses or contact lenses.
+            Normal vision occurs when light is focused directly on the retina rather than in front or behind it."</p>
 
         </div>
         <div class="offer-box">
@@ -66,33 +65,6 @@
           <p class="offer-text">"Regular vision checks to ensure your eyes are in optimal condition. We provide thorough
             eye exams to detect vision problems early, helping you maintain clear and comfortable sight through
             personalized recommendations and treatments."</p>
-
-        </div>
-        <div class="offer-box">
-          <img src="/src/assets/cornea-transplant.jpg" alt="Cornea Transplant" class="offer-image">
-          <p class="offer-title">Cornea Transplant</p>
-          <p class="offer-text">"Expert cornea transplant services to restore clear vision for patients with damaged or
-            diseased corneas. Our skilled surgeons use advanced techniques to replace the cornea, improving vision and
-            enhancing your quality of life."</p>
-
-        </div>
-        <div class="offer-box">
-          <img src="/src/assets/laser-surgery.jpg" alt="Laser Surgery" class="offer-image">
-          <p class="offer-title">Laser Surgery</p>
-          <p class="offer-text">"Precise and minimally invasive laser surgery to correct various vision issues,
-            including
-            nearsightedness, farsightedness, and astigmatism. Our state-of-the-art technology ensures quick recovery and
-            excellent results, giving you the freedom of clear vision without glasses or contacts."</p>
-
-        </div>
-        <div class="offer-box">
-          <img src="/src/assets/dry-eye-surgery.jpg" alt="Dry Eye Surgery" class="offer-image">
-          <p class="offer-title">Dry Eye Surgery</p>
-          <p class="offer-text">"Specialized dry eye surgery to relieve persistent discomfort and improve tear
-            production.
-            Our advanced procedures target the underlying causes of chronic dry eye, providing long-lasting relief and
-            enhancing your eye health and comfort."</p>
-
         </div>
       </div>
     </div>

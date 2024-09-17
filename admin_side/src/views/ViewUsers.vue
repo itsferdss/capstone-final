@@ -105,38 +105,49 @@ export default {
 }
 
 @media (max-width: 960px) {
-  .header {
-    display: block;
-    font-size: 18px;
-    border-radius: 10px;
-    background-color: rgb(165, 215, 225);
-    padding: 10px;
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: bold;
-    max-width: 100%;
-  }
-
   .v-data-table {
     font-size: 10px;
   }
 
 
   .main-content {
-    display: flex;
-    flex-direction: column;
-    margin-left: 0px;
+    margin-left: 0;
     max-width: 100%;
+    margin-right: 0;
 
     .users {
-      border-radius: 10px;
-      background-color: #f0f0f0;
       padding: 0.5rem;
       height: 100%;
-      border: 1px solid #ccc;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      max-width: 100%;
     }
+  }
+
+  .dash{
+    margin-left: -10px;
+    margin-bottom: -20px;
+  }
+
+  .title-container{
+    height: 60px;
+  }
+
+  .material-icons{
+    font-size: 28px;
+  }
+
+  .text{
+    font-size: 25px;
+  }
+  
+
+  .ghostTitle{
+    position: absolute;
+    z-index: -1;
+    opacity: 0.1;
+    top: 0px;
+    right: 50px;
+    font-size: 80px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: #848484;
   }
 }
 </style>
