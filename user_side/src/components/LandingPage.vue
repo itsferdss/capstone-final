@@ -16,11 +16,13 @@
     <div id="section1" class="full-height">
       <div class="content">
         <div class="background-overlay"></div>
-        <div>
+        <div class="groupTitle">
           <h1 class="Title">Elevate Your Look, <br> Enhance Your Sight</h1>
-          <p class="subtitle">MVC Optical CLinic is one of the most trusted eye care business with a <br>
-            focus on style and reliability. At MVC Optical Clinic, we blend trusted expertise<br>
-            with fashionable solutions to keep your vision and style on point. </p>
+          <p class="subtitle">MVC Optical CLinic is one of the most trusted eye <br>
+            care business with a focus on style and reliability. <br>
+            At MVC Optical Clinic, we blend trusted expertise <br>
+            with fashionable solutionsto keep your vision and <br>
+            style on point. </p>
         </div>
         <div class="button-borders">
           <button class="primary-button" @click="goToLogin"> Shop Now!
@@ -163,7 +165,7 @@
               <p class="mvcAdd">Instagram</p>
             </div>
           </div>
-          <div class="text-section">
+          <div class="text-section-computer" :class="journey">
             <i class="mdi mdi-account-group mvc-icon"></i>
             <div>
               <p class="mvcInfo">Join Our Journey!</p>
@@ -236,6 +238,8 @@ export default {
   },
 };
 </script>
+
+
 <style lang="scss" scoped>
 html {
   scroll-behavior: smooth;
@@ -580,20 +584,6 @@ html {
   font-weight: bold;
 }
 
-/* Responsive Design */
-@media screen and (max-width: 1024px) {
-  .offer-box {
-    width: 48%;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .offer-box {
-    width: 100%;
-  }
-}
-
-
 #section3 {
   position: relative;
   height: 750px;
@@ -668,10 +658,6 @@ html {
   font-size: 16px;
   font-weight: bold;
   color: #333;
-}
-
-#section4 {
-  height: 600px;
 }
 
 .model-container {
@@ -772,4 +758,132 @@ html {
   margin-top: 5px;
   /* Space above each address or contact detail */
 }
+
+@media (max-width: 768px) {
+  .topnav {
+    position: fixed;
+    width: 100%;
+    background-color: #016888;
+    overflow: hidden;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    height: 8%;
+    padding: 20px;
+  }
+  .logo-separator {
+    height: 50px;
+  }
+
+  .landing-page .content {
+    padding: 10px;
+    margin-top: 100px;
+  }
+
+  .Title {
+    font-size: 30px;
+    margin-left: 10px;
+    margin-top: 140px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+
+  .button-borders {
+    margin-left: 100px;
+    margin-top: 130px;
+  }
+
+  .primary-button {
+    font-size: 12px;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .offers-section {
+    padding: 20px;
+  }
+
+  .offer-header h2 {
+    font-size: 20px;
+  }
+
+  .offer-header p {
+    font-size: 24px;
+  }
+
+  .offer-text {
+    font-size: 12px;
+  }
+
+  .team-images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .team-member-box {
+    margin-bottom: 20px;
+  }
+  .nav-links{
+    display: none;
+  }
+  .logo{
+    height: 30px;
+  }
+
+  .MVClogo{
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .background-overlay{
+    height: 700px;
+    margin-top: -130px;
+    width: 100%;
+  }
+
+  .groupTitle{
+    margin-top: -150px;
+  }
+
+  .offer-box{
+    width: 100%;
+  }
+
+  .lastBut{
+    margin-left: 25px;
+  }
+
+  .rectangle-text {
+    flex-direction: column; /* Stack items vertically */
+  }
+  
+  .text-section {
+    flex-direction: column; 
+    text-align: left; 
+    font-size: 12px;
+  }
+
+  .text-section-computer{
+    display: none;
+  }
+  
+  .mvc-icon {
+    margin-bottom: 10px; /* Space between icon and text */
+  }
+
+  .sec3Title{
+    font-size: 30px;
+  }
+
+  #section3{
+    height: 100%;
+  }
+  
+}
+
 </style>

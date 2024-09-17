@@ -539,4 +539,102 @@ export default {
   margin: 20px; /* Increase margin */
 }
 
+@media (max-width: 768px) {
+  .header-banner {
+    margin-bottom: 20px;
+  }
+
+  .logo-container {
+    height: 300px; /* Adjust height for mobile */
+  }
+
+  .welcome {
+    bottom: 90px; /* Adjust bottom position */
+    left: 20px; /* Adjust left position */
+    padding: 30px; /* Adjust padding */
+  }
+
+  .welcome h1 {
+    font-size: 32px; /* Adjust font size */
+  }
+
+  .button-container {
+    bottom: 10px; /* Adjust bottom position */
+    left: 10px; /* Adjust left position */
+    gap: 10px; /* Adjust gap */
+  }
+
+  .shop-button {
+    padding: 10px 20px; /* Adjust padding */
+    font-size: 16px; /* Adjust font size */
+  }
+
+  .banner-section {
+    gap: 15px; /* Adjust gap */
+    margin-bottom: 20px; /* Adjust bottom margin */
+  }
+
+  .banner-card {
+    flex: 1 1 100%; /* Adjust for mobile */
+    max-width: 100%;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr); /* Adjust for mobile */
+  }
+
+  .product-card {
+    flex: 1 1 45%; /* Adjust for mobile */
+    max-width: 45%;
+  }
+
+  .ratings {
+    height: 300px; /* Adjust height for mobile */
+  }
+
+  .rate h1 {
+    font-size: 28px; /* Adjust font size */
+  }
+
+  .rate p {
+    font-size: 16px; /* Adjust font size */
+  }
+
+  .description-section {
+    padding: 20px; /* Adjust padding */
+    margin: 20px auto; /* Adjust margin */
+    max-width: 90%; /* Adjust max-width */
+  }
+
+  .description-title {
+    font-size: 28px; /* Adjust font size */
+  }
+
+  .description-content {
+    font-size: 16px; /* Adjust font size */
+  }
+
+  .header-banner {
+    margin-bottom: 30px;
+  }
+
+  .banner-section {
+    gap: 20px; /* Adjust gap for smaller screens */
+    margin-bottom: 30px; /* Adjust bottom margin */
+  }
+
+  .banner-card {
+    flex: 1 1 45%; /* Adjust for smaller screens */
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr); /* Adjust for smaller screens */
+  }
+
+  .product-card {
+    flex: 1 1 30%; /* Adjust for smaller screens */
+    max-width: 30%;
+  }
+}
+
 </style>

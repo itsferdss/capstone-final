@@ -291,5 +291,55 @@ button:hover {
   right: 0;
   margin-right: 10px;
 }
+@media (max-width: 960px) {
+  .container {
+    flex-direction: column;
+    margin-top: 20px;
+    padding: 0 20px;
+  }
+
+  .login-form-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .mvcLogo {
+    width: 100%;
+    height: auto;
+  }
+
+  .eye-icon {
+    margin-top: 30px
+  }
+
+  .graphics{
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form-container {
+    margin-top: 150px;
+    padding: 10px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 10px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .inputTitle {
+    font-size: 14px;
+  }
+
+  .trapezoid {
+    position: absolute;
+    height: 50px;
+  }
+}
 </style>
 

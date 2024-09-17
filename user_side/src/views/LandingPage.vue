@@ -23,9 +23,20 @@ export default {
     display: flex;
     flex-direction: column;
 
-    .landingPage {
-        
-       
+    .landingPage {   
+        height: 100%;
+    }
+}
+
+@media (max-width: 960px) {
+    .main-content {
+        margin-left: 0;
+        max-width: 100%;
+        margin-right: 0;
+    }
+
+    .landingPage{
+        height: 100%;
     }
 }
 </style>

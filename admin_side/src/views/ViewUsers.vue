@@ -109,7 +109,6 @@ export default {
     font-size: 10px;
   }
 
-
   .main-content {
     margin-left: 0;
     max-width: 100%;
