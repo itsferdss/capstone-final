@@ -85,7 +85,7 @@
       <h2 class="newProds">New Products</h2>
       <div class="product-container">
         <div v-for="product in products" :key="product.id" class="product-card" @click="viewProduct(product.id)">
-          <img :src="product.currentImage" :alt="product.product_name" class="main-image"
+          <img :src="product.currentImage" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
@@ -100,11 +100,12 @@
 
     <div class="description-section">
       <h2>THE MOST TRUSTED CLINIC</h2>
-      <p>Welcome to MVC optical. We're an optical clinic in Cabangan, Zambales. Bringing a new category of prescription
+      <p class="liit">Welcome to MVC optical. We're an optical clinic in Cabangan, Zambales. Bringing a new category of
+        prescription
         eyeglasses and sunglasses by bringing proven, cutting-edge sport performance tech to everyday eyewear.</p>
-      <p>If you're active and need a versatile eyewear solution, we've got you covered.</p>
+      <p class="liit">If you're active and need a versatile eyewear solution, we've got you covered.</p>
       <img src="../assets/mvc.png" alt="Logo" class="description-logo">
-      <img src="../assets/ECHODE.png" alt="Logo" class="description-logo">
+      <img src="../assets/echode_logo.png" alt="Logo" class="description-logo">
       <img src="../assets/newlogo.png" alt="Logo" class="description-logo">
     </div>
   </div>
@@ -156,7 +157,7 @@ export default {
       }
     },
     shopSunglass() {
-      // Handle shop sunglasses action
+      this.$router.push('/products');
     },
     shopPrescription() {
       // Handle shop prescription action
@@ -416,13 +417,12 @@ export default {
 .product-container {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
   flex-wrap: wrap;
 }
 
 .product-card {
   flex: 1 1 2%;
-  max-width: 22%;
+  max-width: 100%;
   margin: 10px;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -436,12 +436,12 @@ export default {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-.main-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+.product-card img.main-image {
+  max-width: 100%;
+  height: 300px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
 }
 
 .product-details {
@@ -481,9 +481,11 @@ export default {
 .rate {
   position: absolute;
   bottom: 40px; /* Increase bottom position */
-  left: 30px; /* Increase left position */
+  left: 10px; /* Increase left position */
+  right:150px;
   padding: 40px; /* Increase padding */
   z-index: 10;
+  top: 10px
 }
 
 .rate h1 {
@@ -540,64 +542,103 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .container {
+    overflow-x: hidden; 
+  }
+
   .header-banner {
     margin-bottom: 20px;
+    width: 120%;
+    margin-left: -30px;
   }
 
   .logo-container {
-    height: 300px; /* Adjust height for mobile */
+    height: 300px; 
   }
 
   .welcome {
-    bottom: 90px; /* Adjust bottom position */
-    left: 20px; /* Adjust left position */
-    padding: 30px; /* Adjust padding */
+    bottom: 90px; 
+    left: 20px; 
+    padding: 30px; 
   }
 
   .welcome h1 {
-    font-size: 32px; /* Adjust font size */
+    font-size: 32px;
   }
 
   .button-container {
-    bottom: 10px; /* Adjust bottom position */
-    left: 10px; /* Adjust left position */
-    gap: 10px; /* Adjust gap */
+    bottom: 10px;
+    left: 10px;
+    gap: 10px; 
   }
 
   .shop-button {
-    padding: 10px 20px; /* Adjust padding */
-    font-size: 16px; /* Adjust font size */
+    padding: 10px 20px; 
+    font-size: 16px; 
   }
 
   .banner-section {
-    gap: 15px; /* Adjust gap */
-    margin-bottom: 20px; /* Adjust bottom margin */
+    gap: 20px; 
+    margin-bottom: 20px;
+    margin-top: 50px;
+    height: 300px;
+    width: 340px;
+    margin-left: 10px;
+  }
+
+  .background-image{
+    width: 100%;
+    height: 200px;
+    margin-top: -100px;
+  }
+
+  .categories-title{
+    font-size: 30px;
+    margin-top: -50px;
   }
 
   .banner-card {
     flex: 1 1 100%; /* Adjust for mobile */
-    max-width: 100%;
+    width: 120%;
+  }
+
+  .categories-section{
+    margin-top: -20px;
   }
 
   .categories-grid {
-    grid-template-columns: repeat(2, 1fr); /* Adjust for mobile */
+    grid-template-columns: repeat(2, 1fr); 
+    height: 100%;
+    width: 350px;
+    margin-left: -45px;
+  }
+
+  .product-container {
+    grid-template-columns: repeat(2, 1fr); 
+    display: flex;
+    justify-content:center;
+    flex-wrap: wrap;
+    margin-left: -140px;
+    width: 560px;
   }
 
   .product-card {
-    flex: 1 1 45%; /* Adjust for mobile */
-    max-width: 45%;
+    flex-basis: 30%;
   }
 
   .ratings {
-    height: 300px; /* Adjust height for mobile */
+    height: 400px;
+    width: 500px;
+    margin-top: 20px;
+    margin-left: -10px;
   }
 
   .rate h1 {
-    font-size: 28px; /* Adjust font size */
+    font-size: 20px;
   }
 
   .rate p {
-    font-size: 16px; /* Adjust font size */
+    font-size: 12px;
   }
 
   .description-section {
@@ -607,33 +648,32 @@ export default {
   }
 
   .description-title {
-    font-size: 28px; /* Adjust font size */
+    font-size: 28px;
   }
 
   .description-content {
-    font-size: 16px; /* Adjust font size */
+    font-size: 16px;
   }
 
-  .header-banner {
-    margin-bottom: 30px;
-  }
-
-  .banner-section {
-    gap: 20px; /* Adjust gap for smaller screens */
-    margin-bottom: 30px; /* Adjust bottom margin */
-  }
-
-  .banner-card {
-    flex: 1 1 45%; /* Adjust for smaller screens */
-  }
-
-  .categories-grid {
-    grid-template-columns: repeat(3, 1fr); /* Adjust for smaller screens */
+  .description-logo{
+    width: 200px;
   }
 
   .product-card {
-    flex: 1 1 30%; /* Adjust for smaller screens */
+    flex: 1 1 30%; 
     max-width: 30%;
+  }
+
+  .header-video{
+    width: 100%;
+  }
+
+  .product-card img.main-image {
+    max-width: 100%;
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
   }
 }
 

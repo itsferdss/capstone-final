@@ -30,7 +30,7 @@ export default {
   components: {
     Sidebar,
     AdminLogin,
-    Header
+    Header,
   },
   setup() {
     const route = useRoute();

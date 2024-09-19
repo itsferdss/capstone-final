@@ -593,6 +593,16 @@ html {
   overflow: hidden;
 }
 
+#section2 {
+  position: relative;
+  height: 1050px;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  margin-top: 50px;
+}
+
 
 .about {
   font-family: 'Times New Roman', Times, serif;
@@ -841,7 +851,7 @@ html {
   }
 
   .background-overlay{
-    height: 700px;
+    height: 250%;
     margin-top: -130px;
     width: 100%;
   }
@@ -882,6 +892,11 @@ html {
 
   #section3{
     height: 100%;
+  }
+
+   #section2{
+    height: 100%;
+    margin-top: 200px;
   }
   
 }

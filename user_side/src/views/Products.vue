@@ -88,30 +88,36 @@ export default {
 
 @media (max-width: 960px) {
     .main-content {
-        margin-left: 0px;
+        margin: 0px;
         max-width: 100%;
     }
 
     .Products {
-        border-radius: 10px;
-        background-color: #f0f0f0;
-        padding: 0.5rem;
-        height: 100%;
-        border: 1px solid #ccc; // Add border
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Add shadow effect
-        flex: 1;
+      width: 100%;
+      height: 100%;
     }
 
-    .logo-container {
-        display: block; /* Show on mobile */
+    .dash{
+        margin-left: -10px;
+        margin-bottom: -20px;
     }
 
-    .mvcLogo {
-        display: block;
-        max-height: 200px;
-        max-width: 235px;
-        margin-left: 40px;
-        border-radius: 10px;
+    .title-container{
+        height: 60px;
+    }
+
+    .material-icons{
+        font-size: 28px;
+    }
+
+    .text{
+        font-size: 25px;
+    }
+    
+
+    .ghostTitle{
+        font-size: 80px;
+        margin-top: 30px;
     }
 }
 </style>

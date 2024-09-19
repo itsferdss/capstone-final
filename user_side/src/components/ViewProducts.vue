@@ -3,7 +3,7 @@
     <button class="back-button" @click="goBack">
       ◀ Back
     </button>
-    <aside class="left-container">
+    <aside class="left-container" v-if="photos.length > 0">
       <div class="photo-grid">
         <a v-for="(photo, index) in photos" :key="index" @click="updateRightPhoto(index)"
           :class="{ selected: currentIndex === index }">
@@ -13,7 +13,7 @@
     </aside>
     <main class="right-container">
       <div class="image-description-container">
-        <div class="image-container" @mousemove="handleMouseMove" @mouseleave="hideZoom">
+        <div class="image-container" @mousemove="handleMouseMove" @mouseleave="hideZoom" v-if="currentPhoto">
           <button class="nav-button prev" @click="prevPhoto">◀</button>
           <img :src="currentPhoto" alt="Selected Photo" v-if="currentPhoto" />
           <button class="nav-button next" @click="nextPhoto">▶</button>
@@ -44,7 +44,7 @@
           </div>
 
           <div class="offers">
-            <p><strong>Special Offers:</strong></p>
+
             <ul>
               <li v-for="offer in product.offers" :key="offer">{{ offer }}</li>
             </ul>
@@ -220,7 +220,7 @@ export default {
   display: flex;
   height: 100vh;
   font-family: 'Arial', sans-serif;
-  margin-left: 10%;
+  margin-left: 5%;
   position: relative;
 }
 
@@ -228,16 +228,13 @@ export default {
   position: absolute;
   top: 20px;
   left: 20px;
-  /* Adjusted for better alignment */
   background-color: #007bff;
-  /* Updated color for better contrast */
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   font-weight: bold;
   border-radius: 5px;
   color: #fff;
-  /* White text for better readability */
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
@@ -425,7 +422,6 @@ export default {
   /* Darker shade for hover effect */
 }
 
-/* New styles for the zoomed container */
 .zoomed-container {
   position: absolute;
   width: 300px;
@@ -437,9 +433,70 @@ export default {
   border-radius: 8px;
   z-index: 100;
   top: 10px;
-  /* Adjusted top position */
   right: 10px;
-  /* Adjusted right position */
   transition: background-position 0.1s ease;
+}
+
+@media screen and (max-width: 960px) {
+  .container {
+    flex-direction: column;
+    margin-left: 0px;
+  }
+
+  .left-container {
+    width: 100%;
+    padding: 10px;
+    border-right: none;
+    box-shadow: none;
+    margin-bottom: 20px;
+  }
+
+  .photo-grid {
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .photo-grid img {
+    width: 100px;
+  }
+
+  .right-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .image-description-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 300px;
+    margin-top: 50px;
+  }
+
+  .description-container {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .select-button {
+    width: 100%;
+  }
+
+   .back-button {
+    position: fixed;
+    top: 550px;
+    left: 10px;
+    z-index: 1000;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    color: white;
+   }
 }
 </style>

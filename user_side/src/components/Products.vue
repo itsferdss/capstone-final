@@ -211,7 +211,6 @@ export default {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  /* Set 4 columns per row */
   gap: 20px;
 }
 
@@ -287,6 +286,34 @@ export default {
   padding: 5px;
   font-size: 12px;
   border-radius: 3px;
+}
+
+@media (max-width: 960px) {
+  .title{
+    margin-left: 0px;
+    width: 100%;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px; 
+  }
+
+  .product-name{
+    font-size: 13px;
+  }
+
+  .product-card {
+    height: 330px; 
+  }
+
+  .product-name {
+    font-size: 13px;
+  }
+
+  .product-card img.main-image {
+    height: 250px; 
+  }
 }
 </style>
 

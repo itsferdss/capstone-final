@@ -1,12 +1,18 @@
 <template>
     <v-container>
         <div class="title-container">
+
             <h1 class="ghostTitle">Reservations</h1>
             <div class="dash">
                 <span class="material-icons">dashboard</span>
                 <span class="text">Reservations</span>
             </div>
         </div>
+
+        <button class="back-button" @click="goBack">
+            <i class="fas fa-arrow-left"></i> <!-- Font Awesome Icon -->
+            Back
+        </button>
 
         <!-- Reservations table -->
         <v-card class="reservations-card" elevation="2">
@@ -24,11 +30,16 @@
                     <template v-slot:item.product.supplier="{ item }">
                         {{ item.product.supplier }}
                     </template>
+                    <template v-slot:item.color="{ item }">
+                        <span :style="{ color: item.color, textTransform: 'uppercase' }">
+                            {{ item.color }}
+                        </span>
+                    </template>
                     <template v-slot:item.status="{ item }">
                         <span :style="getStatusStyle(item.status)">{{ getStatusText(item.status) }}</span>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-btn v-if="item.status === 'pending'" @click="updateStatus(item, 'canceled')" color="red"
+                        <v-btn v-if="item.status === 'pending' || item.status === 'accepted' " @click="updateStatus(item, 'canceled')" color="red"
                             text>
                             Cancel
                         </v-btn>
@@ -54,6 +65,7 @@ export default {
                 { title: 'Product', align: 'center', value: 'product.product_name' },
                 { title: 'Brand', align: 'center', value: 'product.supplier' },
                 { title: 'Pickup Date', align: 'center', value: 'picked_up_date' },
+                { title: 'Color', align: 'center', value: 'color' },
                 { title: 'Status', align: 'center', value: 'status' },
                 { title: 'Actions', align: 'center', value: 'actions' }
             ]
@@ -145,6 +157,9 @@ export default {
                     'error'
                 );
             }
+        },
+        goBack() {
+            this.$router.go(-1);
         }
     }
 }
@@ -221,7 +236,56 @@ export default {
     text-align: center;
 }
 
+.back-button{
+    margin-left: 40px;
+    margin-top: 20px;
+    background-color: #007bff;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    color: #fff;
+}
+
 .v-btn {
     text-transform: none;
+}
+
+@media (max-width: 960px) {
+    .reservations-card-title{
+        font-size: 18px;
+    }
+
+    .v-data-table {
+        font-size: 13px;
+    }
+    .dash{
+        margin-left: -10px;
+        margin-bottom: -20px;
+    }
+
+    .title-container{
+        height: 60px;
+    }
+
+    .material-icons{
+        font-size: 28px;
+    }
+
+    .text{
+        font-size: 25px;
+    }
+    
+
+    .ghostTitle{
+        font-size: 55px;
+        margin-top: 30px;
+    }
+
+    .back-button{
+        font-size: 12px;
+        margin-left: 0px;
+        margin-top: 50px;
+    }
 }
 </style>

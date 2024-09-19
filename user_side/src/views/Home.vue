@@ -38,23 +38,15 @@ export default {
 
 @media (max-width: 960px) {
   .main-content {
-    margin-left: 0px;
+    margin: 0;
     max-width: 100%;
+    
 
     .Home {
-      padding: 0.5rem;
       height: 100%;
-    }
-
-    .logo-container {
-      display: block;
-      /* Show on mobile */
-    }
-
-    .mvcLogo {
-      max-width: 235px;
-      margin-left: 40px;
-      border-radius: 10px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
     }
   }
 }

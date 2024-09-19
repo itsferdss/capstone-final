@@ -11,7 +11,8 @@
       </v-col>
       <v-col class="text-left" cols="6">
         <v-btn @click="openReservation" color="primary" dark class="showRes">
-          <v-icon left>mdi-cart</v-icon> See Your Reservations
+          <v-icon left>mdi-cart</v-icon>
+          <div class="resText"> See Your Reservations</div>
         </v-btn>
       </v-col>
     </v-row>
@@ -285,26 +286,6 @@ export default {
   font-size: 0.8rem; /* Adjust input font size for mobile */
 }
 
-@media (max-width: 600px) {
-  .patient-info-card-title {
-    font-size: 1rem;
-    margin-left: -30px;
-  }
-  .patient-info-row {
-    margin-top: -20px;
-    margin-bottom: -20px;
-    font-size: 0.8rem;
-    margin-left: -30px;
-    margin-right: -30px;
-  }
-  .update-dialog-title {
-    font-size: 1rem;
-  }
-  .v-btn {
-    font-size: 0.7rem;
-  }
-
-}
 .agreement-reminder-text {
   font-size: 1rem;
   line-height: 1.5;
@@ -328,4 +309,40 @@ export default {
 .showRes{
   margin-left: 300px;
 }
+
+@media (max-width: 600px) {
+  .patient-info-card-title {
+    font-size: 1rem;
+    margin-left: -30px;
+  }
+  .patient-info-row {
+    margin-top: -20px;
+    margin-bottom: -20px;
+    font-size: 0.8rem;
+    margin-left: -30px;
+    margin-right: -30px;
+  }
+  .update-dialog-title {
+    font-size: 1rem;
+  }
+  .v-btn {
+    font-size: 0.7rem;
+  }
+
+  .showRes{
+    margin-left: 85px;
+  }
+
+  .resText{
+    display: none;
+  }
+
+  .updateBtn{
+      margin-left: 0px;
+      width: 100%;
+  }
+
+}
+
+
 </style>

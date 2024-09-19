@@ -315,9 +315,7 @@ button:hover {
   .graphics{
     display: none;
   }
-}
 
-@media (max-width: 600px) {
   .login-form-container {
     margin-top: 150px;
     padding: 10px;
@@ -337,8 +335,27 @@ button:hover {
   }
 
   .trapezoid {
-    position: absolute;
-    height: 50px;
+    display: none;
+  }
+
+  @keyframes slideInCircle1 {
+    from {
+      left: -1100px;
+    }
+
+    to {
+      left: -120%;
+    }
+  }
+
+  @keyframes slideInCircle2 {
+    from {
+      left: -1100px;
+    }
+
+    to {
+      left: -120%;
+    }
   }
 }
 </style>

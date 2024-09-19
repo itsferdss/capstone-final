@@ -87,23 +87,36 @@ export default {
 
 @media (max-width: 960px) {
     .main-content {
-        margin-left: 0px;
+        margin-left: 0;
         max-width: 100%;
+        margin-right: 0;
 
         .Profile {
             padding: 0.5rem;
             height: 100%;
         }
-        
-        .logo-container {
-            display: block; /* Show on mobile */
-        }
+    }
+    .dash{
+        margin-left: -10px;
+        margin-bottom: -20px;
+    }
 
-        .mvcLogo {
-            max-width: 235px;
-            margin-left: 40px;
-            border-radius: 10px;
-        }
+    .title-container{
+        height: 60px;
+    }
+
+    .material-icons{
+        font-size: 28px;
+    }
+
+    .text{
+        font-size: 25px;
+    }
+    
+
+    .ghostTitle{
+        font-size: 90px;
+        margin-top: 30px;
     }
 }
 </style>

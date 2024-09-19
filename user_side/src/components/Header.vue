@@ -111,6 +111,10 @@ export default {
 }
 
 @media (max-width: 960px) {
+  .header {
+    width: 100%;
+  }
+
   .menu-button {
     font-size: 15px;
     margin-left: 0px;
