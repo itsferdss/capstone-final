@@ -12,13 +12,29 @@
         <li><a href="#" @click.prevent="scrollToSection('readers')"
             :class="{ active: activeSection === 'readers' }">ACCESSORIES</a></li>
       </ul>
+
+      <div class="dropdown" @click="toggleDropdown">
+        <button class="dropbtn">
+          {{ selectedCategory ? selectedCategory : 'Filter by Gender' }}
+          <span :class="isDropdownVisible ? 'arrow-up' : 'arrow-down'"></span>
+        </button>
+        <div class="dropdown-content" v-if="isDropdownVisible">
+          <a href="#" @click.prevent="filterByCategory('Men')">Men</a>
+          <a href="#" @click.prevent="filterByCategory('Women')">Women</a>
+          <a href="#" @click.prevent="filterByCategory('Unisex')">Unisex</a>
+          <a href="#" @click.prevent="filterByCategory(null)">All</a>
+        </div>
+      </div>
     </nav>
+
+
 
     <!-- FRAMES Section -->
     <section id="sunglasses" class="category-section">
       <h1 class="title">FRAMES</h1>
       <div class="product-grid">
-        <div @click="viewProduct(product.id)" class="product-card" v-for="product in framesProducts" :key="product.id">
+        <div @click="viewProduct(product.id)" class="product-card" v-for="product in filteredFramesProducts"
+          :key="product.id">
           <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
           <img :src="product.currentImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
@@ -102,7 +118,9 @@ export default {
   data() {
     return {
       products: [],
-      activeSection: 'sunglasses'
+      activeSection: 'sunglasses',
+      isDropdownVisible: false,
+      selectedCategory: null 
     };
   },
   methods: {
@@ -143,18 +161,37 @@ export default {
       console.log(diffDays); 
       return diffDays <= 14;
     },
+    toggleDropdown() {
+      this.isDropdownVisible = !this.isDropdownVisible;
+    },
+    filterByCategory(gender) {
+      this.selectedCategory = gender ? gender : 'All'; 
+      this.isDropdownVisible = false; 
+    },
   },
   computed: {
-    framesProducts() {
-      return this.products.filter(product => product.type === 'Frames');
+    filteredFramesProducts() {
+      if (this.selectedCategory && this.selectedCategory !== 'All') {
+        return this.products.filter(product => product.type === 'Frames' && product.gender === this.selectedCategory);
+      }
+      return this.products.filter(product => product.type === 'Frames'); 
     },
     lensesProducts() {
+      if (this.selectedCategory && this.selectedCategory !== 'All') {
+        return this.products.filter(product => product.type === 'Lens' && product.gender === this.selectedCategory);
+      }
       return this.products.filter(product => product.type === 'Lens');
     },
     contactLensesProducts() {
+      if (this.selectedCategory && this.selectedCategory !== 'All') {
+        return this.products.filter(product => product.type === 'Contact Lenses' && product.gender === this.selectedCategory);
+      }
       return this.products.filter(product => product.type === 'Contact Lenses');
     },
     accessoriesProducts() {
+      if (this.selectedCategory && this.selectedCategory !== 'All') {
+        return this.products.filter(product => product.type === 'Accessories' && product.gender === this.selectedCategory);
+      }
       return this.products.filter(product => product.type === 'Accessories');
     }
   },
@@ -287,6 +324,55 @@ export default {
   font-size: 12px;
   border-radius: 3px;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: -90%;
+}
+
+.dropbtn {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.dropbtn:hover {
+  background-color: #2980b9;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  left: 0; 
+  background-color: #fff;
+  min-width: 160px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
 
 @media (max-width: 960px) {
   .title{
