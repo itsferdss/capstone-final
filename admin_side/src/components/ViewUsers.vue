@@ -80,7 +80,7 @@
                       <v-list-item-title>Generate PDF</v-list-item-title>
                     </v-list-item>
                     <v-list-item
-                      @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
+                      @click="exportPrescriptionExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
                       class="mb-2 rounded-l add-record-button">
                       <v-list-item-icon></v-list-item-icon>
                       <v-list-item-title>Generate Excel</v-list-item-title>
@@ -174,7 +174,7 @@
                         <v-list-item-title>Generate PDF</v-list-item-title>
                       </v-list-item>
                       <v-list-item
-                        @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Weekly Report`)"
+                        @click="exportSpecraclesExcel(selectedUserGlasses, `${selectedUser.full_name}'s Spectacles`)"
                         class="mb-2 rounded-l add-record-button">
                         <v-list-item-icon></v-list-item-icon>
                         <v-list-item-title>Generate Excel</v-list-item-title>
@@ -255,7 +255,7 @@
                       <v-list-item-title>Generate PDF</v-list-item-title>
                     </v-list-item>
                     <v-list-item
-                      @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Weekly Report`)"
+                      @click="exportHistoryExcel(selectedUserHistory, `${selectedUser.full_name}'s Medical History`)"
                       class="mb-2 rounded-l add-record-button">
                       <v-list-item-icon></v-list-item-icon>
                       <v-list-item-title>Generate Excel</v-list-item-title>
@@ -305,6 +305,11 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+
+
+
 
 
 export default {
@@ -949,9 +954,223 @@ export default {
       } catch (error) {
         console.error('Error exporting PDF:', error);
       }
-    }
+    },
+      async exportPrescriptionExcel(patients, title) {
+      try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Report');
+
+        const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+        const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
+        
+        const imageId = workbook.addImage({
+          buffer: imageBuffer,
+          extension: 'png',
+        });
+
+        // Add the image to the worksheet
+        worksheet.addImage(imageId, {
+          tl: { col: 2, row: 0 },
+          ext: { width: 650, height: 100 },
+        });
+
+        // Define cells to merge
+        const mergeCells = [
+          { range: 'C6:E6', value: 'MVC Optical Clinic' },
+          { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
+          { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric'})}` },
+          { range: 'C9:E9', value: title }
+        ];
+
+        // Merge cells and set their values
+        mergeCells.forEach(cell => {
+          if (!worksheet.getCell(cell.range).isMerged) {
+            worksheet.mergeCells(cell.range);
+            worksheet.getCell(cell.range).value = cell.value;
+            worksheet.getCell(cell.range).font = { size: 14, bold: true };
+            worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
+          }
+        });
+
+        worksheet.getCell('C6').font.size = 16; // Make the title bigger
+        worksheet.getCell('C9').font.size = 16;
+
+        // Add column headers
+        const headers = ['Date', 'Eye', 'Sphere', 'Cylinder', 'Axis', 'Best Visual Acuity'];
+        worksheet.addRow(headers);
+
+        // Set specific column widths to reduce cell size
+        worksheet.getColumn('A').width = 15; 
+        worksheet.getColumn('B').width = 15; 
+        worksheet.getColumn('C').width = 10; 
+        worksheet.getColumn('D').width = 10; 
+        worksheet.getColumn('E').width = 10; 
+        worksheet.getColumn('F').width = 20; 
+
+        // Add data rows for each patient
+        patients.forEach(p => {
+          const date = new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' });
+
+          worksheet.addRow([date, 'Right Eye', p.right_eye_sphere, p.right_eye_cylinder, p.right_eye_axis, p.best_visual_acuity]);
+          worksheet.addRow(['', 'Left Eye', p.left_eye_sphere, p.left_eye_cylinder, p.left_eye_axis, p.best_visual_acuity]);
+          worksheet.addRow(['', 'Reading Add', p.reading_add, '', '', 'PD: ' + p.PD]);
+          worksheet.addRow([]);  // Empty row for spacing
+        });
+
+        this.autoAdjustColumns(worksheet);
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/octet-stream' });
+        saveAs(blob, `${title}.xlsx`);
+        console.log('Excel file created successfully!');
+      } catch (error) {
+        console.error('Error exporting Excel:', error);
+      }
+  },
+  async exportSpecraclesExcel(patients, title) {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report');
+
+    const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+    const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
+    
+    const imageId = workbook.addImage({
+      buffer: imageBuffer,
+      extension: 'png',
+    });
+
+    // Add the image to the worksheet
+    worksheet.addImage(imageId, {
+      tl: { col: 2, row: 0 },
+      ext: { width: 650, height: 100 },
+    });
+
+    // Define cells to merge
+    const mergeCells = [
+      { range: 'C6:E6', value: 'MVC Optical Clinic' },
+      { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
+      { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric'})}` },
+      { range: 'C9:E9', value: title }
+    ];
+
+    // Merge cells and set their values
+    mergeCells.forEach(cell => {
+      if (!worksheet.getCell(cell.range).isMerged) {
+        worksheet.mergeCells(cell.range);
+        worksheet.getCell(cell.range).value = cell.value;
+        worksheet.getCell(cell.range).font = { size: 14, bold: true };
+        worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+    });
+
+    worksheet.getCell('C6').font.size = 16; // Make the title bigger
+    worksheet.getCell('C9').font.size = 16;
+
+    // Add column headers for Date, Frame, Type of Lens, and Remarks
+    const headers = ['Date', 'Frame', 'Type of Lens', 'Remarks'];
+    worksheet.addRow(headers);
+
+    // Set specific column widths
+    worksheet.getColumn('A').width = 15; // Date
+    worksheet.getColumn('B').width = 20; // Frame
+    worksheet.getColumn('C').width = 20; // Type of Lens
+    worksheet.getColumn('D').width = 30; // Remarks
+
+    // Add data rows for each patient
+    patients.forEach(p => {
+      const date = new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' });
+      worksheet.addRow([date, p.frame, p.type_of_lens, p.remarks]);
+    });
+
+    this.autoAdjustColumns(worksheet);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${title}.xlsx`);
+    console.log('Excel file created successfully!');
+  } catch (error) {
+    console.error('Error exporting Excel:', error);
+  }
+},
+
+async exportHistoryExcel(patients, title) {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report');
+
+    const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+    const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
+    
+    const imageId = workbook.addImage({
+      buffer: imageBuffer,
+      extension: 'png',
+    });
+
+    // Add the image to the worksheet
+    worksheet.addImage(imageId, {
+      tl: { col: 2, row: 0 },
+      ext: { width: 650, height: 100 },
+    });
+
+    // Define cells to merge
+    const mergeCells = [
+      { range: 'C6:E6', value: 'MVC Optical Clinic' },
+      { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
+      { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric'})}` },
+      { range: 'C9:E9', value: title }
+    ];
+
+    // Merge cells and set their values
+    mergeCells.forEach(cell => {
+      if (!worksheet.getCell(cell.range).isMerged) {
+        worksheet.mergeCells(cell.range);
+        worksheet.getCell(cell.range).value = cell.value;
+        worksheet.getCell(cell.range).font = { size: 14, bold: true };
+        worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+    });
+
+    worksheet.getCell('C6').font.size = 16; // Make the title bigger
+    worksheet.getCell('C9').font.size = 16;
+
+    // Add column headers for Date, Frame, Type of Lens, and Remarks
+    const headers = ['Date', 'Medical History', 'Ocular History'];
+    worksheet.addRow(headers);
+
+    // Set specific column widths
+    worksheet.getColumn('A').width = 15; // Date
+    worksheet.getColumn('B').width = 20; // Frame
+    worksheet.getColumn('C').width = 20; // Type of Lens
+
+    // Add data rows for each patient
+    patients.forEach(p => {
+      const date = new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' });
+      worksheet.addRow([date, p.medical_history, p.ocular_history]);
+    });
+
+    this.autoAdjustColumns(worksheet);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${title}.xlsx`);
+    console.log('Excel file created successfully!');
+  } catch (error) {
+    console.error('Error exporting Excel:', error);
+  }
+},
+
+
+autoAdjustColumns(worksheet) {
+  worksheet.columns.forEach(column => {
+    const maxLength = column.values.reduce((max, value) => {
+      return Math.max(max, String(value).length);
+    }, 0);
+    column.width = Math.min(maxLength + 2, 30);
+  });
+}
+
+
 
   },
+
 };
 </script>
 
