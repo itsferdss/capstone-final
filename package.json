@@ -8,6 +8,8 @@
     "bootstrap": "^5.3.3",
     "bootstrap-vue": "^2.23.1",
     "chart.js": "^4.4.3",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.11.0",
     "vite-plugin-vuetify": "^2.0.3",

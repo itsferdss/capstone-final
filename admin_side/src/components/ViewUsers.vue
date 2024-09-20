@@ -59,12 +59,40 @@
             <v-btn @click="openChildUpdateDialog" color="#35623D" dark style="font-weight: bold;">Add
               Prescription</v-btn>
             <span>&nbsp;</span>
-            <v-btn color="primary" @click="closeDialogPatientHistory">Close</v-btn>
+            <v-btn color="error" @click="closeDialogPatientHistory">Close</v-btn>
+
+            <!-- Dropdown for Generate Report -->
+            <v-row class="mt-4">
+              <v-col>
+                <v-menu offset-y>
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+                      <v-icon left>mdi-file-chart</v-icon>
+                      Generate Report
+                      <v-icon right>mdi-menu-down"></v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item
+                      @click="exportPrescriptionPDF(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
+                      class="mb-2 rounded-l add-record-button">
+                      <v-list-item-icon></v-list-item-icon>
+                      <v-list-item-title>Generate PDF</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
+                      class="mb-2 rounded-l add-record-button">
+                      <v-list-item-icon></v-list-item-icon>
+                      <v-list-item-title>Generate Excel</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </v-col>
+            </v-row>
 
             <!-- Loop through selectedUserPrescriptions -->
             <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index"
               class="mb-4 prescription-table-container">
-              <!-- Prescription Date at the top -->
               <v-row class="align-center justify-space-between">
                 <v-col>
                   <v-card-title class="font-weight-bold presDate">
@@ -80,7 +108,7 @@
               </v-row>
 
               <v-card-text>
-                <!-- Column Titles -->
+                <!-- Prescription Data -->
                 <v-row class="text-center font-weight-bold prescriptionTitle" style="border-bottom: 1px solid black;">
                   <v-col cols="12" sm="1"></v-col>
                   <v-col cols="6" sm="3">Sphere</v-col>
@@ -89,7 +117,7 @@
                   <v-col cols="6" sm="3">Best Visual Acuity</v-col>
                 </v-row>
 
-                <!-- Right Eye Row -->
+                <!-- Right Eye -->
                 <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
                   <v-col cols="12" sm="1" class="font-weight-bold">Right Eye</v-col>
                   <v-col cols="6" sm="3">{{ prescription.right_eye_sphere }}</v-col>
@@ -98,7 +126,7 @@
                   <v-col cols="6" sm="3">{{ prescription.right_eye_best_visual_acuity }}</v-col>
                 </v-row>
 
-                <!-- Left Eye Row -->
+                <!-- Left Eye -->
                 <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
                   <v-col cols="12" sm="1" class="font-weight-bold">Left Eye</v-col>
                   <v-col cols="6" sm="3">{{ prescription.left_eye_sphere }}</v-col>
@@ -107,7 +135,7 @@
                   <v-col cols="6" sm="3">{{ prescription.left_eye_best_visual_acuity }}</v-col>
                 </v-row>
 
-                <!-- Reading Add & PD Row -->
+                <!-- Reading Add & PD -->
                 <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
                   <v-col cols="6" sm="6"><strong>Reading Add:</strong> {{ prescription.reading_add }}</v-col>
                   <v-col cols="6" sm="6"><strong>PD:</strong> {{ prescription.PD }}</v-col>
@@ -117,7 +145,6 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-
 
       <!--DIALOG FOR PATIENT GLASSES-->
       <template>
@@ -129,6 +156,33 @@
                 Spectacles</v-btn>
               <span>&nbsp;</span>
               <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
+              <v-row class="mt-4">
+                <v-col>
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ props }">
+                      <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+                        <v-icon left>mdi-file-chart</v-icon>
+                        Generate Report
+                        <v-icon right>mdi-menu-down"></v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list>
+                      <v-list-item
+                        @click="exportSpectaclesPDF(selectedUserGlasses, `${selectedUser.full_name}'s Spectacles`)"
+                        class="mb-2 rounded-l add-record-button">
+                        <v-list-item-icon></v-list-item-icon>
+                        <v-list-item-title>Generate PDF</v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
+                        @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Weekly Report`)"
+                        class="mb-2 rounded-l add-record-button">
+                        <v-list-item-icon></v-list-item-icon>
+                        <v-list-item-title>Generate Excel</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </v-col>
+              </v-row>
 
               <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4">
                 <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.created_at)
@@ -183,6 +237,33 @@
               History</v-btn>
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeMoreHistoryDialog">Close</v-btn>
+            <v-row class="mt-4">
+              <v-col>
+                <v-menu offset-y>
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+                      <v-icon left>mdi-file-chart</v-icon>
+                      Generate Report
+                      <v-icon right>mdi-menu-down"></v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item
+                      @click="exportHistoryPDF(selectedUserHistory, `${selectedUser.full_name}'s Medical History`)"
+                      class="mb-2 rounded-l add-record-button">
+                      <v-list-item-icon></v-list-item-icon>
+                      <v-list-item-title>Generate PDF</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item
+                      @click="exportExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Weekly Report`)"
+                      class="mb-2 rounded-l add-record-button">
+                      <v-list-item-icon></v-list-item-icon>
+                      <v-list-item-title>Generate Excel</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </v-col>
+            </v-row>
 
             <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4">
               <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.created_at)
@@ -215,10 +296,6 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-
-
-      <!--DIALOG FOR HISTORY UPDATE-->
-
     </template>
   </v-data-table>
 </template>
@@ -226,6 +303,9 @@
 <script>
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+
 
 export default {
   data() {
@@ -693,6 +773,184 @@ export default {
         ocular_history: '',
       };
     },
+    exportPrescriptionPDF(patients, title) {
+      try {
+        const doc = new jsPDF();
+
+        const logoImage = '/src/assets/MVC_logo.png'; 
+        doc.addImage(logoImage, 'PNG', 10, 5, 190, 25); 
+
+        doc.setFontSize(14);
+        doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', 105, 45, { align: 'center' });
+        doc.text(title, 105, 55, { align: 'center' });
+
+        patients.forEach((p, index) => {
+          const baseY = 70 + index * 60; 
+
+          const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          });
+
+          // Date Prescribed
+          doc.setFontSize(18);
+          doc.text(`Date Prescribed: ${prescribedDate}`, 10, baseY);
+
+          // Right Eye Data
+          doc.setFontSize(12);
+          doc.text('Right Eye:', 10, baseY + 10);
+          doc.text(`Sphere: ${p.right_eye_sphere}`, 30, baseY + 10);
+          doc.text(`Cylinder: ${p.right_eye_cylinder}`, 70, baseY + 10);
+          doc.text(`Axis: ${p.right_eye_axis}`, 110, baseY + 10);
+          doc.text(`Best Visual Acuity: ${p.right_eye_best_visual_acuity}`, 150, baseY + 10);
+
+          // Left Eye Data
+          doc.text('Left Eye:', 10, baseY + 20);
+          doc.text(`Sphere: ${p.left_eye_sphere}`, 30, baseY + 20);
+          doc.text(`Cylinder: ${p.left_eye_cylinder}`, 70, baseY + 20);
+          doc.text(`Axis: ${p.left_eye_axis}`, 110, baseY + 20);
+          doc.text(`Best Visual Acuity: ${p.left_eye_best_visual_acuity}`, 150, baseY + 20);
+
+          // Additional Data
+          doc.text(`Reading Add: ${p.reading_add}`, 10, baseY + 30);
+          doc.text(`PD: ${p.PD}`, 70, baseY + 30);
+
+          // Separator between patients
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+        });
+
+        // Date Issued
+        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        const currentDate = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+
+        // Save the PDF
+        doc.save(`${title}.pdf`);
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+      }
+    },
+    exportSpectaclesPDF(patients, title){
+      try {
+        const doc = new jsPDF();
+
+        const logoImage = '/src/assets/MVC_logo.png';
+        doc.addImage(logoImage, 'PNG', 10, 5, 190, 25);
+
+        doc.setFontSize(14);
+        doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', 105, 45, { align: 'center' });
+        doc.text(title, 105, 55, { align: 'center' });
+
+        patients.forEach((p, index) => {
+          const baseY = 70 + index * 60;
+
+          const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          });
+
+          // Date Prescribed
+          doc.setFontSize(18);
+          doc.text(`Date Updated: ${prescribedDate}`, 10, baseY);
+
+          // Right Eye Data
+          doc.setFontSize(12);
+          doc.text('Frame:', 10, baseY + 10);
+          doc.text(`${p.frame}`, 50, baseY + 10);
+
+          // Left Eye Data
+          doc.text('Type of Lens:', 10, baseY + 20);
+          doc.text(` ${p.type_of_lens}`, 50, baseY + 20);
+
+          // Additional Data
+          doc.text('Remakrs:', 10, baseY + 30);
+          doc.text(`${p.remarks}`, 50, baseY + 30);
+       
+
+          // Separator between patients
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+        });
+
+        // Date Issued
+        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        const currentDate = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+
+        // Save the PDF
+        doc.save(`${title}.pdf`);
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+      }
+    },
+    exportHistoryPDF(patients, title) {
+      try {
+        const doc = new jsPDF();
+
+        const logoImage = '/src/assets/MVC_logo.png';
+        doc.addImage(logoImage, 'PNG', 10, 5, 190, 25);
+
+        doc.setFontSize(14);
+        doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', 105, 45, { align: 'center' });
+        doc.text(title, 105, 55, { align: 'center' });
+
+        patients.forEach((p, index) => {
+          const baseY = 70 + index * 60;
+
+          const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          });
+
+          // Date Prescribed
+          doc.setFontSize(18);
+          doc.text(`Date Updated: ${prescribedDate}`, 10, baseY);
+
+          // Right Eye Data
+          doc.setFontSize(12);
+          doc.text('Medical History:', 10, baseY + 10);
+          doc.text(`${p.medical_history}`, 50, baseY + 10);
+
+          // Left Eye Data
+          doc.text('Ocular History:', 10, baseY + 20);
+          doc.text(` ${p.ocular_history}`, 50, baseY + 20);
+
+          // Separator between patients
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+        });
+
+        // Date Issued
+        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        const currentDate = new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+
+        // Save the PDF
+        doc.save(`${title}.pdf`);
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+      }
+    }
+
   },
 };
 </script>
@@ -712,6 +970,14 @@ export default {
 .styled-btn .v-icon {
   margin-right: 8px; /* Add spacing between icon and text */
   color: black;
+}
+
+.generateBtn{
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-top: 70px;
+  margin-right: 25px;
 }
 
 td{
@@ -770,6 +1036,13 @@ td{
 
   .historyDate{
     font-size: 15px;
+  }
+
+  .generateBtn {
+    width: 100%; 
+    margin-top: -30px;
+    justify-content: center;
+    position: relative;
   }
 }
 </style>

@@ -16,6 +16,8 @@
     "bootstrap": "^5.3.3",
     "bootstrap-vue": "^2.23.1",
     "chart.js": "^4.0.0-release",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
     "primevue": "^3.51.0",
     "roboto-fontface": "*",
     "sass": "^1.75.0",
