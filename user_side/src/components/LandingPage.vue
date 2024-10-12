@@ -803,7 +803,7 @@ html {
   }
 
   .button-borders {
-    margin-left: 100px;
+    margin-left: 32%;
     margin-top: 130px;
   }
 

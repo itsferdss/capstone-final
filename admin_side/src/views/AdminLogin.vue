@@ -2,7 +2,7 @@
   <div class="container">
     <div class="login-form-container">
       <div id="login">
-        <v-img src="src/assets/MVC_logo.png" class="mvcLogo"></v-img>
+        <v-img src="../assets/MVC_logo.png" class="mvcLogo"></v-img>
         <p class="subtitle">Sign in as Admin</p>
         <div class="input-group">
           <label class="inputTitle" for="email">Email</label>
@@ -43,7 +43,7 @@ export default {
   },  
   methods: {
     login() {
-      axios.post('http://127.0.0.1:8000/api/authlogin', { // Update this line to use '/authlogin' instead of '/login'
+      axios.post('/authlogin', { // Update this line to use '/authlogin' instead of '/login'
         email: this.email,
         password: this.password
       })

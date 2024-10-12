@@ -42,6 +42,7 @@
             {{ appointments.color }}
           </span>
         </td>
+        <td>{{ appointments.quantity }}</td>
         <td>
           <v-icon size="small" style="color: #2F3F64" @click="pickedUp(appointments)">mdi-truck</v-icon>
         </td>
@@ -68,6 +69,7 @@ export default {
         { title: 'Product ID', align: 'center', key: 'product_id' },
         { title: 'Product Name', align: 'center', key: 'product_name' },
         { title: 'Color', align: 'center', key: 'color' },
+        { title: 'Quantity', align: 'center', key: 'quantity' },
         { title: 'Actions', align: 'center', sortable: false },
       ],
       appointments: [],

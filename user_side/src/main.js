@@ -10,8 +10,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 window.axios = axios
 axios.defaults.withCredentials = false
-let backendUrl = "http://" + window.location.hostname.toString() + ":8000/api"
-axios.defaults.baseURL = backendUrl
+
+// Set base URL dynamically based on environment
+axios.defaults.baseURL = 'https://opticare.fun/api';
 
 
 createApp(App).use(router).use(store).use(vuetify).mount('#app')

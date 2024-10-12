@@ -1,13 +1,7 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    :permanent="!isMobile"
-    class="navigation-drawer"
-    :mini-variant="miniVariant"
+  <v-navigation-drawer v-model="drawer" :permanent="!isMobile" class="navigation-drawer" :mini-variant="miniVariant"
     @update:mini-variant="toggleMiniVariant"
-    :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }"
-    app
-  >
+    :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }" app>
     <div class="admin-title">
       <v-icon class="admin-icon">mdi-account-circle-outline</v-icon>
       <h1 class="admin-text">Admin</h1>
@@ -36,16 +30,16 @@
       </router-link>
     </v-list>
 
-    <v-list-item class="logout-link">
-      <router-link to="/" class="sidebar-link">
-        <v-icon class="link-icon">mdi-logout</v-icon>
-        <span class="link-text">Logout</span>
-      </router-link>
+    <v-list-item class="logout-link" @click="confirmLogout">
+      <v-icon class="link-icon">mdi-logout</v-icon>
+      <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>
     </v-list-item>
   </v-navigation-drawer>
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   props: {
     miniVariant: {
@@ -92,6 +86,24 @@ export default {
       } else {
         this.miniVariant = !this.miniVariant;
       }
+    },
+    confirmLogout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log out!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        sessionStorage.removeItem('token');
+        if (result.isConfirmed) {
+          // Handle the logout process here
+          this.$router.push('/'); // Redirect to home or login page
+        }
+      });
     }
   }
 };

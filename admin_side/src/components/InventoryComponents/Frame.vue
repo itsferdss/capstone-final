@@ -4,7 +4,7 @@
     <template v-slot:top>
       <v-toolbar flat>
         <!-- Title with icon -->
-        <v-toolbar-title class="text-uppercase grey--text">
+        <v-toolbar-title class="text-uppercase grey--text productTitle">
           <v-icon left>mdi-package-variant</v-icon> <!-- Icon added here -->
           Frames
         </v-toolbar-title>
@@ -33,48 +33,79 @@
         <td>{{ item.quantity }}</td>
         <td>₱{{ item.price }}</td>
         <td>
+          <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
         </td>
       </tr>
 
-      <!-- Dialog for delete product -->
-      <v-dialog v-model="dialogDelete" max-width="500px">
+      <v-dialog v-model="infoDialog" max-width="750px">
         <v-card>
-          <v-card-title style="font-weight: bold; text-align: center;">Are you sure you want to delete this
-            product?</v-card-title>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="#35623D" variant="text" @click="closeDelete">Cancel</v-btn>
-            <v-btn color="#35623D" variant="text" @click="deleteProductConfirm">OK</v-btn>
-            <v-spacer></v-spacer>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <!-- Dialog for edit product -->
-      <v-dialog v-model="editItemDialog" max-width="750px">
-        <v-card>
-          <v-card-title>
-            <span class="text-h6 m-2">Edit Product</span>
+          <v-card-title class="stockTitle">
+            <span class="text-h6 m-2">{{ editedItem.product_name }} Details</span>
           </v-card-title>
+
           <v-card-text>
             <v-container>
               <v-row dense>
-                <v-col cols="6">
+                <!-- Product Image with navigation buttons -->
+                <v-col cols="12" class="d-flex justify-center align-center">
+                  <v-btn icon @click="prevImage" :disabled="currentImageIndex === 0">
+                    <v-icon>mdi-chevron-left</v-icon>
+                  </v-btn>
+
+                  <v-img :src="editedItem.images[currentImageIndex]" aspect-ratio="1.5" class="mb-4"></v-img>
+
+                  <v-btn icon @click="nextImage" :disabled="currentImageIndex === editedItem.images.length - 1">
+                    <v-icon>mdi-chevron-right</v-icon>
+                  </v-btn>
+                </v-col>
+
+                <!-- Product Name -->
+                <v-col cols="12" sm="12" md="6">
                   <v-text-field v-model="editedItem.product_name" label="Product Name*"
-                    prepend-icon="mdi-package-variant-closed"></v-text-field>
+                    prepend-icon="mdi-package-variant-closed" disabled></v-text-field>
                 </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model="editedItem.supplier" label="Supplier"
-                    prepend-icon="mdi-truck-delivery"></v-text-field>
+
+                <!-- Supplier -->
+                <v-col cols="12" sm="12" md="6">
+                  <v-text-field v-model="editedItem.supplier" label="Supplier" prepend-icon="mdi-truck-delivery"
+                    disabled></v-text-field>
                 </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model="editedItem.quantity" label="Quantity"
-                    prepend-icon="mdi-counter"></v-text-field>
+
+                <!-- Quantity -->
+                <v-col cols="12" sm="12" md="6">
+                  <v-text-field v-model="editedItem.quantity" label="Quantity" prepend-icon="mdi-counter"
+                    disabled></v-text-field>
                 </v-col>
-                <v-col cols="6">
-                  <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash"></v-text-field>
+
+                <!-- Price -->
+                <v-col cols="12" sm="12" md="6">
+                  <v-text-field v-model="editedItem.price" label="Price" prepend-icon="mdi-cash"
+                    disabled></v-text-field>
+                </v-col>
+
+                <!-- Type -->
+                <v-col cols="12" sm="12" md="6">
+                  <v-select v-model="editedItem.type" :items="['Frames', 'Sunglasses', 'Prescription Glasses']"
+                    label="Type" prepend-icon="mdi-glasses" disabled></v-select>
+                </v-col>
+
+                <v-col cols="12">
+                  <h4>Color Stock</h4>
+                  <v-row>
+                    <v-col v-for="(colorStock, index) in parsedColorStock" :key="index" cols="12" sm="4">
+                      <v-card outlined>
+                        <v-card-title>
+                          <v-text-field :label="colorStock.color" :value="colorStock.color" readonly></v-text-field>
+                        </v-card-title>
+                        <v-card-subtitle>
+                          <v-text-field :label="'Stock for ' + colorStock.color"
+                            v-model="colorStock.stock"></v-text-field>
+                        </v-card-subtitle>
+                      </v-card>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-container>
@@ -82,18 +113,18 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="black" text @click="closeEditItemDialog">Cancel</v-btn>
-            <v-btn color="black" text @click="saveEditedProduct">Save Product</v-btn>
+            <v-btn color="black" text @click="closeInfoItemDialog">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
 
     </template>
   </v-data-table>
 </template>
 
 <script>
-import swal from 'sweetalert';
+import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default {
@@ -101,22 +132,21 @@ export default {
     return {
       editItemDialog: false,
       dialog: false,
+      infoDialog: false,  
       editedItem: {
         product_image: '',
         product_id: '',
         product_name: '',
         supplier: '',
         quantity: '',
-        price: '', // Add price property
+        price: '',
         image: '',
         type: '',
+        images: [],
+        color_stock: [{ color: '', stock: 0 }],
       },
-
-
       search: '',
       dialogAddPrescription: false,
-
-
       headers: [
         { title: 'Product ID', align: 'center', key: 'product_id' },
         { title: 'Product Name', align: 'center', key: 'product_name' },
@@ -126,9 +156,10 @@ export default {
         { title: 'Price', align: 'center', key: 'price' },
         { title: 'Actions', align: 'center', sortable: false },
       ],
-
+      currentImageIndex: 0,
       viewingRecords: false,
       products: [],
+      color_stock: [],
       dialogDelete: false,
       deleteRecordIndex: -1,
     };
@@ -144,16 +175,37 @@ export default {
         )
       );
     },
+    parsedColorStock() {
+      try {
+        return JSON.parse(this.editedItem.color_stock);
+      } catch (error) {
+        console.error('Invalid color_stock format', error);
+        return [];
+      }
+    },
   },
   mounted() {
     this.fetchProducts();
   },
   methods: {
+    updateQuantity() {
+      const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
+      this.editedItem.quantity = totalStock;
+    },
+    nextImage() {
+      if (this.currentImageIndex < this.editedItem.images.length - 1) {
+        this.currentImageIndex++;
+      }
+    },
+    prevImage() {
+      if (this.currentImageIndex > 0) {
+        this.currentImageIndex--;
+      }
+    },
     fetchProducts() {
-      axios.get('http://127.0.0.1:8000/api/products')
+      axios.get('/allProducts')
         .then(response => {
           if (Array.isArray(response.data)) {
-            // Filter products where type is 'Frames'
             this.products = response.data.filter(product => product.type === 'Frames');
           } else {
             this.error = 'Unexpected response format';
@@ -163,143 +215,55 @@ export default {
           this.error = 'Error fetching products: ' + error.message;
         });
     },
-    saveNewProduct() {
-      const formData = new FormData();
-
-      formData.append('product_name', this.editedItem.product_name);
-      formData.append('supplier', this.editedItem.supplier);
-      formData.append('quantity', this.editedItem.quantity);
-      formData.append('price', this.editedItem.price);
-
-      // Append each image file to the FormData object
-      if (this.editedItem.images && this.editedItem.images.length > 0) {
-        for (let i = 0; i < this.editedItem.images.length; i++) {
-          formData.append('product_images[]', this.editedItem.images[i]);
-        }
-      }
-
-      axios.post('/products', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-        .then(response => {
-          swal('Success!', 'Product saved successfully.', 'success');
-
-          // Reset form data
-          this.editedItem.product_name = '';
-          this.editedItem.supplier = '';
-          this.editedItem.quantity = '';
-          this.editedItem.price = '';
-          this.editedItem.images = null;
-
-          this.closeDialog();
-
-          // Fetch updated product list
-          this.fetchProducts();
-        })
-        .catch(error => {
-          console.error('Error saving product:', error);
-          swal('Oops...', 'Something went wrong!', 'error');
-        });
-    },
-    saveEditedProduct() {
-      axios.put(`http://127.0.0.1:8000/api/products/${this.editedItem.id}`, {
-        product_name: this.editedItem.product_name,
-        supplier: this.editedItem.supplier,
-        quantity: this.editedItem.quantity,
-        price: this.editedItem.price,
-      })
-        .then(response => {
-          swal('Success!', 'Product updated successfully.', 'success');
-          this.fetchProducts(); // Fetch updated product list
-          this.closeEditItemDialog();
-        })
-        .catch(error => {
-          console.error('Error updating product:', error);
-          swal('Oops...', 'Something went wrong!', 'error');
-        });
-    },
-    deleteProduct(item) {
-      swal({
-        title: 'Are you sure?',
-        text: 'You will not be able to recover this product!',
-        icon: 'warning',
-        buttons: ['Cancel', 'Delete'],
-        dangerMode: true,
-      }).then((willDelete) => {
-        if (willDelete) {
-          axios.delete(`/products/${item.id}`)
-            .then(response => {
-              swal('Deleted!', 'Product has been deleted.', 'success');
-              this.fetchProducts(); // Fetch updated product list
-            })
-            .catch(error => {
-              console.error('Error deleting product:', error);
-              swal('Oops...', 'Something went wrong!', 'error');
-            });
-        } else {
-          swal('Cancelled', 'Your product is safe :)', 'info');
-        }
-      });
-    },
-
-
-
     openDialog() {
       this.$router.push('/add/product')
     },
     closeDialog() {
       this.dialog = false;
     },
-    viewPrescriptions(user) {
-      user.showPrescriptions = !user.showPrescriptions;
+    openEditItem() {
+      this.$router.push('/view/product')
     },
-    togglePrescriptionEdit(user, prescription) {
-      prescription.editing = !prescription.editing;
-    },
-    deletePrescription(user, index) {
-      user.prescriptions.splice(index, 1);
-    },
-
-    deleteUser(item) {
-      // Set the deleteRecordIndex and open the delete confirmation dialog
-      this.deleteRecordIndex = this.products.indexOf(item);
-      this.dialogDelete = true;
-    },
-
-    deleteUserConfirm() {
-      if (this.deleteRecordIndex !== -1) {
-        // Remove the user at deleteRecordIndex
-        this.products.splice(this.deleteRecordIndex, 1);
-        this.dialogDelete = false;
-        this.deleteRecordIndex = -1;
-      }
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.deleteRecordIndex = -1;
-    },
-
-    openAddPrescriptioDialog() {
-      this.dialogAddPrescription = true;
-    },
-
-    cancelAddPrescription() {
-      this.dialogAddPrescription = false;
-    },
-
-    openEditItem(item) {
-      // Create a shallow copy of the item
-      this.editedItem = { ...item };
-      // Open the editItemDialog
-      this.editItemDialog = true;
+    openInfoItem(item) {
+      this.editedItem = { ...item, images: item.images || [] };
+      this.currentImageIndex = 0;
+      this.infoDialog = true;
     },
 
     closeEditItemDialog() {
       this.editItemDialog = false;
     },
+
+    closeInfoItemDialog() {
+      this.infoDialog = false;
+    },
+    deleteProduct(item) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You will not be able to recover this product!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.delete(`/products/${item.id}`)
+            .then(response => {
+              Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+              this.fetchProducts(); // Fetch updated product list
+            })
+            .catch(error => {
+              console.error('Error deleting product:', error);
+              Swal.fire('Oops...', 'Something went wrong!', 'error');
+            });
+        } else {
+          Swal.fire('Cancelled', 'Your product is safe :)', 'info');
+        }
+      });
+    },
+
 
 
   },
@@ -311,12 +275,10 @@ export default {
 <style>
 .v-card:hover {
   background-color: #f0f0f0;
-  /* Set the hover color here */
 }
 
 .add-btn {
   background-color: #B3D9E6 !important;
-  /* Customize the background color */
   color: white !important;
   font-weight: bold !important;
 }
@@ -331,7 +293,21 @@ td{
 }
 .add-btn .v-icon {
   margin-right: 8px;
-  /* Add spacing between icon and text */
   color: black;
+}
+
+.stockTitle{
+  text-align: center;
+  background-color: rgb(189, 226, 240);
+}
+
+@media (max-width: 960px) {
+  .add-text{
+    display: none;
+  }
+
+  .productTitle{
+    display: none;
+  }
 }
 </style>

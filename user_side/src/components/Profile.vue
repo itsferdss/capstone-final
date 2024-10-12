@@ -59,8 +59,8 @@
     <!-- Dialog for updating parent information -->
     <v-dialog v-model="updateParentDialog" max-width="750px">
       <v-card>
-        <v-card-title>
-          <span class="update-dialog-title">Update Patient Information</span>
+        <v-card-title class="stockTitle">
+          <span class="update-dialog-title">Update Your Information</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -225,6 +225,7 @@ export default {
           this.closeUpdateParentDialog();
         })
         .catch(error => {
+          this.updateParentDialog = false;
           console.error('Error updating patient information:', error);
           let errorMessage = 'Failed to update patient information. Please try again later.';
           if (error.response && error.response.data && error.response.data.message) {
@@ -308,6 +309,11 @@ export default {
 
 .showRes{
   margin-left: 300px;
+}
+
+.stockTitle {
+  text-align: center;
+  background-color: rgb(189, 226, 240);
 }
 
 @media (max-width: 600px) {

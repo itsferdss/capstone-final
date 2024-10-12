@@ -6,7 +6,7 @@
         <!-- Title with icon -->
         <v-toolbar-title class="text-uppercase grey--text productTitle">
           <v-icon left>mdi-package-variant</v-icon> <!-- Icon added here -->
-          Contact Lenses
+          Stashed Products
         </v-toolbar-title>
         <v-spacer></v-spacer>
 
@@ -207,7 +207,7 @@ export default {
         .then(response => {
           if (Array.isArray(response.data)) {
             // Filter products where type is 'Frames'
-            this.products = response.data.filter(product => product.type === 'Accessories');
+            this.products = response.data.filter(product => product.quantity === 0);
           } else {
             this.error = 'Unexpected response format';
           }

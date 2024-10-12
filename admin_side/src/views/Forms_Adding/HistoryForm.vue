@@ -32,7 +32,7 @@
           <hr />
           <div class="form-buttons">
             <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
-              Add Patient
+              Add History
             </v-btn>
             <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white' }" @click="goBack">
               Back

@@ -17,7 +17,7 @@
             <div class="form-column">
               <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <input type="number" v-model.number="editedItem.quantity" id="quantity" class="form-input" disabled />
+                <input type="number" v-model.number="editedItem.quantity" id="quantity" class="form-input" />
               </div>
               <div class="form-group">
                 <label for="type">Type</label>
@@ -51,7 +51,7 @@
             <label for="images">Product Images</label>
             <input type="file" id="images" class="form-input" multiple @change="handleImageUpload" />
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="showColorStock">
             <label for="colorStock">Color Stock</label>
             <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="form-row">
               <input type="text" v-model="colorStock.color" placeholder="Color" class="form-input" required />
@@ -97,13 +97,18 @@ export default {
       },
     };
   },
+  computed: {
+    showColorStock() {
+      return ['Frames'].includes(this.editedItem.type);
+    }
+  },
   methods: {
     addColorStock() {
       this.editedItem.color_stock.push({ color: '', stock: 0 });
     },
     removeColorStock(index) {
       this.editedItem.color_stock.splice(index, 1);
-      this.updateQuantity(); // Update quantity after removal
+      this.updateQuantity(); 
     },
     updateQuantity() {
       const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
@@ -113,6 +118,16 @@ export default {
       this.editedItem.images = Array.from(event.target.files);
     },
     saveNewProduct() {
+      // Check if the quantity is 0 or less
+      if (this.editedItem.quantity <= 0) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Quantity must be greater than 0.',
+          icon: 'error',
+        });
+        return; // Prevent form submission
+      }
+
       const formData = new FormData();
       formData.append('product_name', this.editedItem.product_name);
       formData.append('supplier', this.editedItem.supplier);

@@ -2,7 +2,7 @@
   <div class="container">
     <div class="login-form-container">
       <div id="login">
-        <v-img src="src/assets/MVC_logo.png" class="mvcLogo"></v-img>
+        <v-img src="../assets/MVC_logo.png" class="mvcLogo"></v-img>
         <p class="subtitle">Sign in to Continue</p>
         <div class="input-group">
           <label class="inputTitle" for="email">Email</label>
@@ -23,8 +23,8 @@
     <div class="circle circle-1"></div>
     <div class="circle circle-2">
       <img class="graphics" src="../assets/graphics.png" alt="Graphics" />
-      <img class="logo" src="../assets/newlogo.png" alt="New Logo" />
-      <img class="echode_logo" src="../assets/echode_logo.png" alt="New Logo" />
+      <img class="logo mobile-position" src="../assets/newlogo.png" alt="New Logo" />
+      <img class="echode_logo mobile-position" src="../assets/echode_logo.png" alt="EchoDE Logo" />
     </div>
   </div>
 </template>
@@ -356,6 +356,24 @@ button:hover {
     to {
       left: -120%;
     }
+  }
+
+  .logo.mobile-position {
+    position: relative; /* Adjust logo position */
+    bottom: auto;
+    left: 40%;
+    width: auto; /* Make logo responsive */
+    height: 100px;
+    margin-top: 55%; /* Adjust margin */
+  }
+
+  .echode_logo.mobile-position {
+    position: relative; /* Adjust EchoDE logo position */
+    bottom: auto;
+    left: 40%;
+    width: auto; /* Make EchoDE logo responsive */
+    height: 150px;
+    margin-top: 55%; /* Adjust margin */
   }
 }
 </style>

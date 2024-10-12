@@ -33,6 +33,7 @@
                         <td>{{ item.product.product_name }}</td>
                         <td>{{ item.product.quantity }}</td>
                         <td>₱{{ item.product.price }}</td>
+                        <td>{{ item.quantity }}</td>
                     </tr>
                 </template>
             </v-data-table>
@@ -58,6 +59,7 @@ export default {
                 { title: 'Product Name', align: 'center' },
                 { title: 'Stock', align: 'center' },
                 { title: 'Price', align: 'center' },
+                { title: 'Quantity', align: 'center' },
             ],
         };
     },

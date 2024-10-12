@@ -6,58 +6,58 @@ const router = createRouter({
         {
             path: '/login',
             component: () => import('../views/AdminLogin.vue'),
-            // meta: {
-            //     requiresAuthentication: false, // Login page doesn't require authentication
-            // },
+            meta: {
+                requiresAuthentication: false, // Login page doesn't require authentication
+            },
         },
         {
             path: '/home',
             component: () => import('../views/Home.vue'),
-            // meta: {
-            //     requiresAuthentication: true, // Home requires authentication
-            // },
+            meta: {
+                requiresAuthentication: true, // Home requires authentication
+            },
         },
         {
             path: '/profile',
             component: () => import('../views/Profile.vue'),
-            // meta: {
-            //     requiresAuthentication: true, // Profile requires authentication
-            // },
+            meta: {
+                requiresAuthentication: true, // Profile requires authentication
+            },
         },
         {
             path: '/products',
             component: () => import('../views/Products.vue'),
-            // meta: {
-            //     requiresAuthentication: true, // Products requires authentication
-            // },
+            meta: {
+                requiresAuthentication: true, // Products requires authentication
+            },
         },
         {
             path: '/',
             component: () => import('../views/LandingPage.vue'),
-            // meta: {
-            //     requiresAuthentication: false, // Landing page doesn't require authentication
-            // },
+            meta: {
+                requiresAuthentication: false, // Landing page doesn't require authentication
+            },
         },
         {
             path: '/newproducts',
             component: () => import('../components/NEWPRODUCTS.vue'),
-            // meta: {
-            //     requiresAuthentication: false, // Landing page doesn't require authentication
-            // },
+            meta: {
+                requiresAuthentication: false, // Landing page doesn't require authentication
+            },
         },
         {
             path: '/viewProduct',
             component: () => import('../components/ViewProducts.vue'),
-            // meta: {
-            //     requiresAuthentication: false, // Landing page doesn't require authentication
-            // },
+            meta: {
+                requiresAuthentication: false, // Landing page doesn't require authentication
+            },
         },
         {
             path: '/viewReservation',
             component: () => import('../views/Viewing/ViewReservation.vue'),
-            // meta: {
-            //     requiresAuthentication: false, // Landing page doesn't require authentication
-            // },
+            meta: {
+                requiresAuthentication: false, // Landing page doesn't require authentication
+            },
         }
     ],
 });

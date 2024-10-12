@@ -22,6 +22,8 @@
                 Lens</button>
             <button class="buttons" @click="handleTabClick('Accessories')"
                 :class="{ active: activeTab === 'Accessories' }">Accessories</button>
+            <button class="noButtons" @click="handleTabClick('noStock')"
+                :class="{ active: activeTab === 'noStock' }">Stashed Products</button>
         </div>
         <div class="main-content">
             <div v-if="activeTab === 'Inventory'">
@@ -49,6 +51,11 @@
                     <Accessories />
                 </div>
             </div>
+            <div v-if="activeTab === 'noStock'">
+                <div class="outStock">
+                    <noStock />
+                </div>
+            </div>
         </div>
     </main>
 </template>
@@ -59,6 +66,7 @@ import Frame from '../components/InventoryComponents/Frame.vue';
 import Lens from '../components/InventoryComponents/Lens.vue';
 import Contacts from '../components/InventoryComponents/ContactLens.vue';
 import Accessories from '../components/InventoryComponents/Accessories.vue';
+import noStock from '../components/InventoryComponents/noStock.vue';
 
 export default {
     data() {
@@ -77,7 +85,8 @@ export default {
         Frame,
         Lens,
         Contacts,
-        Accessories
+        Accessories,
+        noStock
     }
 };
 </script>
@@ -133,7 +142,8 @@ export default {
     .frame,
     .lens,
     .contacts,
-    .accessories {
+    .accessories,
+    .outStock {
         border-radius: 5px;
         background-color: #f0f0f0;
         padding: 0.5rem;
@@ -173,6 +183,10 @@ export default {
 
 .tab-content-display {
     margin-top: 2rem;
+}
+
+.noButtons{
+    margin-left: 37%;
 }
 
 @media (max-width: 960px) {
@@ -218,7 +232,7 @@ export default {
     .tab-content button {
         position: relative;
         color: var(--dark);
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 600;
         border: none;
         background: none;
@@ -242,9 +256,14 @@ export default {
     .frame,
     .lens,
     .contacts,
-    .accessories {
-        padding: 0.25rem;
+    .accessories,
+    .outStock {
+        padding: 0.20rem;
         margin-bottom: 5px;
+    }
+
+    .noButtons{
+        margin-left: 0%;
     }
 }
 </style>

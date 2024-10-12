@@ -27,6 +27,7 @@
         <td>{{ item.id }}</td>
         <td>{{ item.full_name }} </td>
         <td>{{ item.contact }}</td>
+        <td>{{ item.email }}</td>
         <td>{{ item.address }}</td>
         <td>
           <v-icon class="me-2" size="small" style="color: #2F3F64"
@@ -194,14 +195,24 @@
                       <strong>Frame:</strong>
                     </v-col>
                     <v-col cols="12" sm="8">
-                      {{ glasses.frame }}
+                      <span v-if="glasses.product_id">
+                        {{ glasses.product.product_name }}
+                      </span>
+                      <span v-else>
+                        {{ glasses.custom_frame }}
+                      </span>
                     </v-col>
 
                     <v-col cols="12" sm="4" class="label-col">
                       <strong>Type of Lens:</strong>
                     </v-col>
                     <v-col cols="12" sm="8">
-                      {{ glasses.type_of_lens }}
+                      <span v-if="glasses.lens_id">
+                        {{ glasses.lens.product_name }}
+                      </span>
+                      <span v-else>
+                        {{ glasses.custom_lens }}
+                      </span>
                     </v-col>
 
                     <v-col cols="12" sm="4" class="label-col">
@@ -209,6 +220,12 @@
                     </v-col>
                     <v-col cols="12" sm="8">
                       {{ glasses.remarks }}
+                    </v-col>
+                    <v-col cols="12" sm="4" class="label-col">
+                      <strong>Price:</strong>
+                    </v-col>
+                    <v-col cols="12" sm="8">
+                      ₱{{ glasses.price }}
                     </v-col>
 
                     <!-- Delete Button -->
@@ -308,10 +325,6 @@ import "jspdf-autotable";
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 
-
-
-
-
 export default {
   data() {
     return {
@@ -331,6 +344,7 @@ export default {
         email: '',
         address: '',
         contact: '',
+        email: '',
         birthdate: '',
         password: '',
         confirm_password: '',
@@ -352,6 +366,7 @@ export default {
         frame: '',
         type_of_lens: '',
         remarks: '',
+        lens: '',
 
         history_updated: '',
         medical_history: '',
@@ -361,6 +376,7 @@ export default {
         { title: 'User ID', align: 'center', key: 'id' },
         { title: 'User Name', align: 'center', key: 'full_name' },
         { title: 'Contact Number', align: 'center', key: 'contact' },
+        { title: 'Email', align: 'center', key: 'email' },
         { title: 'Address', align: 'center', key: 'address' }, 
         { title: 'Actions', align: 'center', sortable: false },
       ],
@@ -397,7 +413,7 @@ export default {
   },
   methods: {
     fetchPatients() {
-      axios.get('http://127.0.0.1:8000/api/patients')
+      axios.get('/patients')
         .then(response => {
           if (Array.isArray(response.data)) {
             this.displayedPatients = response.data;
@@ -781,10 +797,18 @@ export default {
     exportPrescriptionPDF(patients, title) {
       try {
         const doc = new jsPDF();
+        const logoImage = '../assets/MVC_logo.png';
 
-        const logoImage = '/src/assets/MVC_logo.png'; 
-        doc.addImage(logoImage, 'PNG', 10, 5, 190, 25); 
+        // Constants for layout
+        const marginTop = 10;
+        const pageHeight = doc.internal.pageSize.height; // Get the height of the page
+        const lineHeight = 60; // Height for each patient's section
+        let currentY = 70; // Starting Y position on the page
 
+        // Add logo
+        doc.addImage(logoImage, 'PNG', 10, 5, 190, 25);
+
+        // Add title and clinic information
         doc.setFontSize(14);
         doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
         doc.setFontSize(12);
@@ -792,7 +816,12 @@ export default {
         doc.text(title, 105, 55, { align: 'center' });
 
         patients.forEach((p, index) => {
-          const baseY = 70 + index * 60; 
+          // Check if there is enough space left on the current page
+          if (currentY + lineHeight > pageHeight - marginTop) {
+            // Add a new page if we run out of space
+            doc.addPage();
+            currentY = marginTop; // Reset Y position after adding a new page
+          }
 
           const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -800,41 +829,48 @@ export default {
             day: 'numeric',
           });
 
-          // Date Prescribed
+          // Print Date Prescribed
           doc.setFontSize(18);
-          doc.text(`Date Prescribed: ${prescribedDate}`, 10, baseY);
+          doc.text(`Date Prescribed: ${prescribedDate}`, 10, currentY);
 
-          // Right Eye Data
+          // Print Right Eye Data
           doc.setFontSize(12);
-          doc.text('Right Eye:', 10, baseY + 10);
-          doc.text(`Sphere: ${p.right_eye_sphere}`, 30, baseY + 10);
-          doc.text(`Cylinder: ${p.right_eye_cylinder}`, 70, baseY + 10);
-          doc.text(`Axis: ${p.right_eye_axis}`, 110, baseY + 10);
-          doc.text(`Best Visual Acuity: ${p.right_eye_best_visual_acuity}`, 150, baseY + 10);
+          doc.text('Right Eye:', 10, currentY + 10);
+          doc.text(`Sphere: ${p.right_eye_sphere}`, 30, currentY + 10);
+          doc.text(`Cylinder: ${p.right_eye_cylinder}`, 70, currentY + 10);
+          doc.text(`Axis: ${p.right_eye_axis}`, 110, currentY + 10);
+          doc.text(`Best Visual Acuity: ${p.right_eye_best_visual_acuity}`, 150, currentY + 10);
 
-          // Left Eye Data
-          doc.text('Left Eye:', 10, baseY + 20);
-          doc.text(`Sphere: ${p.left_eye_sphere}`, 30, baseY + 20);
-          doc.text(`Cylinder: ${p.left_eye_cylinder}`, 70, baseY + 20);
-          doc.text(`Axis: ${p.left_eye_axis}`, 110, baseY + 20);
-          doc.text(`Best Visual Acuity: ${p.left_eye_best_visual_acuity}`, 150, baseY + 20);
+          // Print Left Eye Data
+          doc.text('Left Eye:', 10, currentY + 20);
+          doc.text(`Sphere: ${p.left_eye_sphere}`, 30, currentY + 20);
+          doc.text(`Cylinder: ${p.left_eye_cylinder}`, 70, currentY + 20);
+          doc.text(`Axis: ${p.left_eye_axis}`, 110, currentY + 20);
+          doc.text(`Best Visual Acuity: ${p.left_eye_best_visual_acuity}`, 150, currentY + 20);
 
           // Additional Data
-          doc.text(`Reading Add: ${p.reading_add}`, 10, baseY + 30);
-          doc.text(`PD: ${p.PD}`, 70, baseY + 30);
+          doc.text(`Reading Add: ${p.reading_add}`, 10, currentY + 30);
+          doc.text(`PD: ${p.PD}`, 70, currentY + 30);
 
           // Separator between patients
-          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, currentY + 40);
+
+          // Move currentY for the next patient
+          currentY += lineHeight;
         });
 
-        // Date Issued
-        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        // Date Issued (Place it at the last page)
         const currentDate = new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         });
-        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+        if (currentY + 20 > pageHeight - marginTop) {
+          // If not enough space, add a new page for the date issued
+          doc.addPage();
+          currentY = marginTop;
+        }
+        doc.text(`Date Issued: ${currentDate}`, 195, currentY + 10, { align: 'right' });
 
         // Save the PDF
         doc.save(`${title}.pdf`);
@@ -842,13 +878,21 @@ export default {
         console.error('Error exporting PDF:', error);
       }
     },
-    exportSpectaclesPDF(patients, title){
+    exportSpectaclesPDF(patients, title) {
       try {
         const doc = new jsPDF();
+        const logoImage = '../assets/MVC_logo.png';
 
-        const logoImage = '/src/assets/MVC_logo.png';
+        // Constants for layout
+        const marginTop = 10;
+        const pageHeight = doc.internal.pageSize.height; // Get the height of the page
+        const lineHeight = 60; // Height for each patient's section
+        let currentY = 70; // Starting Y position on the page
+
+        // Add logo
         doc.addImage(logoImage, 'PNG', 10, 5, 190, 25);
 
+        // Add title and clinic information
         doc.setFontSize(14);
         doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
         doc.setFontSize(12);
@@ -856,7 +900,12 @@ export default {
         doc.text(title, 105, 55, { align: 'center' });
 
         patients.forEach((p, index) => {
-          const baseY = 70 + index * 60;
+          // Check if there is enough space left on the current page
+          if (currentY + lineHeight > pageHeight - marginTop) {
+            // Add a new page if we run out of space
+            doc.addPage();
+            currentY = marginTop; // Reset Y position after adding a new page
+          }
 
           const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -864,36 +913,55 @@ export default {
             day: 'numeric',
           });
 
-          // Date Prescribed
+          // Print Date Prescribed
           doc.setFontSize(18);
-          doc.text(`Date Updated: ${prescribedDate}`, 10, baseY);
+          doc.text(`Date Updated: ${prescribedDate}`, 10, currentY);
 
-          // Right Eye Data
+          // Print Right Eye Data
           doc.setFontSize(12);
-          doc.text('Frame:', 10, baseY + 10);
-          doc.text(`${p.frame}`, 50, baseY + 10);
+          doc.text('Frame:', 10, currentY + 10);
+          if (p.product_id) {
+            doc.text(`${p.product.product_name}`, 50, currentY + 10);
+          }
+          else {
+            doc.text(`${p.custom_frame}`, 50, currentY + 10);
+          }
 
-          // Left Eye Data
-          doc.text('Type of Lens:', 10, baseY + 20);
-          doc.text(` ${p.type_of_lens}`, 50, baseY + 20);
+          // Print Left Eye Data
+          doc.text('Type of Lens:', 10, currentY + 20);
+          if (p.lens_id) {
+            doc.text(`${p.lens.product_name}`, 50, currentY + 20);
+          }
+          else {
+            doc.text(`${p.custom_lens}`, 50, currentY + 20);
+          }
 
           // Additional Data
-          doc.text('Remakrs:', 10, baseY + 30);
-          doc.text(`${p.remarks}`, 50, baseY + 30);
-       
+          doc.text('Remarks:', 10, currentY + 30);
+          doc.text(`${p.remarks}`, 50, currentY + 30);
+
+          doc.text('Price:', 10, currentY + 40);
+          doc.text(`${p.price}`, 50, currentY + 40);
 
           // Separator between patients
-          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, currentY + 50);
+
+          // Move currentY for the next patient
+          currentY += lineHeight;
         });
 
-        // Date Issued
-        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        // Date Issued (Place it at the last page)
         const currentDate = new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         });
-        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+        if (currentY + 20 > pageHeight - marginTop) {
+          // If not enough space, add a new page for the date issued
+          doc.addPage();
+          currentY = marginTop;
+        }
+        doc.text(`Date Issued: ${currentDate}`, 195, currentY + 10, { align: 'right' });
 
         // Save the PDF
         doc.save(`${title}.pdf`);
@@ -904,10 +972,18 @@ export default {
     exportHistoryPDF(patients, title) {
       try {
         const doc = new jsPDF();
+        const logoImage = '../assets/MVC_logo.png';
 
-        const logoImage = '/src/assets/MVC_logo.png';
+        // Constants for layout
+        const marginTop = 10;
+        const pageHeight = doc.internal.pageSize.height; // Get the height of the page
+        const lineHeight = 60; // Height for each patient's section
+        let currentY = 70; // Starting Y position on the page
+
+        // Add logo
         doc.addImage(logoImage, 'PNG', 10, 5, 190, 25);
 
+        // Add title and clinic information
         doc.setFontSize(14);
         doc.text('MVC Optical Clinic', 105, 40, { align: 'center' });
         doc.setFontSize(12);
@@ -915,7 +991,12 @@ export default {
         doc.text(title, 105, 55, { align: 'center' });
 
         patients.forEach((p, index) => {
-          const baseY = 70 + index * 60;
+          // Check if there is enough space left on the current page
+          if (currentY + lineHeight > pageHeight - marginTop) {
+            // Add a new page if we run out of space
+            doc.addPage();
+            currentY = marginTop; // Reset Y position after adding a new page
+          }
 
           const prescribedDate = new Date(p.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -923,31 +1004,38 @@ export default {
             day: 'numeric',
           });
 
-          // Date Prescribed
+          // Print Date Updated
           doc.setFontSize(18);
-          doc.text(`Date Updated: ${prescribedDate}`, 10, baseY);
+          doc.text(`Date Updated: ${prescribedDate}`, 10, currentY);
 
-          // Right Eye Data
+          // Print Medical History
           doc.setFontSize(12);
-          doc.text('Medical History:', 10, baseY + 10);
-          doc.text(`${p.medical_history}`, 50, baseY + 10);
+          doc.text('Medical History:', 10, currentY + 10);
+          doc.text(`${p.medical_history}`, 50, currentY + 10);
 
-          // Left Eye Data
-          doc.text('Ocular History:', 10, baseY + 20);
-          doc.text(` ${p.ocular_history}`, 50, baseY + 20);
+          // Print Ocular History
+          doc.text('Ocular History:', 10, currentY + 20);
+          doc.text(` ${p.ocular_history}`, 50, currentY + 20);
 
           // Separator between patients
-          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, baseY + 40);
+          doc.text('-----------------------------------------------------------------------------------------------------------------------------------', 10, currentY + 40);
+
+          // Move currentY for the next patient
+          currentY += lineHeight;
         });
 
-        // Date Issued
-        const finalY = 70 + patients.length * 60; // Calculate final Y position
+        // Date Issued (Place it at the last page)
         const currentDate = new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         });
-        doc.text(`Date Issued: ${currentDate}`, 195, finalY + 10, { align: 'right' });
+        if (currentY + 20 > pageHeight - marginTop) {
+          // If not enough space, add a new page for the date issued
+          doc.addPage();
+          currentY = marginTop;
+        }
+        doc.text(`Date Issued: ${currentDate}`, 195, currentY + 10, { align: 'right' });
 
         // Save the PDF
         doc.save(`${title}.pdf`);
@@ -960,7 +1048,7 @@ export default {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Report');
 
-        const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+        const imagePath = '../assets/MVC_logo.png'; // Provide the correct path to your image
         const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
         
         const imageId = workbook.addImage({
@@ -1031,7 +1119,7 @@ export default {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Report');
 
-    const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+    const imagePath = '../assets/MVC_logo.png'; // Provide the correct path to your image
     const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
     
     const imageId = workbook.addImage({
@@ -1067,7 +1155,7 @@ export default {
     worksheet.getCell('C9').font.size = 16;
 
     // Add column headers for Date, Frame, Type of Lens, and Remarks
-    const headers = ['Date', 'Frame', 'Type of Lens', 'Remarks'];
+    const headers = ['Date', 'Frame', 'Type of Lens', 'Remarks', 'Price'];
     worksheet.addRow(headers);
 
     // Set specific column widths
@@ -1075,11 +1163,18 @@ export default {
     worksheet.getColumn('B').width = 20; // Frame
     worksheet.getColumn('C').width = 20; // Type of Lens
     worksheet.getColumn('D').width = 30; // Remarks
+    worksheet.getColumn('E').width = 20; // Remarks
 
     // Add data rows for each patient
     patients.forEach(p => {
       const date = new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' });
-      worksheet.addRow([date, p.frame, p.type_of_lens, p.remarks]);
+      worksheet.addRow([
+        date,
+        p.product_id ? p.product.product_name : p.custom_frame, // Use product name if selected, otherwise custom frame
+        p.lens_id ? p.lens.product_name : p.custom_lens,        // Use lens name if selected, otherwise custom lens
+        p.remarks,
+        p.price
+      ]);
     });
 
     this.autoAdjustColumns(worksheet);
@@ -1097,7 +1192,7 @@ async exportHistoryExcel(patients, title) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Report');
 
-    const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+    const imagePath = '../assets/MVC_logo.png'; // Provide the correct path to your image
     const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
     
     const imageId = workbook.addImage({
@@ -1226,6 +1321,8 @@ td{
 
   .presName{
     font-size: 16px;
+    text-align: center;
+    background-color: rgb(155, 209, 239);
   }
 
   .presDate {

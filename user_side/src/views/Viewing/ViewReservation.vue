@@ -67,6 +67,7 @@ export default {
                 { title: 'Pickup Date', align: 'center', value: 'picked_up_date' },
                 { title: 'Color', align: 'center', value: 'color' },
                 { title: 'Status', align: 'center', value: 'status' },
+                { title: 'Quantity', align: 'center', value: 'quantity' },
                 { title: 'Actions', align: 'center', value: 'actions' }
             ]
         };

@@ -15,13 +15,13 @@
     </div>
 
     <div class="banner-section">
-      <div class="banner-card">
+      <div class="banner-card" @click="shopSunglass">
         <img src="../assets/men-model.jpg" alt="Men's Glasses">
         <div class="overlay">
           <p>MEN</p>
         </div>
       </div>
-      <div class="banner-card">
+      <div class="banner-card" @click="shopSunglass">
         <img src="../assets/women-model.jpg" alt="Women's Glasses">
         <div class="overlay">
           <p>WOMEN</p>
@@ -47,25 +47,25 @@
         <div class="categories-card">
           <img src="../assets/frames.jpg" class="categories-image" alt="Frames">
           <div class="category-overlay">
-            <button class="category-button">FRAMES</button>
+            <button class="category-button" @click="shopSunglass">FRAMES</button>
           </div>
         </div>
         <div class="categories-card">
           <img src="../assets/lens.jpg" class="categories-image" alt="Lens">
           <div class="category-overlay">
-            <button class="category-button">LENS</button>
+            <button class="category-button" @click="shopSunglass">LENS</button>
           </div>
         </div>
         <div class="categories-card">
           <img src="../assets/contact-lens.jpg" class="categories-image" alt="Contact Lenses">
           <div class="category-overlay">
-            <button class="category-button">CONTACT LENSES</button>
+            <button class="category-button" @click="shopSunglass">CONTACT LENSES</button>
           </div>
         </div>
         <div class="categories-card">
           <img src="../assets/accessories.jpg" class="categories-image" alt="Accessories">
           <div class="category-overlay">
-            <button class="category-button">ACCESSORIES</button>
+            <button class="category-button" @click="shopSunglass">ACCESSORIES</button>
           </div>
         </div>
       </div>
@@ -85,8 +85,8 @@
       <h2 class="newProds">New Products</h2>
       <div class="product-container">
         <div v-for="product in products" :key="product.id" class="product-card" @click="viewProduct(product.id)">
-          <img :src="product.currentImage" class="main-image"
-            @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
+          <img :src="product.currentImage" class="main-image" @mouseover="changeImage(product, 'hover')"
+            @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
             <span class="price">
@@ -558,12 +558,12 @@ export default {
 
   .welcome {
     bottom: 90px; 
-    left: 20px; 
+    left: 0px; 
     padding: 30px; 
   }
 
   .welcome h1 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .button-container {
@@ -582,8 +582,8 @@ export default {
     margin-bottom: 20px;
     margin-top: 50px;
     height: 300px;
-    width: 340px;
-    margin-left: 10px;
+    width: 100%;
+    margin-left: 0px;
   }
 
   .background-image{
@@ -598,8 +598,8 @@ export default {
   }
 
   .banner-card {
-    flex: 1 1 100%; /* Adjust for mobile */
-    width: 120%;
+    flex: 1 1 10%; /* Adjust for mobile */
+    width: 150%;
   }
 
   .categories-section{
@@ -609,17 +609,17 @@ export default {
   .categories-grid {
     grid-template-columns: repeat(2, 1fr); 
     height: 100%;
-    width: 350px;
-    margin-left: -45px;
+    width: 100%;
+   
   }
 
   .product-container {
     grid-template-columns: repeat(2, 1fr); 
     display: flex;
-    justify-content:center;
+    justify-content:left;
     flex-wrap: wrap;
-    margin-left: -140px;
-    width: 560px;
+    width: 147%;
+
   }
 
   .product-card {
@@ -630,7 +630,7 @@ export default {
     height: 400px;
     width: 500px;
     margin-top: 20px;
-    margin-left: -10px;
+    margin-left: -30px;
   }
 
   .rate h1 {
@@ -662,6 +662,12 @@ export default {
   .product-card {
     flex: 1 1 30%; 
     max-width: 30%;
+  }
+
+  .product-section{
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
   }
 
   .header-video{

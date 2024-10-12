@@ -37,6 +37,7 @@
                         </td>
                         <td>{{ item.product.quantity }}</td>
                         <td>₱{{ item.product.price }}</td>
+                        <td>{{ item.quantity }}</td>
                         <td>
                             <v-icon size="small" style="color: green"
                                 @click="acceptAppointment(item.id)">mdi-check</v-icon>
@@ -68,6 +69,7 @@ export default {
                 { title: 'Color', align: 'center' },
                 { title: 'Stock', align: 'center' },
                 { title: 'Price', align: 'center' },
+                { title: 'Quantity', align: 'center' },
                 { title: 'Actions', align: 'center', sortable: false },
             ],
         };

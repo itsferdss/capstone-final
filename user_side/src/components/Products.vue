@@ -16,13 +16,21 @@
       <div class="dropdown" @click="toggleDropdown">
         <button class="dropbtn">
           {{ selectedCategory ? selectedCategory : 'Filter by Gender' }}
-          <span :class="isDropdownVisible ? 'arrow-up' : 'arrow-down'"></span>
+          <i :class="isDropdownVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
         </button>
         <div class="dropdown-content" v-if="isDropdownVisible">
-          <a href="#" @click.prevent="filterByCategory('Men')">Men</a>
-          <a href="#" @click.prevent="filterByCategory('Women')">Women</a>
-          <a href="#" @click.prevent="filterByCategory('Unisex')">Unisex</a>
-          <a href="#" @click.prevent="filterByCategory(null)">All</a>
+          <a href="#" @click.prevent="filterByCategory('Men')">
+            <i class="fas fa-male"></i> Men
+          </a>
+          <a href="#" @click.prevent="filterByCategory('Women')">
+            <i class="fas fa-female"></i> Women
+          </a>
+          <a href="#" @click.prevent="filterByCategory('Unisex')">
+            <i class="fas fa-venus-mars"></i> Unisex
+          </a>
+          <a href="#" @click.prevent="filterByCategory(null)">
+            <i class="fas fa-circle"></i> All
+          </a>
         </div>
       </div>
     </nav>
@@ -36,7 +44,7 @@
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in filteredFramesProducts"
           :key="product.id">
           <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
-          <img :src="product.currentImage" :alt="product.name" class="main-image"
+          <img :src="product.currentImage || defaultImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
@@ -55,7 +63,7 @@
       <div class="product-grid">
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in lensesProducts" :key="product.id">
           <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
-          <img :src="product.currentImage" :alt="product.name" class="main-image"
+          <img :src="product.currentImage || defaultImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
@@ -75,7 +83,7 @@
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in contactLensesProducts"
           :key="product.id">
           <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
-          <img :src="product.currentImage" :alt="product.name" class="main-image"
+          <img :src="product.currentImage || defaultImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
@@ -95,7 +103,7 @@
         <div @click="viewProduct(product.id)" class="product-card" v-for="product in accessoriesProducts"
           :key="product.id">
           <div class="new-badge" v-if="isNewProduct(product.created_at)">NEW!</div>
-          <img :src="product.currentImage" :alt="product.name" class="main-image"
+          <img :src="product.currentImage || defaultImage" :alt="product.name" class="main-image"
             @mouseover="changeImage(product, 'hover')" @mouseleave="changeImage(product, 'default')">
           <div class="product-details">
             <span class="product-name">{{ product.product_name }}</span>
@@ -113,6 +121,7 @@
 
 <script>
 import axios from 'axios';
+import logoImage from '../assets/MVC_logo.png';
 
 export default {
   data() {
@@ -120,7 +129,8 @@ export default {
       products: [],
       activeSection: 'sunglasses',
       isDropdownVisible: false,
-      selectedCategory: null 
+      selectedCategory: null,
+      defaultImage: logoImage
     };
   },
   methods: {
@@ -137,11 +147,13 @@ export default {
         });
     },
     changeImage(product, action) {
-      if (action === 'hover' && product.images.length > 1) {
-        product.currentImage = product.images[1]; // Use second image on hover
-      } else {
-        product.currentImage = product.images[0]; // Use default image otherwise
-      }
+      if (product.images && product.images.length > 1) {
+        if (action === 'hover') {
+          product.currentImage = product.images[1]; // Use second image on hover
+        } else {
+          product.currentImage = product.images[0]; // Use default image otherwise
+        }
+      } 
     },
     scrollToSection(sectionId) {
       const section = document.getElementById(sectionId);
@@ -265,6 +277,11 @@ export default {
 .product-card:hover {
   transform: scale(1.03);
 }
+.main-image {
+  width: 100%; 
+  height: auto;
+  object-fit: contain; 
+}
 
 .product-card img.main-image {
   max-width: 100%;
@@ -328,7 +345,7 @@ export default {
 .dropdown {
   position: relative;
   display: inline-block;
-  margin-left: -90%;
+  margin-left: -80%;
 }
 
 .dropbtn {
@@ -339,6 +356,9 @@ export default {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   transition: background-color 0.3s;
 }
 
@@ -399,6 +419,11 @@ export default {
 
   .product-card img.main-image {
     height: 250px; 
+  }
+
+  .dropdown{
+    margin-left: -200px;
+    margin-top: 20px;
   }
 }
 </style>
