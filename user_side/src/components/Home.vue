@@ -485,7 +485,7 @@ export default {
   right:150px;
   padding: 40px; /* Increase padding */
   z-index: 10;
-  top: 10px
+  top: 250px
 }
 
 .rate h1 {
@@ -633,12 +633,18 @@ export default {
     margin-left: -30px;
   }
 
+  .rate {
+    top: 60px;
+  }
+
   .rate h1 {
-    font-size: 20px;
+    font-size: 12px;
+    
   }
 
   .rate p {
     font-size: 12px;
+    
   }
 
   .description-section {

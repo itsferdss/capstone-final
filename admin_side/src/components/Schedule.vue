@@ -3,14 +3,15 @@
     :sort-by="[{ key: 'user_id', order: 'asc' }]">
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title class="text-uppercase grey--text reservationTitle">
-          <v-icon left>mdi-calendar-clock</v-icon>
-          Reservations
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
 
+        <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l addBtn" elevation="2" v-bind="props">
+          <v-icon left>mdi-plus-outline</v-icon>
+          <span class="picked-up-text">Private Reservation</span>
+        </v-btn>
+
+        <v-spacer></v-spacer>
         <!-- Search input -->
-        <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search User"
+        <v-text-field v-model="search" class="w-auto mr-4 searchBar" density="compact" label="Search Patients"
           prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
           style="max-width: 300px;"></v-text-field>
 
@@ -241,6 +242,19 @@ export default {
 td{
   text-align: center;
 }
+
+.addBtn {
+  background-color: #B3D9E6 !important;
+  color: white !important;
+  font-weight: bold !important;
+  margin-left: 0px;
+}
+
+.addBtn .v-icon {
+  margin-right: 8px; 
+  color: black;
+}
+
 
 @media (max-width: 960px) {
   .pending-text{
