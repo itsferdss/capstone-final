@@ -248,11 +248,10 @@ export default {
 
 .title {
   margin: 20px 0;
-  background-color: #e4e1e1;
   padding: 50px;
   margin-right: 100px;
   margin-left: 100px;
-  font-size: 35px;
+  font-size: 20px;
   font-style: italic;
   font-family: Arial, Helvetica, sans-serif;
 }
