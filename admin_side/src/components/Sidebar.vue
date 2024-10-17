@@ -16,17 +16,17 @@
 
       <router-link :to="{ path: '/viewusers' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-account-group</v-icon>
-        <span class="link-text">View Patients</span>
+        <span class="link-text">Patients Records</span>
       </router-link>
 
       <router-link :to="{ path: '/schedule' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-calendar-clock</v-icon>
-        <span class="link-text">See Reservations</span>
+        <span class="link-text">Product Reservations</span>
       </router-link>
 
       <router-link :to="{ path: '/inventory' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-package-variant-closed</v-icon>
-        <span class="link-text">See Products</span>
+        <span class="link-text">Manage Products</span>
       </router-link>
     </v-list>
 
