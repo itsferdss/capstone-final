@@ -93,34 +93,55 @@
     </v-dialog>
 
     <!--LOGIN DIALOG-->
-    <v-dialog v-model="loginDialog" persistent max-width="400px" class="loginDia">
-      <v-card>
-        <v-card-title class="text-h5">Sign in to Continue</v-card-title>
+    <v-dialog v-model="loginDialog" persistent max-width="400px" class="login-dialog">
+    <v-card class="login-card elevation-8">
+      <v-card-title class="login-title text-center">Log in to continue.</v-card-title>
 
-        <v-card-text>
-          <v-img src="../src/assets/MVC_logo.png" class="mvcLogo"></v-img>
-          <div class="input-group">
-            <label class="inputTitle" for="email">Email</label>
-            <input type="text" id="email" v-model="email" required>
-          </div>
+      <v-card-text class="text-center">
+        <v-img src="../src/assets/MVC_logo.png" class="mvcLogo" contain></v-img>
 
-          <div class="input-group">
-            <label class="inputTitle" for="password">Password</label>
-            <input :type="passwordType" id="password" v-model="password" required>
-            <i class="eye-icon" @click="togglePasswordVisibility">
-              <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-            </i>
-          </div>
+        <v-text-field
+          label="Email"
+          v-model="email"
+          required
+          outlined
+          class="mb-4"
+          prepend-icon="mdi-email"
+        ></v-text-field>
 
-          <p>{{ errorMessage }}</p>
-        </v-card-text>
+        <v-text-field
+          :type="passwordType"
+          label="Password"
+          v-model="password"
+          required
+          outlined
+          class="mb-4"
+          prepend-icon="mdi-lock"
+        >
+          <template v-slot:append>
+            <v-icon
+              @click="togglePasswordVisibility"
+              class="eye-icon"
+              style="cursor: pointer;"
+            >
+              {{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}
+            </v-icon>
+          </template>
+        </v-text-field>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="login">Log in</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
+      </v-card-text>
+
+      <v-card-actions class="justify-center">
+        <v-btn color="#00BFFF" @click="login" class="mr-2 rounded-button" elevation="2">Log In</v-btn>
+        <v-btn text @click="loginDialog = false" class="rounded-button">Back</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
+
+
 
   </div>
 </template>
@@ -586,7 +607,7 @@ export default {
       cursor: pointer;
       position: absolute;
       right: 10px;
-      top: 36px;
+      top: 250 px;
     }
 
     .loginButton {
@@ -602,7 +623,59 @@ export default {
       text-align: center;
     }
 
-    .loginDia {}
+    .login-dialog {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.9)); /* Gradient background */
+}
+
+.login-card {
+  padding: 30px;
+  border-radius: 12px; /* Increased border-radius for softness */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
+}
+
+.login-title {
+  font-size: 20px; /* Smaller font size for title */
+}
+
+.mvcLogo {
+  width: 520px; /* Adjust logo size as needed */
+  margin-bottom: 20px;
+  margin-top: -40px;
+}
+
+.eye-icon {
+  cursor: pointer;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px; /* Spacing above error message */
+}
+
+.rounded-button {
+  border-radius: 20px;
+  font-weight: bold;
+  min-width: 120px; /* Ensures buttons have a consistent width */
+  transition: background-color 0.3s ease; /* Smooth transition for button hover */
+}
+
+/* Optional: Button Hover Effect */
+.v-btn:hover {
+  background-color: rgba(0, 191, 255, 0.2); /* Lighten the button color on hover */
+}
+
+/* Centering and Spacing */
+.v-card-title {
+  margin-bottom: 20px;
+}
+
+.mb-4 {
+  margin-bottom: 16px !important; /* Ensures consistent spacing */
+}
+
+
+    
 
     @media screen and (max-width: 960px) {
       .container {
