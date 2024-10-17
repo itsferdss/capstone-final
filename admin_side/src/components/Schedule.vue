@@ -15,6 +15,11 @@
           prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
           style="max-width: 300px;"></v-text-field>
 
+          <v-btn @click="openAddRes" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
+          <v-icon left>mdi-plus</v-icon>
+          <span class="pending-text">Add Direct Reservation</span>
+        </v-btn>
+
         <!-- Pending Reservations Dialog -->
         <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
           <v-icon left>mdi-clock-outline</v-icon>
@@ -103,6 +108,9 @@ export default {
     },
     openDialogPr() {
       this.$router.push('/view/pending')
+    },
+    openAddRes() {
+      this.$router.push('/add/reservation')
     },
 
     openDialogPu() {
