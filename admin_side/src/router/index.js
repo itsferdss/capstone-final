@@ -44,6 +44,8 @@ const router = createRouter({
             meta: {
                 requiresAuthentication: true, // Login page doesn't require authentication
             },
+        },
+        {
             path: '/add/reservation',
             component: () => import('../views/Forms_Adding/AddDirectReservation.vue'),
             meta: {

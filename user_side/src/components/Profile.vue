@@ -143,6 +143,12 @@ export default {
     },
   },
   mounted() {
+    const token = sessionStorage.getItem('token'); // Check if token exists
+    if (!token) {
+      // Show login dialog if not logged in
+      this.loginDialog = true;
+      return; // Prevent fetching data if not logged in
+    }
     if (this.patientId) {
       this.fetchPatientData(this.patientId);
     } else {

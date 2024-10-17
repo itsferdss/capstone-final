@@ -4,9 +4,9 @@
     <template v-slot:top>
       <v-toolbar flat>
 
-        <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l addBtn" elevation="2" v-bind="props">
-          <v-icon left>mdi-plus-outline</v-icon>
-          <span class="picked-up-text">Private Reservation</span>
+        <v-btn @click="openAddRes" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
+          <v-icon left>mdi-plus</v-icon>
+          <span class="pending-text">Add Direct Reservation</span>
         </v-btn>
 
         <v-spacer></v-spacer>
@@ -14,11 +14,6 @@
         <v-text-field v-model="search" class="w-auto mr-4 searchBar" density="compact" label="Search Patients"
           prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
           style="max-width: 300px;"></v-text-field>
-
-          <v-btn @click="openAddRes" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
-          <v-icon left>mdi-plus</v-icon>
-          <span class="pending-text">Add Direct Reservation</span>
-        </v-btn>
 
         <!-- Pending Reservations Dialog -->
         <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
