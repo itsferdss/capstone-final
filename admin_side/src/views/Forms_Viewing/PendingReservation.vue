@@ -99,10 +99,11 @@ export default {
                         this.pendingAppointments.splice(index, 1);
                     }
 
+                    // Show success alert
                     Swal.fire({
                         icon: 'success',
-                        title: 'Reservation Accepted',
-                        text: 'The reservation has been accepted successfully!',
+                        title: 'Success!',
+                        text: 'The reservation has been accepted successfully.',
                     });
                 })
                 .catch(error => {
@@ -114,6 +115,7 @@ export default {
                     });
                 });
         },
+
         goBack() {
             this.$router.push('/schedule');
         },

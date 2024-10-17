@@ -20,7 +20,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" v-if="editedItem.color_stock.length > 0">
                         <label for="colorStock">Color Stock</label>
                         <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="form-row">
                             <input type="text" v-model="colorStock.color" placeholder="Color" class="form-input"
@@ -28,18 +28,18 @@
                             <input type="number" v-model.number="colorStock.stock" @input="updateQuantity"
                                 placeholder="Stock" class="form-input" required />
                             <button type="button" class="rmvBtn" @click="removeColorStock(index)">Remove</button>
+                            <input type="number" v-model.number="colorStock.restockQuantity" placeholder="Restock"
+                                class="form-input" style="width: 200px; margin-bottom: 20px;" />
+                            <button type="button" class="restockBtn" @click="restockQuantity(index)">Restock</button>
                         </div>
                         <button type="button" class="addClr" @click="addColorStock">Add Color Stock</button>
                     </div>
                     <hr />
                     <div class="form-buttons">
-                        <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
-                            Save Product
-                        </v-btn>
+                        <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">Save
+                            Product</v-btn>
                         <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white' }"
-                            @click="goBack">
-                            Back
-                        </v-btn>
+                            @click="goBack">Back</v-btn>
                     </div>
                 </form>
             </div>
@@ -56,43 +56,39 @@ export default {
         return {
             editedItem: {
                 product_id: '',
-                product_name: '', // Ensure this is included
+                product_name: '',
                 quantity: 0,
                 price: '',
-                color_stock: [{ color: '', stock: 0 }]
+                color_stock: [{ color: '', stock: 0, restockQuantity: 0 }]
             },
         };
     },
     mounted() {
-        const productId = this.$route.query.id;  // Access the `id` from query parameters
+        const productId = this.$route.query.id;
         if (productId) {
-            this.fetchProducts(productId);  // Fetch the product data by ID
+            this.fetchProducts(productId);
         }
     },
     methods: {
         fetchProducts(productId) {
-            axios.get(`/viewProduct/${productId}`) // Use the productId in the URL
+            axios.get(`/viewProduct/${productId}`)
                 .then(response => {
-                    if (response.data) {
-                        const productData = response.data;  // Use the single product data
-                        this.editedItem = {
-                            product_id: productData.id,
-                            product_name: productData.product_name,
-                            quantity: productData.quantity,
-                            price: productData.price,
-                            color_stock: JSON.parse(productData.color_stock) // Parse color_stock if it's a JSON string
-                        };
-                        this.removeEmptyColorStocks(); // Clean up empty color stocks
-                    } else {
-                        this.error = 'Product not found';
-                    }
+                    const productData = response.data;
+                    this.editedItem = {
+                        product_id: productData.id,
+                        product_name: productData.product_name,
+                        quantity: productData.quantity,
+                        price: productData.price,
+                        color_stock: JSON.parse(productData.color_stock).map(item => ({ ...item, restockQuantity: 0 }))
+                    };
+                    this.removeEmptyColorStocks();
                 })
                 .catch(error => {
-                    this.error = 'Error fetching product: ' + error.message;
+                    console.error('Error fetching product:', error);
                 });
         },
         addColorStock() {
-            this.editedItem.color_stock.push({ color: '', stock: 0 });
+            this.editedItem.color_stock.push({ color: '', stock: 0, restockQuantity: 0 });
         },
         removeColorStock(index) {
             this.editedItem.color_stock.splice(index, 1);
@@ -102,27 +98,25 @@ export default {
             this.editedItem.color_stock = this.editedItem.color_stock.filter(colorStock => colorStock.stock > 0);
         },
         updateQuantity() {
-            this.removeEmptyColorStocks(); // Clean up color stocks with no stock
-            const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
-            this.editedItem.quantity = totalStock;
+            this.removeEmptyColorStocks();
+            this.editedItem.quantity = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
+        },
+        restockQuantity(index) {
+            const colorStock = this.editedItem.color_stock[index];
+            colorStock.stock += colorStock.restockQuantity || 0;
+            this.updateQuantity();
+            colorStock.restockQuantity = 0;
         },
         saveEditedProduct() {
-            axios.put(`/products/${this.editedItem.product_id}`, {
-                product_name: this.editedItem.product_name, // Include product_name in the request
-                supplier: this.editedItem.supplier, // Ensure supplier is included if needed
-                quantity: this.editedItem.quantity,
-                price: this.editedItem.price,
-                color_stock: this.editedItem.color_stock // Include color_stock in the request
-            })
-                .then(response => {
+            axios.put(`/products/${this.editedItem.product_id}`, this.editedItem)
+                .then(() => {
                     Swal.fire({
                         title: 'Success!',
                         text: 'Product updated successfully.',
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
-                    this.fetchProducts(); // Fetch updated product list
-                    this.goBack(); // Navigate back after saving
+                    this.goBack();
                 })
                 .catch(error => {
                     console.error('Error updating product:', error);
@@ -140,7 +134,6 @@ export default {
     }
 };
 </script>
-
 
 <style scoped>
 .bg-title {
@@ -166,12 +159,6 @@ export default {
     padding: 2rem;
     width: 100%;
     max-width: 800px;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
 }
 
 .form-row {
@@ -212,20 +199,6 @@ input:focus {
     box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
 }
 
-select {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    font-size: 1rem;
-}
-
-select:focus {
-    border-color: #3EB489;
-    outline: none;
-    box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
-}
-
 .form-buttons {
     display: flex;
     justify-content: space-between;
@@ -252,7 +225,7 @@ select:focus {
     background-color: #93222b;
 }
 
-.addClr{
+.addClr {
     background-color: rgb(10, 126, 89);
     width: 30%;
     height: 40px;
@@ -262,8 +235,17 @@ select:focus {
     font-weight: bold;
 }
 
-.rmvBtn{
+.rmvBtn {
     background-color: #940601;
+    height: 40px;
+    width: 150px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: rgb(214, 213, 213);
+}
+
+.restockBtn {
+    background-color: #01944d;
     height: 40px;
     width: 150px;
     border-radius: 5px;
@@ -292,7 +274,7 @@ select:focus {
         gap: 0.5rem;
     }
 
-    .addClr{
+    .addClr {
         height: 50px;
         width: 200px;
     }
@@ -305,7 +287,7 @@ select:focus {
     }
 
     .form-container {
-        padding: 0rem;
+        padding: 0;
     }
 
     input {

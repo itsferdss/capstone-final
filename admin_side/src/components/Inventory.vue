@@ -33,6 +33,11 @@
         <td>{{ item.quantity }}</td>
         <td>₱{{ item.price }}</td>
         <td>
+          <span :class="getStockStatusClass(item.quantity)">
+            {{ getStockStatus(item.quantity) }}
+          </span>
+        </td>
+        <td>
           <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
@@ -132,7 +137,7 @@ export default {
     return {
       editItemDialog: false,
       dialog: false,
-      infoDialog: false,  
+      infoDialog: false,
       editedItem: {
         product_image: '',
         product_id: '',
@@ -154,7 +159,10 @@ export default {
         { title: 'Type', align: 'center', key: 'type' },
         { title: 'Stock', align: 'center', key: 'quantity' },
         { title: 'Price', align: 'center', key: 'price' },
+        { title: 'Status', align: 'center', },
         { title: 'Actions', align: 'center', sortable: false },
+        
+
       ],
       currentImageIndex: 0,
       viewingRecords: false,
@@ -162,8 +170,8 @@ export default {
       color_stock: [],
       dialogDelete: false,
       deleteRecordIndex: -1,
+      lowStockThreshold: 5, // Define your low stock threshold here
     };
-
   },
   computed: {
     displayedProducts() {
@@ -188,6 +196,12 @@ export default {
     this.fetchProducts();
   },
   methods: {
+    getStockStatus(quantity) {
+      return quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock'; // Determine stock status
+    },
+    getStockStatusClass(quantity) {
+      return quantity <= this.lowStockThreshold ? 'low-stock' : 'high-stock'; // Return class based on stock status
+    },
     updateQuantity() {
       const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
       this.editedItem.quantity = totalStock;
@@ -216,13 +230,12 @@ export default {
         });
     },
     openDialog() {
-      this.$router.push('/add/product')
+      this.$router.push('/add/product');
     },
     closeDialog() {
       this.dialog = false;
     },
     openEditItem(item) {
-      // Redirect to the product edit page with the product ID in the query string
       this.$router.push({ path: '/view/product', query: { id: item.id } });
     },
     openInfoItem(item) {
@@ -230,50 +243,58 @@ export default {
       this.currentImageIndex = 0;
       this.infoDialog = true;
     },
-
     closeEditItemDialog() {
       this.editItemDialog = false;
     },
-
     closeInfoItemDialog() {
       this.infoDialog = false;
     },
     deleteProduct(item) {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'You will not be able to recover this product!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.delete(`/products/${item.id}`)
-            .then(response => {
-              Swal.fire('Deleted!', 'Product has been deleted.', 'success');
-              this.fetchProducts(); // Fetch updated product list
-            })
-            .catch(error => {
-              console.error('Error deleting product:', error);
-              Swal.fire('Oops...', 'Something went wrong!', 'error');
-            });
-        } else {
-          Swal.fire('Cancelled', 'Your product is safe :)', 'info');
-        }
-      });
+      this.deleteRecordIndex = this.products.indexOf(item);
+      this.dialogDelete = true;
     },
-
-
-
+    confirmDelete() {
+      const productToDelete = this.products[this.deleteRecordIndex];
+      axios.delete('/product/' + productToDelete.id)
+        .then(() => {
+          this.products.splice(this.deleteRecordIndex, 1);
+          this.dialogDelete = false;
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'Product has been deleted.',
+            confirmButtonText: 'Ok',
+          });
+        })
+        .catch(error => {
+          console.error('Delete failed:', error);
+          this.dialogDelete = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Error deleting product!',
+            confirmButtonText: 'Ok',
+          });
+        });
+    },
   },
-
-
 };
 </script>
 
 <style>
+.low-stock {
+  background-color: #ffcccc; 
+  color: #c0392b;
+  padding: 5px 10px; 
+  border-radius: 4px; 
+}
+
+.high-stock {
+  background-color: #d4edda; 
+  color: #155724; 
+  padding: 5px 10px;
+  border-radius: 4px;
+}
 .v-card:hover {
   background-color: #f0f0f0;
 }

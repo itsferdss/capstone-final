@@ -232,7 +232,7 @@ export default {
     });
 
     return {
-      goToLogin: () => router.push('/login'),  // Use router to navigate
+      goToLogin: () => router.push('/products'),  // Use router to navigate
       activeSection,
     };
   },
