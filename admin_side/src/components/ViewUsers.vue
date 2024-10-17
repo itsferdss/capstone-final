@@ -63,33 +63,29 @@
             <v-btn color="error" @click="closeDialogPatientHistory">Close</v-btn>
 
             <!-- Dropdown for Generate Report -->
-            <v-row class="mt-4">
-              <v-col>
-                <v-menu offset-y>
-                  <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
-                      <v-icon left>mdi-file-chart</v-icon>
-                      Generate Report
-                      <v-icon right>mdi-menu-down"></v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list>
-                    <v-list-item
-                      @click="exportPrescriptionPDF(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
-                      class="mb-2 rounded-l add-record-button">
-                      <v-list-item-icon></v-list-item-icon>
-                      <v-list-item-title>Generate PDF</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item
-                      @click="exportPrescriptionExcel(selectedUserPrescriptions, `${selectedUser.full_name}'s Prescription`)"
-                      class="mb-2 rounded-l add-record-button">
-                      <v-list-item-icon></v-list-item-icon>
-                      <v-list-item-title>Generate Excel</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </v-col>
-            </v-row>
+                  <v-dialog v-model="dialog" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Generate Report</span>
+          </v-card-title>
+          <v-card-text>
+            <v-checkbox v-model="generateAll" label="Generate for all prescriptions"></v-checkbox>
+            <v-date-picker v-model="startDate" label="Start Date" :max="endDate" v-if="!generateAll"></v-date-picker>
+            <v-date-picker v-model="endDate" label="End Date" :min="startDate" v-if="!generateAll"></v-date-picker>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="generatePrescriptionReport('pdf')">Generate PDF</v-btn>
+            <v-btn @click="generatePrescriptionReport('excel')">Generate Excel</v-btn>
+            <v-btn @click="dialog = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-btn @click="dialog = true" class="mb-2 rounded-l generateBtn" dark color="primary">
+        <v-icon left>mdi-file-chart</v-icon>
+        Generate Report
+      </v-btn>
+
 
             <!-- Loop through selectedUserPrescriptions -->
             <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index"
@@ -157,89 +153,69 @@
                 Spectacles</v-btn>
               <span>&nbsp;</span>
               <v-btn color="primary" @click="closePatientGlassesInformation">Close</v-btn>
-              <v-row class="mt-4">
-                <v-col>
-                  <v-menu offset-y>
-                    <template v-slot:activator="{ props }">
-                      <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
-                        <v-icon left>mdi-file-chart</v-icon>
-                        Generate Report
-                        <v-icon right>mdi-menu-down"></v-icon>
-                      </v-btn>
-                    </template>
-                    <v-list>
-                      <v-list-item
-                        @click="exportSpectaclesPDF(selectedUserGlasses, `${selectedUser.full_name}'s Spectacles`)"
-                        class="mb-2 rounded-l add-record-button">
-                        <v-list-item-icon></v-list-item-icon>
-                        <v-list-item-title>Generate PDF</v-list-item-title>
-                      </v-list-item>
-                      <v-list-item
-                        @click="exportSpecraclesExcel(selectedUserGlasses, `${selectedUser.full_name}'s Spectacles`)"
-                        class="mb-2 rounded-l add-record-button">
-                        <v-list-item-icon></v-list-item-icon>
-                        <v-list-item-title>Generate Excel</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </v-col>
-              </v-row>
+              <v-dialog v-model="dialog" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Generate Report</span>
+          </v-card-title>
+          <v-card-text>
+            <v-checkbox v-model="generateAll" label="Generate for all prescriptions"></v-checkbox>
+            <v-date-picker v-model="startDate" label="Start Date" :max="endDate" v-if="!generateAll"></v-date-picker>
+            <v-date-picker v-model="endDate" label="End Date" :min="startDate" v-if="!generateAll"></v-date-picker>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="generateSpectaclesReport('pdf')">Generate PDF</v-btn>
+            <v-btn @click="generateSpectaclesReport('excel')">Generate Excel</v-btn>
+            <v-btn @click="dialog = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-              <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4">
-                <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.created_at)
-                  }}</v-card-title>
-                <v-card-text>
-                  <v-row>
-                    <!-- Labels -->
-                    <v-col cols="12" sm="4" class="label-col">
-                      <strong>Frame:</strong>
-                    </v-col>
-                    <v-col cols="12" sm="8">
-                      <span v-if="glasses.product_id">
-                        {{ glasses.product.product_name }}
-                      </span>
-                      <span v-else>
-                        {{ glasses.custom_frame }}
-                      </span>
-                    </v-col>
+      <v-btn @click="dialog = true" class="mb-2 rounded-l generateBtn" dark color="primary">
+        <v-icon left>mdi-file-chart</v-icon>
+        Generate Report
+      </v-btn>
 
-                    <v-col cols="12" sm="4" class="label-col">
-                      <strong>Type of Lens:</strong>
-                    </v-col>
-                    <v-col cols="12" sm="8">
-                      <span v-if="glasses.lens_id">
-                        {{ glasses.lens.product_name }}
-                      </span>
-                      <span v-else>
-                        {{ glasses.custom_lens }}
-                      </span>
-                    </v-col>
+      <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4">
+  <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.created_at) }}</v-card-title>
+  <v-card-text>
+    <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid black;">
+      <v-col cols="12" sm="4" class="label-col"><strong>Frame:</strong></v-col>
+      <v-col cols="12" sm="8">
+        <span v-if="glasses.product_id">{{ glasses.product.product_name }}</span>
+        <span v-else>{{ glasses.custom_frame }}</span>
+      </v-col>
+    </v-row>
 
-                    <v-col cols="12" sm="4" class="label-col">
-                      <strong>Remarks:</strong>
-                    </v-col>
-                    <v-col cols="12" sm="8">
-                      {{ glasses.remarks }}
-                    </v-col>
-                    <v-col cols="12" sm="4" class="label-col">
-                      <strong>Price:</strong>
-                    </v-col>
-                    <v-col cols="12" sm="8">
-                      ₱{{ glasses.price }}
-                    </v-col>
+    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+      <v-col cols="12" sm="4" class="label-col"><strong>Type of Lens:</strong></v-col>
+      <v-col cols="12" sm="8">
+        <span v-if="glasses.lens_id">{{ glasses.lens.product_name }}</span>
+        <span v-else>{{ glasses.custom_lens }}</span>
+      </v-col>
+    </v-row>
 
-                    <!-- Delete Button -->
-                    <v-col cols="12" sm="12" class="text-right">
-                      <v-btn color="error" @click="deleteGlasses(selectedPatient.id, glasses.id)">
-                        <v-icon left>mdi-delete</v-icon>
-                        <div class="deleteText">
-                          Delete
-                        </div>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
+    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+      <v-col cols="12" sm="4" class="label-col"><strong>Remarks:</strong></v-col>
+      <v-col cols="12" sm="8">{{ glasses.remarks }}</v-col>
+    </v-row>
+
+    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+      <v-col cols="12" sm="4" class="label-col"><strong>Price:</strong></v-col>
+      <v-col cols="12" sm="8">₱{{ glasses.price }}</v-col>
+    </v-row>
+
+    <!-- Delete Button -->
+    <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
+      <v-col cols="12">
+        <v-btn color="error" @click="deleteGlasses(selectedPatient.id, glasses.id)">
+          <v-icon left>mdi-delete</v-icon>
+          <div class="deleteText">Delete</div>
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-card-text>
+</v-card>
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -254,62 +230,53 @@
               History</v-btn>
             <span>&nbsp;</span>
             <v-btn color="primary" @click="closeMoreHistoryDialog">Close</v-btn>
-            <v-row class="mt-4">
-              <v-col>
-                <v-menu offset-y>
-                  <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
-                      <v-icon left>mdi-file-chart</v-icon>
-                      Generate Report
-                      <v-icon right>mdi-menu-down"></v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list>
-                    <v-list-item
-                      @click="exportHistoryPDF(selectedUserHistory, `${selectedUser.full_name}'s Medical History`)"
-                      class="mb-2 rounded-l add-record-button">
-                      <v-list-item-icon></v-list-item-icon>
-                      <v-list-item-title>Generate PDF</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item
-                      @click="exportHistoryExcel(selectedUserHistory, `${selectedUser.full_name}'s Medical History`)"
-                      class="mb-2 rounded-l add-record-button">
-                      <v-list-item-icon></v-list-item-icon>
-                      <v-list-item-title>Generate Excel</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </v-col>
-            </v-row>
+            <v-dialog v-model="dialog" max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Generate Report</span>
+          </v-card-title>
+          <v-card-text>
+            <v-checkbox v-model="generateAll" label="Generate for all prescriptions"></v-checkbox>
+            <v-date-picker v-model="startDate" label="Start Date" :max="endDate" v-if="!generateAll"></v-date-picker>
+            <v-date-picker v-model="endDate" label="End Date" :min="startDate" v-if="!generateAll"></v-date-picker>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="generateHistoryReport('pdf')">Generate PDF</v-btn>
+            <v-btn @click="generateHistoryReport('excel')">Generate Excel</v-btn>
+            <v-btn @click="dialog = false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-btn @click="dialog = true" class="mb-2 rounded-l generateBtn" dark color="primary">
+        <v-icon left>mdi-file-chart</v-icon>
+        Generate Report
+      </v-btn>
 
             <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4">
-              <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.created_at)
-                }}</v-card-title>
-              <v-card-text>
-                <v-row>
-                  <!-- Medical History Label -->
-                  <v-col cols="12" sm="4" class="label-col">
-                    <strong>Medical History:</strong>
-                  </v-col>
-                  <v-col cols="12" sm="8">
-                    {{ history.medical_history }}
-                  </v-col>
+        <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.created_at) }}</v-card-title>
+        <v-card-text>
+          <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid lightgray;">
+            <v-col cols="12" sm="4" class="label-col"><strong>Medical History:</strong></v-col>
+            <v-col cols="12" sm="8">{{ history.medical_history }}</v-col>
+          </v-row>
 
-                  <!-- Ocular History Label -->
-                  <v-col cols="12" sm="4" class="label-col">
-                    <strong>Ocular History:</strong>
-                  </v-col>
-                  <v-col cols="12" sm="8">
-                    {{ history.ocular_history }}
-                  </v-col>
+          <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+            <v-col cols="12" sm="4" class="label-col"><strong>Ocular History:</strong></v-col>
+            <v-col cols="12" sm="8">{{ history.ocular_history }}</v-col>
+          </v-row>
 
-                  <!-- Delete Button -->
-                  <v-col cols="12" sm="12" class="text-right">
-                    <v-btn color="error" @click="deleteHistory(selectedPatient.id, history.id)">Delete</v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
+          <!-- Delete Button -->
+          <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
+            <v-col cols="12">
+              <v-btn color="error" @click="deleteHistory(selectedPatient.id, history.id)">
+                <v-icon left>mdi-delete</v-icon>
+                <div class="deleteText">Delete</div>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -337,7 +304,12 @@ export default {
       childGlassesDialog: false,
       dialogMoreHistory: false,
       childHistoryDialog: false,
+      generateAll: false, 
       selectedPatient: null,
+      startDate: null,
+      endDate: null,
+      selectedUserPrescriptions: [],
+      selectedUser: { full_name: 'User Name' },
       editedItem: {
         id: '',
         full_name: '',
@@ -794,6 +766,87 @@ export default {
         ocular_history: '',
       };
     },
+    async generatePrescriptionReport(format) {
+    let filteredPrescriptions;
+
+    if (this.generateAll) {
+      // Use all prescriptions if the checkbox is checked
+      filteredPrescriptions = this.selectedUserPrescriptions;
+    } else {
+      if (!this.startDate || !this.endDate) {
+        alert("Please select both start and end dates.");
+        return;
+      }
+
+      // Filter prescriptions based on date range
+      filteredPrescriptions = this.selectedUserPrescriptions.filter(prescription => {
+        const prescriptionDate = new Date(prescription.created_at);
+        return prescriptionDate >= new Date(this.startDate) && prescriptionDate <= new Date(this.endDate);
+      });
+    }
+
+    const title = `${this.selectedUser.full_name}'s Prescription`;
+
+    if (format === 'pdf') {
+      this.exportPrescriptionPDF(filteredPrescriptions, title);
+    } else if (format === 'excel') {
+      await this.exportPrescriptionExcel(filteredPrescriptions, title);
+    }
+  },
+  async generateSpectaclesReport(format) {
+  let filteredSpectacles;
+
+  if (this.generateAll) {
+    // Use all spectacles if the checkbox is checked
+    filteredSpectacles = this.selectedUserSpectacles; // Assuming you have this array
+  } else {
+    if (!this.startDate || !this.endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+
+    // Filter spectacles based on date range
+    filteredSpectacles = this.selectedUserSpectacles.filter(spectacle => {
+      const spectacleDate = new Date(spectacle.created_at);
+      return spectacleDate >= new Date(this.startDate) && spectacleDate <= new Date(this.endDate);
+    });
+  }
+
+  const title = `${this.selectedUser.full_name}'s Spectacles`;
+
+  if (format === 'pdf') {
+    this.exportSpectaclesPDF(filteredSpectacles, title);
+  } else if (format === 'excel') {
+    await this.exportSpectaclesExcel(filteredSpectacles, title);
+  }
+},
+async generateHistoryReport(format) {
+  let filteredHistory;
+
+  if (this.generateAll) {
+    // Use all history if the checkbox is checked
+    filteredHistory = this.selectedUserHistory; // Assuming you have this array
+  } else {
+    if (!this.startDate || !this.endDate) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+
+    // Filter history based on date range
+    filteredHistory = this.selectedUserHistory.filter(history => {
+      const historyDate = new Date(history.created_at);
+      return historyDate >= new Date(this.startDate) && historyDate <= new Date(this.endDate);
+    });
+  }
+
+  const title = `${this.selectedUser.full_name}'s History`;
+
+  if (format === 'pdf') {
+    this.exportHistoryPDF(filteredHistory, title);
+  } else if (format === 'excel') {
+    await this.exportHistoryExcel(filteredHistory, title);
+  }
+},
     exportPrescriptionPDF(patients, title) {
       try {
         const doc = new jsPDF();
@@ -878,6 +931,72 @@ export default {
         console.error('Error exporting PDF:', error);
       }
     },
+     exportSpecraclesExcel(patients, title) {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report');
+
+    const imagePath = '../src/assets/MVC_logo.png'; // Provide the correct path to your image
+    const imageBuffer = fetch(imagePath).then(res => res.arrayBuffer());
+    
+    const imageId = workbook.addImage({
+      buffer: imageBuffer,
+      extension: 'png',
+    });
+
+    // Add the image to the worksheet
+    worksheet.addImage(imageId, {
+      tl: { col: 2, row: 0 },
+      ext: { width: 650, height: 100 },
+    });
+
+    // Define cells to merge
+    const mergeCells = [
+      { range: 'C6:E6', value: 'MVC Optical Clinic' },
+      { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
+      { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric'})}` },
+      { range: 'C9:E9', value: title }
+    ];
+
+    // Merge cells and set their values
+    mergeCells.forEach(cell => {
+      if (!worksheet.getCell(cell.range).isMerged) {
+        worksheet.mergeCells(cell.range);
+        worksheet.getCell(cell.range).value = cell.value;
+        worksheet.getCell(cell.range).font = { size: 14, bold: true };
+        worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+    });
+
+    worksheet.getCell('C6').font.size = 16; // Make the title bigger
+    worksheet.getCell('C9').font.size = 16;
+
+    // Add column headers for Date, Frame, Type of Lens, and Remarks
+    const headers = ['Date', 'Frame', 'Type of Lens', 'Remarks'];
+    worksheet.addRow(headers);
+
+    // Set specific column widths
+    worksheet.getColumn('A').width = 15; // Date
+    worksheet.getColumn('B').width = 20; // Frame
+    worksheet.getColumn('C').width = 20; // Type of Lens
+    worksheet.getColumn('D').width = 30; // Remarks
+
+    // Add data rows for each patient
+    patients.forEach(p => {
+      const date = new Date(p.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' });
+      worksheet.addRow([date, p.frame, p.type_of_lens, p.remarks]);
+    });
+
+    this.autoAdjustColumns(worksheet);
+    const buffer = workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    saveAs(blob, `${title}.xlsx`);
+    console.log('Excel file created successfully!');
+  } catch (error) {
+    console.error('Error exporting Excel:', error);
+  }
+},
+
     exportSpectaclesPDF(patients, title) {
       try {
         const doc = new jsPDF();
