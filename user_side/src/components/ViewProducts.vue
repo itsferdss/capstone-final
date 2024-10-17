@@ -91,6 +91,37 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!--LOGIN DIALOG-->
+    <v-dialog v-model="loginDialog" persistent max-width="400px" class="loginDia">
+      <v-card>
+        <v-card-title class="text-h5">Sign in to Continue</v-card-title>
+
+        <v-card-text>
+          <v-img src="../src/assets/MVC_logo.png" class="mvcLogo"></v-img>
+          <div class="input-group">
+            <label class="inputTitle" for="email">Email</label>
+            <input type="text" id="email" v-model="email" required>
+          </div>
+
+          <div class="input-group">
+            <label class="inputTitle" for="password">Password</label>
+            <input :type="passwordType" id="password" v-model="password" required>
+            <i class="eye-icon" @click="togglePasswordVisibility">
+              <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+            </i>
+          </div>
+
+          <p>{{ errorMessage }}</p>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="login">Log in</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </div>
 </template>
 
@@ -119,6 +150,11 @@ export default {
       },
       colorDialog: false,
       selectedColor: null,
+      loginDialog: false,
+      loginForm: {
+        email: '',
+        password: '',
+      }
     };
   },
   computed: {
@@ -143,6 +179,33 @@ export default {
           console.error('Error fetching product data:', error);
         });
     },
+    login() {
+      axios.post('/login', {
+        email: this.loginForm.email,  
+        password: this.loginForm.password
+      })
+        .then(response => {
+          const token = response.data.token; // Assuming the token is returned in the response
+          const id = response.data.id;
+          localStorage.setItem('patientId', id);
+          sessionStorage.setItem('token', token); // Store the token in sessionStorage
+          this.$store.commit('setPatientId', id);
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: 'Welcome!',
+          });
+          this.$router.push('/home'); // Redirect to home after successful login
+        })
+        .catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Invalid email or password',
+          });
+          console.error('Login failed:', error);
+        });
+    },
     updateRightPhoto(index) {
       this.currentIndex = index;
     },
@@ -164,13 +227,22 @@ export default {
     hideZoom() {
       this.zoomed = false;
     },
-        reserve(product) {
-          if (!this.patientId) {
-            console.error('User ID not available.');
-            return;
-          }
-          this.colorDialog = true; // Open the dialog
-        },
+    reserve(product) {
+      const token = sessionStorage.getItem('token'); // Check if token exists
+
+      if (!token) {
+        // Show login dialog if not logged in
+        this.loginDialog = true;
+        return;
+      }
+
+      if (!this.patientId) {
+        console.error('User ID not available.');
+        return;
+      }
+
+      this.colorDialog = true; // Open the color selection dialog if logged in
+    },
         selectColor(color) {
           this.selectedColor = color; // Set the selected color
         },
@@ -473,6 +545,64 @@ export default {
       text-align: center;
       background-color: #86b6ea;
     }
+
+    .loginDialog {
+      background-color: #e0f7fa;
+    }
+
+    .loginCard {
+      background-color: #f0f8ff;
+      padding: 16px;
+      border-radius: 10px;
+    }
+
+    .mvcLogo {
+      width: 100%;
+      height: auto;
+      max-width: 300px;
+      margin: 0 auto 16px;
+      display: block;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .inputTitle {
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    .eye-icon {
+      cursor: pointer;
+      position: absolute;
+      right: 10px;
+      top: 36px;
+    }
+
+    .loginButton {
+      width: 100%;
+      background-color: #b3e5fc;
+      color: #000;
+      text-transform: none;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+    }
+
+    .loginDia {}
 
     @media screen and (max-width: 960px) {
       .container {
