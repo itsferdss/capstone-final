@@ -8,6 +8,7 @@ import 'vuetify/dist/vuetify.min.css';
 import axios from "axios";
 import fontAwesomeApp from './fontAwesome.js';
 
+
 window.axios = axios;
 axios.defaults.withCredentials = false;
 
