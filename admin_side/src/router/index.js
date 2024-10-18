@@ -39,6 +39,13 @@ const router = createRouter({
             },
         },
         {
+            path: '/inventory2',
+            component: () => import('../views/Inventory2.vue'),
+            meta: {
+                requiresAuthentication: true, // Login page doesn't require authentication
+            },
+        },
+        {
             path: '/add/user',
             component: () => import('../views/Forms_Adding/AddUserForm.vue'),
             meta: {

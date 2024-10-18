@@ -1,10 +1,10 @@
 <template>
     <main>
         <div class="title-container">
-            <h1 class="ghostTitle">Inventory</h1>
+            <h1 class="ghostTitle">Products</h1>
             <div class="dash">
                 <span class="material-icons">inventory</span>
-                <span class="text">View Inventory</span>
+                <span class="text">View Products</span>
             </div>
         </div>
         <hr class="divider">
