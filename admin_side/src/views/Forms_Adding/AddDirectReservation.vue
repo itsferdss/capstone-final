@@ -5,24 +5,46 @@
       <div class="form-box">
         <form @submit.prevent="saveNewUser">
           <div class="form-group">
-            <label for="patient">Patient Name</label>
-            <v-autocomplete v-model="selectedPatient" 
-              :items="patients" 
-              item-text="full_name" 
-              item-value="id" 
-              label="Select Patient"
-              clearable
-              :search-input.sync="search"
-              :filter="filterPatients"
-              return-object
-              hide-no-data
-              hide-selected
-              ></v-autocomplete>
-          </div>
-          <div class="form-group">
-            <label for="product">Product Name</label>
-            <input type="text" v-model="editedItem.product_id" id="product" class="form-input" required />
-          </div>
+              <label for="patient">Patient Name</label>
+              <input
+                type="text"
+                v-model="search"
+                @input="filterPatients"
+                @focus="showSuggestions = true"
+                class="form-input"
+                required
+                placeholder="Type to search for a patient..."
+              />
+              <ul v-if="filteredPatients.length > 0" class="suggestions">
+                <li
+                  v-for="patient in filteredPatients"
+                  :key="patient.id"
+                  @click="selectPatient(patient)"
+                >
+                  {{ patient.full_name }}
+                </li>
+              </ul>
+            </div>
+            <div class="form-group">
+              <label for="product">Product Name</label>
+              <input
+                type="text"
+                v-model="searchProduct"
+                @input="filterProducts"
+                class="form-input"
+                required
+                placeholder="Type to search for a product..."
+              />
+              <ul v-if="filteredProducts.length > 0" class="suggestions">
+                <li
+                  v-for="product in filteredProducts"
+                  :key="product.id"
+                  @click="selectProduct(product)"
+                >
+                  {{ product.product_name }}
+                </li>
+              </ul>
+            </div>
           <div class="form-row">
             <div class="form-column">
               <div class="form-group">
@@ -64,7 +86,12 @@ export default {
   data() {
     return {
       selectedPatient: null, // Store the selected patient object
+      filteredProducts: [],
       patients: [],  // Array to hold fetched patient data
+      filteredPatients: [], // New data property for filtered patients
+      products: [], // Array to hold fetched product data
+      searchProduct: '', // For managing product search
+      selectedProduct: null, // Store the selected product object
       search: '',
       editedItem: {
         product_id: '',
@@ -77,28 +104,65 @@ export default {
   },
   mounted() {
     this.fetchPatients(); // Fetch patients when the component is mounted
+    this.fetchProducts(); // Fetch products
   },
   methods: {
     goBack() {
       this.$router.go(-1); // Navigate back to the previous page
     },
+    fetchProducts() {
+    axios.get('/products')
+      .then((response) => {
+        this.products = response.data;
+        this.filteredProducts = response.data; // Store fetched products
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+      });
+  },
+  filterProducts() {
+  if (!this.products) return; // Prevent errors if products is not defined
+  this.filteredProducts = this.products.filter(product =>
+    product.product_name.toLowerCase().includes(this.searchProduct.toLowerCase())
+  );
+},
+  selectProduct(product) {
+    this.selectedProduct = product; // Set selected product
+    this.searchProduct = product.product_name; // Set input to selected product's name
+    this.filteredProducts = []; // Clear suggestions
+  },
     fetchPatients() {
-      axios
-        .get('/patients')
-        .then((response) => {
-          this.patients = response.data; // Assuming response.data contains the patient array
-        })
-        .catch((error) => {
-          console.error('Error fetching patients:', error);
-        });
-    },
-    filterPatients(item) {
-      const searchTerm = this.search.toLowerCase();
-      return (
-        !searchTerm ||
-        item.name.toLowerCase().includes(searchTerm) // Adjust according to your data structure
-      );
-    },
+    axios.get('/patients')
+      .then((response) => {
+        this.patients = response.data;
+        this.filteredPatients = response.data; // Initialize filtered patients
+      })
+      .catch((error) => {
+        console.error('Error fetching patients:', error);
+      });
+  },
+  updateSearch() {
+    if (this.selectedPatient) {
+      this.search = this.selectedPatient.full_name; // Set search to selected patient's name
+    }
+  },
+  filterPatients() {
+  if (!this.patients) return; // Prevent errors if patients is not defined
+  this.filteredPatients = this.patients.filter(patient =>
+    patient.full_name.toLowerCase().includes(this.search.toLowerCase())
+  );
+},
+  filterPatients() {
+    this.filteredPatients = this.patients.filter(patient =>
+      patient.full_name.toLowerCase().includes(this.search.toLowerCase())
+    );
+  },
+  selectPatient(patient) {
+    this.selectedPatient = patient;
+    this.search = patient.full_name; // Set input to selected patient's name
+    this.filteredPatients = []; // Clear suggestions
+  },
+
     saveNewUser() {
       if (!this.selectedPatient) {
         Swal.fire('Error', 'Please select a patient.', 'error'); // Show error if no patient selected
@@ -128,6 +192,19 @@ export default {
 </script>
   
   <style scoped>
+  .form-input {
+  padding: 0.75rem;
+  border: 1px solid #ccc; /* Adjust border color */
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  border-color: #3EB489; /* Change border color on focus */
+  outline: none;
+  box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
+}
   .bg-title {
     background-color: #f0f4f7;
     padding: 1rem;
@@ -230,6 +307,26 @@ export default {
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     font-size: 1rem;
   }
+  .suggestions {
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  position: absolute;
+  background: white;
+  z-index: 1000;
+  margin-top: 5rem; /* Add some spacing above */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.suggestions li {
+  padding: 0.75rem; /* Add padding for better touch target */
+  cursor: pointer; /* Change cursor to pointer */
+  transition: background-color 0.2s; /* Smooth background transition */
+}
+
+.suggestions li:hover {
+  background-color: #f0f0f0; /* Highlight on hover */
+}
 
   .select:focus {
     border-color: #3EB489;
