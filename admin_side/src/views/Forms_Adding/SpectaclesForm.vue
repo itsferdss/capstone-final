@@ -1,10 +1,16 @@
 <template>
   <main>
-    <h1 class="bg-title">Enter Patient's Spectacles</h1>
+    <h1 class="bg-title">Enter {{ patient.full_name }}'s Spectacles</h1>
     <div class="form-container">
       <div class="form-box">
         <!-- Update form to call correct method -->
         <form @submit.prevent="saveChildGlasses">
+
+          <div class="input-box-container">
+            <label for="prescription_date" class="presDate">Prescription Date:</label>
+            <input type="date" v-model="prescriptionDate" id="prescription_date" class="date-input" />
+          </div>
+
           <div class="form-row">
             <div class="form-column">
               <div class="form-group">
@@ -77,7 +83,11 @@ import axios from 'axios';
 
 export default {
   data() {
+
+    const today = new Date().toISOString().split('T')[0]; 
+
     return {
+      prescriptionDate: today,
       editedItem: {
         frame: '', // Dropdown to select frame
         type_of_lens: '',
@@ -89,9 +99,20 @@ export default {
       },
       frames: [], // Array to store frames fetched from API
       lenses: [],
+      patient: {},
     };  
   },
   methods: {
+    fetchPatient() {
+      const patientId = this.$route.query.patient_id;
+      axios.get(`patients/${patientId}`)
+        .then(response => {
+          this.patient = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching patient:', error);
+        });
+    },
     saveChildGlasses() {
       if (!this.editedItem) {
         console.error('Error: No glasses information available');
@@ -110,6 +131,7 @@ export default {
         price: this.editedItem.price,
         customLens: this.editedItem.customLens,
         customFrame: this.editedItem.customFrame,
+        date: this.prescriptionDate,
       };
 
       axios.post(`/patients/${patientId}/glasses`, glassesData)
@@ -180,6 +202,7 @@ export default {
   mounted() {
     this.fetchProducts();
     this.fetchLens();
+    this.fetchPatient();
   },
 };
 
@@ -292,5 +315,16 @@ input:focus {
   border-color: #3EB489;
   outline: none;
   box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
+}
+
+.input-box-container{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.presDate{
+  margin-top: 10px;
+  margin-right: 10px;
 }
 </style>

@@ -1,31 +1,27 @@
 <template>
   <main>
-    <h1 class="bg-title">Enter Patient's History</h1>
+    <h1 class="bg-title">Enter {{ patient.full_name }}'s History</h1>
     <div class="form-container">
       <div class="form-box">
         <!-- Update form to call the correct method -->
         <form @submit.prevent="saveNewHistory">
+
+          <div class="input-box-container">
+            <label for="prescription_date" class="presDate">Prescription Date:</label>
+            <input type="date" v-model="prescriptionDate" id="prescription_date" class="dateHis" />
+          </div>
+
           <div class="form-row">
             <div class="form-column">
               <div class="form-group">
                 <label for="medical_history">Medical History</label>
-                <input
-                  type="text"
-                  v-model="editedItem.medical_history"
-                  id="medical_history"
-                  class="form-input"
-                  required
-                />
+                <input type="text" v-model="editedItem.medical_history" id="medical_history" class="form-input"
+                  required />
               </div>
               <div class="form-group">
                 <label for="ocular_history">Ocular History</label>
-                <input
-                  type="text"
-                  v-model="editedItem.ocular_history"
-                  id="ocular_history"
-                  class="form-input"
-                  required
-                />
+                <input type="text" v-model="editedItem.ocular_history" id="ocular_history" class="form-input"
+                  required />
               </div>
             </div>
           </div>
@@ -50,7 +46,11 @@ import axios from 'axios';
 
 export default {
   data() {
+    
+    const today = new Date().toISOString().split('T')[0]; 
+
     return {
+      prescriptionDate: today,
       editedItem: {
         history_updated: '',
         medical_history: '',
@@ -58,9 +58,23 @@ export default {
         patient_id: '',
       },
       selectedPatient: null, // Ensure that selectedPatient is defined
+      patient: {},
     };
   },
+  mounted() {
+    this.fetchPatient();
+  },
   methods: {
+    fetchPatient() {
+      const patientId = this.$route.query.patient_id;
+      axios.get(`patients/${patientId}`)
+        .then(response => {
+          this.patient = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching patient:', error);
+        });
+    },
     saveNewHistory() {
       // Check if editedItem contains all necessary data
       if (!this.editedItem) {
@@ -75,6 +89,7 @@ export default {
         patient_id: patientId, // Populate patient_id with selectedPatient's id
         medical_history: this.editedItem.medical_history,
         ocular_history: this.editedItem.ocular_history,
+        date: this.prescriptionDate,
       };
 
       // Make a POST request to save the new medical history
@@ -83,6 +98,8 @@ export default {
         .then(response => {
           // Medical history saved successfully
           console.log("Medical history saved successfully:", response.data);
+
+          this.resetForm();
 
           Swal.fire({
             title: "Success",
@@ -214,5 +231,20 @@ input:focus {
 
 .close:hover {
   background-color: #93222b;
+}
+
+.dateHis{
+  height: 45px;
+}
+
+.presDate{
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.input-box-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
 }
 </style>

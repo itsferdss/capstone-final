@@ -108,6 +108,27 @@ const router = createRouter({
                 requiresAuthentication: true, // Login page doesn't require authentication
             },
         },
+        {
+            path: '/edit/prescription',
+            component: () => import('../views/Form_Editing/EditPrescription.vue'),
+            meta: {
+                requiresAuthentication: true, // Login page doesn't require authentication
+            },
+        },
+        {
+            path: '/edit/spectacles',
+            component: () => import('../views/Form_Editing/EditSpectacles.vue'),
+            meta: {
+                requiresAuthentication: true, // Login page doesn't require authentication
+            },
+        },
+        {
+            path: '/edit/history',
+            component: () => import('../views/Form_Editing/EditHistory.vue'),
+            meta: {
+                requiresAuthentication: true, // Login page doesn't require authentication
+            },
+        },
        
         { path: '/', redirect: '/adminlogin' }
     ]

@@ -93,18 +93,17 @@
 
 
             <!-- Loop through selectedUserPrescriptions -->
-            <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index"
-              class="mb-4 prescription-table-container">
+            <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index" class="mb-4 presCard">
               <v-row class="align-center justify-space-between">
                 <v-col>
                   <v-card-title class="font-weight-bold presDate">
-                    Prescription Date: {{ formatPrescriptionDate(prescription.created_at) }}
+                    Prescription Date: {{ formatPrescriptionDate(prescription.date) }}
                   </v-card-title>
                 </v-col>
                 <v-col class="text-right">
-                  <v-btn color="error" @click="deletePrescription(selectedPatient.id, prescription.id)">
-                    <v-icon left>mdi-delete</v-icon>
-                    <div class="deleteText">Delete</div>
+                  <v-btn color="#35623D" @click="editPrescription(selectedPatient, prescription)">
+                    <v-icon left>mdi-pencil</v-icon>
+                    <div class="deleteText">Edit</div>
                   </v-btn>
                 </v-col>
               </v-row>
@@ -185,46 +184,46 @@
                   </v-menu>
                 </v-col>
               </v-row>
-      <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4">
-  <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.created_at) }}</v-card-title>
-  <v-card-text>
-    <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid black;">
-      <v-col cols="12" sm="4" class="label-col"><strong>Frame:</strong></v-col>
-      <v-col cols="12" sm="8">
-        <span v-if="glasses.product_id">{{ glasses.product.product_name }}</span>
-        <span v-else>{{ glasses.custom_frame }}</span>
-      </v-col>
-    </v-row>
+              <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4 presCard">
+                <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.date) }}</v-card-title>
+                <v-card-text>
+                  <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid black;">
+                    <v-col cols="12" sm="4" class="label-col"><strong>Frame:</strong></v-col>
+                    <v-col cols="12" sm="8">
+                      <span v-if="glasses.product_id">{{ glasses.product.product_name }}</span>
+                      <span v-else>{{ glasses.custom_frame }}</span>
+                    </v-col>
+                  </v-row>
 
-    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
-      <v-col cols="12" sm="4" class="label-col"><strong>Type of Lens:</strong></v-col>
-      <v-col cols="12" sm="8">
-        <span v-if="glasses.lens_id">{{ glasses.lens.product_name }}</span>
-        <span v-else>{{ glasses.custom_lens }}</span>
-      </v-col>
-    </v-row>
+                  <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+                    <v-col cols="12" sm="4" class="label-col"><strong>Type of Lens:</strong></v-col>
+                    <v-col cols="12" sm="8">
+                      <span v-if="glasses.lens_id">{{ glasses.lens.product_name }}</span>
+                      <span v-else>{{ glasses.custom_lens }}</span>
+                    </v-col>
+                  </v-row>
 
-    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
-      <v-col cols="12" sm="4" class="label-col"><strong>Remarks:</strong></v-col>
-      <v-col cols="12" sm="8">{{ glasses.remarks }}</v-col>
-    </v-row>
+                  <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+                    <v-col cols="12" sm="4" class="label-col"><strong>Remarks:</strong></v-col>
+                    <v-col cols="12" sm="8">{{ glasses.remarks }}</v-col>
+                  </v-row>
 
-    <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
-      <v-col cols="12" sm="4" class="label-col"><strong>Price:</strong></v-col>
-      <v-col cols="12" sm="8">₱{{ glasses.price }}</v-col>
-    </v-row>
+                  <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+                    <v-col cols="12" sm="4" class="label-col"><strong>Price:</strong></v-col>
+                    <v-col cols="12" sm="8">₱{{ glasses.price }}</v-col>
+                  </v-row>
 
-    <!-- Delete Button -->
-    <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
-      <v-col cols="12">
-        <v-btn color="error" @click="deleteGlasses(selectedPatient.id, glasses.id)">
-          <v-icon left>mdi-delete</v-icon>
-          <div class="deleteText">Delete</div>
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-card-text>
-</v-card>
+                  <!-- Delete Button -->
+                  <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
+                    <v-col cols="12">
+                      <v-btn color="#35623D" @click="editSpectacles(selectedPatient, glasses)">
+                        <v-icon left>mdi-pencil</v-icon>
+                        <div class="deleteText">Edit</div>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
             </v-card-text>
           </v-card>
         </v-dialog>
@@ -267,30 +266,30 @@
               </v-col>
             </v-row>
 
-            <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4">
-        <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.created_at) }}</v-card-title>
-        <v-card-text>
-          <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid lightgray;">
-            <v-col cols="12" sm="4" class="label-col"><strong>Medical History:</strong></v-col>
-            <v-col cols="12" sm="8">{{ history.medical_history }}</v-col>
-          </v-row>
+            <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4 presCard">
+              <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.date) }}</v-card-title>
+              <v-card-text>
+                <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid lightgray;">
+                  <v-col cols="12" sm="4" class="label-col"><strong>Medical History:</strong></v-col>
+                  <v-col cols="12" sm="8">{{ history.medical_history }}</v-col>
+                </v-row>
 
-          <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
-            <v-col cols="12" sm="4" class="label-col"><strong>Ocular History:</strong></v-col>
-            <v-col cols="12" sm="8">{{ history.ocular_history }}</v-col>
-          </v-row>
+                <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+                  <v-col cols="12" sm="4" class="label-col"><strong>Ocular History:</strong></v-col>
+                  <v-col cols="12" sm="8">{{ history.ocular_history }}</v-col>
+                </v-row>
 
-          <!-- Delete Button -->
-          <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
-            <v-col cols="12">
-              <v-btn color="error" @click="deleteHistory(selectedPatient.id, history.id)">
-                <v-icon left>mdi-delete</v-icon>
-                <div class="deleteText">Delete</div>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
+                <!-- Delete Button -->
+                <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
+                  <v-col cols="12">
+                    <v-btn color="#35623D" @click="editHistory(selectedPatient, history)">
+                      <v-icon left>mdi-pencil</v-icon>
+                      <div class="deleteText">Edit</div>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -305,6 +304,7 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import EditPrescription from '../views/Form_Editing/EditPrescription.vue';
 
 export default {
   data() {
@@ -376,17 +376,17 @@ export default {
   computed: {
   sortedPrescriptions() {
     return this.selectedUserPrescriptions.slice().sort((a, b) => {
-      return new Date(b.created_at) - new Date(a.created_at);
+      return new Date(b.date) - new Date(a.date);
     });
   },
   sortedGlasses() {
     return this.selectedUserGlasses.slice().sort((a, b) => {
-      return new Date(b.created_at) - new Date(a.created_at);
+      return new Date(b.date) - new Date(a.date);
     });
   },
   sortedHistory() {
     return this.selectedUserHistory.slice().sort((a, b) => {
-      return new Date(b.created_at) - new Date(a.created_at);
+      return new Date(b.date) - new Date(a.date);
     });
   },
   screenWidth() {
@@ -1220,7 +1220,51 @@ autoAdjustColumns(worksheet) {
     }, 0);
     column.width = Math.min(maxLength + 2, 30);
   });
-}
+},
+    editPrescription(patient, prescription) {
+      const patientId = patient.id; // Extracting patient_id from the patient object
+      const prescriptionId = prescription.id; // Extracting prescription_id from the prescription object
+
+      console.log('Opening child update dialog with patient_id:', patientId, 'and prescription_id:', prescriptionId);
+
+      this.$router.push({
+        path: '/edit/prescription',
+        query: {
+          patient_id: patientId,
+          prescription_id: prescriptionId // Add prescription_id to the query
+        }
+      });
+    },
+
+    editSpectacles(patient, glasses) {
+      const patientId = patient.id; // Extracting patient_id from the patient object
+      const glassesId = glasses.id; // Extracting prescription_id from the prescription object
+
+      console.log('Opening child update dialog with patient_id:', patientId, 'and prescription_id:', glassesId);
+
+      this.$router.push({
+        path: '/edit/spectacles',
+        query: {
+          patient_id: patientId,
+          glasses_id: glassesId // Add prescription_id to the query
+        }
+      });
+    },
+
+    editHistory(patient, history) {
+      const patientId = patient.id; // Extracting patient_id from the patient object
+      const historyId = history.id; // Extracting prescription_id from the prescription object
+
+      console.log('Opening child update dialog with patient_id:', patientId, 'and prescription_id:', historyId);
+
+      this.$router.push({
+        path: '/edit/history',
+        query: {
+          patient_id: patientId,
+          history_id: historyId // Add prescription_id to the query
+        }
+      });
+    },
 
 
 
@@ -1256,6 +1300,11 @@ autoAdjustColumns(worksheet) {
 
 td{
   text-align: center;
+}
+
+.presCard{
+  border-width: 1px 1px 2px 4px;
+  border-color: rgb(67, 100, 101);
 }
 
 @media (max-width: 960px) {

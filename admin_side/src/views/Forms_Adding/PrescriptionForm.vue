@@ -1,9 +1,14 @@
 <template>
   <main>
-    <h1 class="bg-title">Enter Patient's Prescription</h1>
+    <h1 class="bg-title">Enter {{ patient.full_name }}'s Prescription</h1>
     <div class="form-container">
       <div class="form-box">
         <form @submit.prevent="savePrescription">
+
+          <div class="input-box-container">
+            <label for="prescription_date" class="presDate">Prescription Date:</label>
+            <input type="date" v-model="prescriptionDate" id="prescription_date" class="date-input" />
+          </div>
           <table class="form-table">
             <thead>
               <tr>
@@ -99,7 +104,11 @@ import Swal from 'sweetalert2';
 
 export default {
   data() {
+
+    const today = new Date().toISOString().split('T')[0]; 
+
     return {
+      prescriptionDate: today,
       editedItem: {
         right_eye_sphere: '',
         left_eye_sphere: '',
@@ -112,9 +121,23 @@ export default {
         reading_add: '',
         PD: '',
       },
+      patient: {}, 
     };
   },
+  mounted() {
+    this.fetchPatient();
+  },
   methods: {
+    fetchPatient() {
+      const patientId = this.$route.query.patient_id;
+      axios.get(`/patients/${patientId}`)
+        .then(response => {
+          this.patient = response.data;
+        })
+        .catch(error => {
+          console.error('Error fetching patient:', error);
+        });
+    },
     savePrescription() {
       const patientId = this.$route.query.patient_id;
 
@@ -130,6 +153,7 @@ export default {
         right_eye_best_visual_acuity: this .editedItem.right_eye_best_visual_acuity,
         reading_add: this.editedItem.reading_add,
         PD: this.editedItem.PD,
+        date: this.prescriptionDate,
       };
 
       axios.post(`/patients/${patientId}/prescriptions`, prescriptionData)
@@ -275,6 +299,26 @@ input:focus {
 
 .close:hover {
   background-color: #93222b;
+}
+
+.input-box-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 200px;
+}
+
+.presDate{
+  margin-top: 10px;
+  margin-right: 10px;
+  font-weight: bold;
 }
 
 /* Media Queries for Responsiveness */

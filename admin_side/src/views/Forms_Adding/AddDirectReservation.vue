@@ -38,13 +38,17 @@
             <div class="form-column">
               <div class="form-group">
                 <label for="color">Color</label>
-                <input type="text" v-model="editedItem.color" id="color" class="form-input" required />
+                <select v-model="editedItem.color" id="color" class="form-input" required>
+                  <option v-for="color in parsedColorStock" :key="color.color" :value="color.color">
+                    {{ color.color }} (Stock: {{ color.stock }})
+                  </option>
+                </select>
               </div>
             </div>
           </div>
           <hr />
           <div class="form-buttons">
-            <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
+            <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }" @click="addReservation">
               Add Reservation
             </v-btn>
             <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white' }" @click="goBack">
@@ -64,112 +68,110 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      selectedPatient: null, // Store the selected patient object
+      selectedPatient: null,
       filteredProducts: [],
-      patients: [],  // Array to hold fetched patient data
-      filteredPatients: [], // New data property for filtered patients
-      products: [], // Array to hold fetched product data
-      searchProduct: '', // For managing product search
-      selectedProduct: null, // Store the selected product object
+      patients: [],
+      filteredPatients: [],
+      products: [],
+      searchProduct: '',
+      selectedProduct: null,
       search: '',
+      parsedColorStock: [],
       editedItem: {
+        product_name: '',
         product_id: '',
         quantity: '',
         created_at: '',
         color: '',
       },
-      error: null, // Optional error handling
     };
   },
   mounted() {
-    this.fetchPatients(); // Fetch patients when the component is mounted
-    this.fetchProducts(); // Fetch products
+    this.fetchPatients();
+    this.fetchProducts();
   },
   methods: {
     goBack() {
-      this.$router.go(-1); // Navigate back to the previous page
+      this.$router.go(-1);
     },
     fetchProducts() {
       axios.get('/products')
         .then((response) => {
           this.products = response.data;
-          this.filteredProducts = response.data; // Store fetched products
+          this.filteredProducts = response.data;
         })
         .catch((error) => {
           console.error('Error fetching products:', error);
         });
     },
     filterProducts() {
-      if (!this.products) return; // Prevent errors if products is not defined
+      if (!this.products) return;
       this.filteredProducts = this.products.filter(product =>
         product.product_name.toLowerCase().includes(this.searchProduct.toLowerCase())
       );
     },
     selectProduct(product) {
-      this.selectedProduct = product; // Set selected product
-      this.searchProduct = product.product_name; // Set input to selected product's name
-      this.filteredProducts = []; // Clear suggestions
+      this.selectedProduct = product;
+      this.searchProduct = product.product_name;
+      this.editedItem.product_id = product.id; // Set the product ID
+      this.filteredProducts = [];
+      this.editedItem.color = '';
+
+      // Parse the color_stock JSON string
+      try {
+        this.parsedColorStock = JSON.parse(product.color_stock);
+      } catch (error) {
+        console.error('Error parsing color_stock:', error);
+        this.parsedColorStock = [];
+      }
     },
     fetchPatients() {
       axios.get('/patients')
         .then((response) => {
           this.patients = response.data;
-          this.filteredPatients = response.data; // Initialize filtered patients
+          this.filteredPatients = response.data;
         })
         .catch((error) => {
           console.error('Error fetching patients:', error);
         });
     },
-    updateSearch() {
-      if (this.selectedPatient) {
-        this.search = this.selectedPatient.full_name; // Set search to selected patient's name
-      }
-    },
     filterPatients() {
-      if (!this.patients) return; // Prevent errors if patients is not defined
-      this.filteredPatients = this.patients.filter(patient =>
-        patient.full_name.toLowerCase().includes(this.search.toLowerCase())
-      );
-    },
-    filterPatients() {
+      if (!this.patients) return;
       this.filteredPatients = this.patients.filter(patient =>
         patient.full_name.toLowerCase().includes(this.search.toLowerCase())
       );
     },
     selectPatient(patient) {
       this.selectedPatient = patient;
-      this.search = patient.full_name; // Set input to selected patient's name
-      this.filteredPatients = []; // Clear suggestions
+      this.search = patient.full_name;
+      this.filteredPatients = [];
     },
-
-    saveNewUser() {
+    addReservation() {
       if (!this.selectedPatient) {
-        Swal.fire('Error', 'Please select a patient.', 'error'); // Show error if no patient selected
+        Swal.fire('Error', 'Please select a patient.', 'error');
         return;
       }
 
       const reservationData = {
-        user_id: this.selectedPatient.id, // Use the selected patient ID
+        user_id: this.selectedPatient.id,
         product_id: this.editedItem.product_id,
         quantity: this.editedItem.quantity,
-        created_at: this.editedItem.created_at,
+        product_name: this.editedItem.product_name,
+        // created_at: this.editedItem.created_at,
         color: this.editedItem.color,
       };
 
-      // Send reservation data to API
-      axios.post('/reservations', reservationData)
+      axios.post('/adminReserve', reservationData)
         .then(response => {
-          Swal.fire('Success', 'Reservation added successfully!', 'success'); // Show success message
-          // Handle success (e.g., redirect or reset form)
+          Swal.fire('Success', 'Reservation added successfully!', 'success');
         })
         .catch(error => {
-          Swal.fire('Error', 'Failed to add reservation: ' + error.message, 'error'); // Show error message
+          Swal.fire('Error', 'Failed to add reservation: ' + error.message, 'error');
         });
     },
   },
 };
 </script>
-
 <style scoped>
 .form-input {
   padding: 0.75rem;
