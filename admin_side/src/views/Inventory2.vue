@@ -12,7 +12,7 @@
         <!-- Button to minimize or expand cards -->
         <div class="minimize-button">
             <v-btn @click="toggleCards" color="primary">
-                {{ cardsMinimized ? 'Expand Cards' : 'Minimize Cards' }}
+                {{ cardsMinimized ? 'See Reports' : 'Minimize Reports' }}
             </v-btn>
         </div>
 
