@@ -45,6 +45,7 @@
         </td>
         <td>{{ appointments.quantity }}</td>
         <td>
+          <v-icon size="small" style="color: #d33" @click="declineAppointment(appointments.id)">mdi-cancel</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="pickedUp(appointments)">mdi-truck</v-icon>
         </td>
       </tr>
@@ -116,6 +117,46 @@ export default {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, options);
   },
+    declineAppointment(id) {
+      // Show confirmation dialog
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to undo this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, decline it!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // If the user confirms, proceed with the decline
+          axios.put(`/reservations/${id}/decline`)
+            .then(response => {
+              // Remove the declined appointment from acceptedAppointments
+              const index = this.acceptedAppointments.findIndex(appointment => appointment.id === id);
+              if (index !== -1) {
+                this.acceptedAppointments.splice(index, 1);
+              }
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Reservation Declined',
+                text: 'The reservation has been declined successfully!',
+              });
+              this.fetchAppointments();
+            })
+            .catch(error => {
+              console.error('Error declining reservation:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to decline the reservation. Please try again later.',
+              });
+            });
+        }
+      });
+    },
 
   pickedUp(appointment) {
   Swal.fire({

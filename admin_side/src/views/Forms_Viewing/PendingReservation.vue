@@ -120,28 +120,43 @@ export default {
             this.$router.push('/schedule');
         },
         declineAppointment(id) {
-            axios.put(`/reservations/${id}/decline`)
-                .then(response => {
-                    // Remove the declined appointment from pendingAppointments
-                    const index = this.pendingAppointments.findIndex(appointment => appointment.id === id);
-                    if (index !== -1) {
-                        this.pendingAppointments.splice(index, 1);
-                    }
+            // Show confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, decline it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If the user confirms, proceed with the decline
+                    axios.put(`/reservations/${id}/decline`)
+                        .then(response => {
+                            // Remove the declined appointment from pendingAppointments
+                            const index = this.pendingAppointments.findIndex(appointment => appointment.id === id);
+                            if (index !== -1) {
+                                this.pendingAppointments.splice(index, 1);
+                            }
 
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Reservation Declined',
-                        text: 'The reservation has been declined successfully!',
-                    });
-                })
-                .catch(error => {
-                    console.error('Error declining reservation:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Failed to decline the reservation. Please try again later.',
-                    });
-                });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Reservation Declined',
+                                text: 'The reservation has been declined successfully!',
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error declining reservation:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Failed to decline the reservation. Please try again later.',
+                            });
+                        });
+                }
+            });
         },
         formatPrescriptionDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };

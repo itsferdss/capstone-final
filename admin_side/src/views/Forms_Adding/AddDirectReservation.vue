@@ -147,8 +147,15 @@ export default {
       this.filteredPatients = [];
     },
     addReservation() {
+      // Check if a patient is selected
       if (!this.selectedPatient) {
         Swal.fire('Error', 'Please select a patient.', 'error');
+        return;
+      }
+
+      // Check if the quantity exceeds 5
+      if (this.editedItem.quantity > 5) {
+        Swal.fire('Error', 'The quantity cannot exceed 5.', 'error');
         return;
       }
 
@@ -157,10 +164,10 @@ export default {
         product_id: this.editedItem.product_id,
         quantity: this.editedItem.quantity,
         product_name: this.editedItem.product_name,
-        // created_at: this.editedItem.created_at,
         color: this.editedItem.color,
       };
 
+      // Make API call to create a reservation
       axios.post('/adminReserve', reservationData)
         .then(response => {
           Swal.fire('Success', 'Reservation added successfully!', 'success');

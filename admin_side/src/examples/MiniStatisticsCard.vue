@@ -9,7 +9,7 @@
             borderRadius: icon.shape === 'rounded-circle' ? '50%' : '4px',
           }"
         >
-          <v-icon :class="`text-lg opacity-10 ${icon.component}`" :style="{ color: icon.color }">
+          <v-icon :style="{ color: icon.color + ' !important' }">
             {{ icon.component }}
           </v-icon>
         </div>
@@ -82,7 +82,7 @@ defineProps({
 
 <style scoped>
 .mini-statistics-card {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #000000;
   border-radius: 8px;
   background-color: #ffffff;
   transition: box-shadow 0.3s ease;

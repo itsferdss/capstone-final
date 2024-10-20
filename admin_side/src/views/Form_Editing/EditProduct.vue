@@ -1,45 +1,44 @@
 <template>
-    <main>
-        <h1 class="bg-title">Edit {{ editedItem.product_name }} Information</h1>
-        <div class="form-container">
-            <div class="form-box">
+    <main class="edit-product">
+        <h1 class="edit-title">Edit {{ editedItem.product_name }}</h1>
+        <div class="edit-form-container">
+            <div class="edit-form-box">
                 <form @submit.prevent="saveEditedProduct">
-                    <div class="form-row">
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="quantity">Quantity</label>
-                                <input type="number" v-model="editedItem.quantity" id="quantity" class="form-input"
-                                    disabled />
-                            </div>
-                        </div>
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="price">Price</label>
-                                <input type="number" step="0.01" v-model="editedItem.price" id="price"
-                                    class="form-input" required placeholder="Enter price" />
-                            </div>
-                        </div>
+                    <div class="edit-form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" v-model="editedItem.quantity" id="quantity" class="edit-input" disabled />
                     </div>
-                    <div class="form-group" v-if="editedItem.color_stock.length > 0">
+
+                    <div class="edit-form-group">
+                        <label for="price">Price</label>
+                        <input type="number" step="0.01" v-model="editedItem.price" id="price" class="edit-input"
+                            required placeholder="Enter price" />
+                    </div>
+
+                    <div class="edit-form-group" v-if="editedItem.color_stock.length > 0">
                         <label for="colorStock">Color Stock</label>
-                        <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="form-row">
-                            <input type="text" v-model="colorStock.color" placeholder="Color" class="form-input"
-                                required />
-                            <input type="number" v-model.number="colorStock.stock" @input="updateQuantity"
-                                placeholder="Stock" class="form-input" required />
-                            <button type="button" class="rmvBtn" @click="removeColorStock(index)">Remove</button>
-                            <input type="number" v-model.number="colorStock.restockQuantity" placeholder="Restock"
-                                class="form-input" style="width: 200px; margin-bottom: 20px;" />
-                            <button type="button" class="restockBtn" @click="restockQuantity(index)">Restock</button>
+                        <div class="edit-color-stock">
+                            <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="color-row">
+                                <input type="text" v-model="colorStock.color" placeholder="Color" class="edit-input"
+                                    required />
+                                <input type="number" v-model.number="colorStock.stock" @input="updateQuantity"
+                                    placeholder="Stock" class="edit-input" required />
+                                <input type="number" v-model.number="colorStock.restockQuantity" placeholder="Restock"
+                                    class="edit-input restock-input" />
+                                <button type="button" class="btn restock-btn" @click="restockQuantity(index)">
+                                    Restock
+                                </button>
+                                <button type="button" class="btn remove-btn" @click="removeColorStock(index)">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
-                        <button type="button" class="addClr" @click="addColorStock">Add Color Stock</button>
+                        <button type="button" class="btn add-btn" @click="addColorStock">Add Color Stock</button>
                     </div>
-                    <hr />
-                    <div class="form-buttons">
-                        <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">Save
-                            Product</v-btn>
-                        <v-btn class="close" type="button" :style="{ backgroundColor: '#A82946', color: 'white' }"
-                            @click="goBack">Back</v-btn>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn save-btn">Save Product</button>
+                        <button type="button" class="btn cancel-btn" @click="goBack">Back</button>
                     </div>
                 </form>
             </div>
@@ -136,168 +135,137 @@ export default {
 </script>
 
 <style scoped>
-.bg-title {
-    background-color: #f0f4f7;
-    padding: 1rem;
-    text-align: center;
-    color: #333;
-    font-size: 1.75rem;
-    font-weight: bold;
-    border-bottom: 2px solid #e0e0e0;
+.edit-product {
+    padding: 20px;
 }
 
-.form-container {
+.edit-title {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.edit-form-container {
     display: flex;
     justify-content: center;
-    padding: 2rem;
+    margin-top: 50px;
 }
 
-.form-box {
-    background: #ffffff;
+.edit-form-box {
+    background-color: #fff;
+    padding: 30px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
     width: 100%;
-    max-width: 800px;
+    max-width: 600px;
 }
 
-.form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.form-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
+.edit-form-group {
+    margin-bottom: 20px;
 }
 
 label {
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: #333;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
 }
 
-input {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    font-size: 1rem;
+.edit-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
 }
 
-input:focus {
+.edit-input:focus {
     border-color: #3EB489;
     outline: none;
-    box-shadow: 0 0 8px rgba(62, 180, 137, 0.5);
 }
 
-.form-buttons {
+.color-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.restock-input {
+    width: 100px;
+}
+
+.form-actions {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.v-btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.v-btn:hover {
+.btn:hover {
     transform: translateY(-2px);
 }
 
-.close {
+.save-btn {
+    background-color: #3EB489;
+    color: white;
+}
+
+.cancel-btn {
     background-color: #A82946;
-    color: #fff;
+    color: white;
 }
 
-.close:hover {
-    background-color: #93222b;
+.add-btn {
+    background-color: #007BFF;
+    color: white;
 }
 
-.addClr {
-    background-color: rgb(10, 126, 89);
-    width: 30%;
-    height: 40px;
-    border-radius: 5px;
-    margin-top: 20px;
-    color: rgb(226, 226, 226);
-    font-weight: bold;
-}
-
-.rmvBtn {
-    background-color: #940601;
-    height: 40px;
-    width: 150px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: rgb(214, 213, 213);
-}
-
-.restockBtn {
+.restock-btn {
     background-color: #01944d;
-    height: 40px;
-    width: 150px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: rgb(214, 213, 213);
+    color: white;
 }
 
+.remove-btn {
+    background-color: #940601;
+    color: white;
+}
+
+/* Media Queries */
 @media (max-width: 768px) {
-    .form-box {
-        padding: 1rem;
-        max-width: 100%;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .v-btn {
-        padding: 0.5rem 1rem;
+    .edit-form-box {
+        padding: 20px;
         width: 100%;
     }
 
-    .form-buttons {
+    .color-row {
         flex-direction: column;
-        gap: 0.5rem;
     }
 
-    .addClr {
-        height: 50px;
-        width: 200px;
+    .form-actions {
+        flex-direction: column;
     }
 }
 
 @media (max-width: 480px) {
-    .bg-title {
-        font-size: 1.25rem;
-        padding: 0.5rem;
+    .edit-title {
+        font-size: 20px;
     }
 
-    .form-container {
-        padding: 0;
-    }
-
-    input {
-        font-size: 0.875rem;
-        padding: 0.5rem;
-    }
-
-    .form-buttons {
-        flex-direction: column;
-        gap: 0.5rem;
+    .edit-input {
+        font-size: 14px;
+        padding: 8px;
     }
 }
 </style>

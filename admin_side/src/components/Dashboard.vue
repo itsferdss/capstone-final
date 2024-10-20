@@ -51,9 +51,10 @@
                       class="lineCaption"></div>
                   </div>
                   <div class="year-navigation">
-                      <v-icon @click="prevYear" :disabled="currentYear <= minYear">mdi-chevron-left</v-icon> <!-- Use left chevron icon -->
-                      <v-icon class="nextYr" @click="nextYear">mdi-chevron-right</v-icon> <!-- Use right chevron icon -->
-                    
+                    <v-icon @click="prevYear" :disabled="currentYear <= minYear">mdi-chevron-left</v-icon>
+                    <!-- Use left chevron icon -->
+                    <v-icon class="nextYr" @click="nextYear">mdi-chevron-right</v-icon> <!-- Use right chevron icon -->
+
                   </div>
                 </v-card-title>
 

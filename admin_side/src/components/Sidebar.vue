@@ -173,7 +173,7 @@ export default {
 }
 
 .logout-link {
-  margin-top: 250px;
+  margin-top: 200px;
 }
 
 @media (max-width: 960px) {
