@@ -3,11 +3,62 @@
         <div class="title-container">
             <h1 class="ghostTitle">Inventory</h1>
             <div class="dash">
-                <span class="material-icons">inventory</span>
+                <span class="material-icons card-icon">inventory</span>
                 <span class="text">Inventory</span>
             </div>
         </div>
         <hr class="divider">
+
+        <!-- Button to minimize or expand cards -->
+        <div class="minimize-button">
+            <v-btn @click="toggleCards" color="primary">
+                {{ cardsMinimized ? 'Expand Cards' : 'Minimize Cards' }}
+            </v-btn>
+        </div>
+
+        <div class="cards-container" v-if="!cardsMinimized">
+            <v-row>
+                <v-col cols="12" sm="4">
+                    <v-card class="pa-4 inventCard" style="height: 180px;">
+                        <v-card-title>
+                            <div class="icon-circle">
+                                <span class="material-icons">inventory</span>
+                            </div>
+                            Top 3 Products (Most Sold)
+                        </v-card-title>
+                        <v-card-text>
+                            <ul>
+                                <li v-for="(product, index) in topThreeProducts" :key="index">
+                                    {{ product.product_name }} - Sold: {{ product.total_sold }}
+                                </li>
+                            </ul>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+                <v-col cols="12" sm="4">
+                    <v-card class="pa-4 inventCard" style="height: 180px;">
+                        <v-card-title>
+                            <div class="icon-circle">
+                                <span class="material-icons">shopping_cart</span>
+                            </div>
+                            Total Sold
+                        </v-card-title>
+                        <v-card-text class="sold">{{ totalSold }}</v-card-text>
+                    </v-card>
+                </v-col>
+                <v-col cols="12" sm="4">
+                    <v-card class="pa-4 inventCard" style="height: 180px;">
+                        <v-card-title>
+                            <div class="icon-circle">
+                                <span class="material-icons">attach_money</span>
+                            </div>
+                            Total Reservation Revenue
+                        </v-card-title>
+                        <v-card-text class="rev">₱{{ totalRevenue }}</v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </div>
 
         <div class="main-content">
             <div class="inventory2">
@@ -17,29 +68,72 @@
     </main>
 </template>
 
+
 <script>
 import Inventory2 from '../components/Inventory2.vue';
 
 export default {
     data() {
         return {
-            activeTab: 'Inventory2'
+            activeTab: 'Inventory2',
+            products: [],
+            cardsMinimized: false, // New data property to manage card visibility
         };
+    },
+    computed: {
+        topThreeProducts() {
+            return [...this.products]
+                .sort((a, b) => b.total_sold - a.total_sold)
+                .slice(0, 3);
+        },
+        totalSold() {
+            return this.products.reduce((total, product) => {
+                const sold = Number(product.total_sold) || 0;
+                return total + sold;
+            }, 0);
+        },
+        totalRevenue() {
+            return this.products.reduce((total, product) => total + (product.total_sold * product.price), 0);
+        }
+    },
+    mounted() {
+        this.fetchProducts();
     },
     methods: {
         handleTabClick(tab) {
-            this.activeTab = tab; // Update active tab
-            this.$emit('tab-clicked', tab); // Emit event with tab name
-        }
+            this.activeTab = tab;
+            this.$emit('tab-clicked', tab);
+        },
+        fetchProducts() {
+            axios.get('/allProducts')
+                .then(response => {
+                    if (Array.isArray(response.data)) {
+                        this.products = response.data;
+                    } else {
+                        this.error = 'Unexpected response format';
+                    }
+                })
+                .catch(error => {
+                    this.error = 'Error fetching products: ' + error.message;
+                });
+        },
+        toggleCards() {
+            this.cardsMinimized = !this.cardsMinimized; // Toggle the minimized state
+        },
     },
     components: {
         Inventory2,
-
     }
 };
 </script>
 
+
 <style lang="scss" scoped>
+.minimize-button {
+    margin: 20px 30px; // Adjust margin as needed
+    text-align: center; // Center the button
+}
+
 .ghostTitle {
     position: absolute;
     z-index: -1;
@@ -72,6 +166,13 @@ export default {
     font-size: 2.5rem;
 }
 
+.card-icon {
+    font-size: 2rem;
+    /* Adjust the size of the icons in the card */
+    margin-right: 8px;
+    /* Space between icon and text */
+}
+
 .text {
     margin-left: 0.5rem;
     color: #151515;
@@ -86,7 +187,7 @@ export default {
     margin-left: 30px;
     margin-right: 30px;
 
-    .inventory2{
+    .inventory2 {
         border-radius: 5px;
         background-color: #f0f0f0;
         padding: 0.5rem;
@@ -98,38 +199,63 @@ export default {
     }
 }
 
-.tab-content {
+.cards-container {
+    margin: 20px 30px;
+
+    /* Ensure card heights are the same and responsive */
+    v-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        /* Ensure cards fill the column */
+    }
+}
+
+.inventCard {
+    border-width: 1px 1px 2px 4px;
+    border-color: rgb(67, 100, 101);
+}
+
+.icon-circle {
     display: flex;
-    gap: 2rem; // Gap between buttons
-    padding: 1rem;
-    margin-left: 20px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px; 
+    border-radius: 50%; 
+    background-color: #aeeaaf; 
+    margin-right: 10px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
 }
 
-.tab-content button {
-    position: relative;
-    color: var(--dark);
-    font-size: 1.2rem;
+.icon-circle .material-icons {
+    color: #2c7438;
+    font-size: 1.5rem; 
+}
+
+/* Main icon color */
+.material-icons {
+    color: #1a1a1a;
+    font-size: 2.5rem;
+}
+
+.text {
+    margin-left: 0.5rem;
+    color: #151515;
+    font-size: 2rem;
     font-weight: 600;
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding-bottom: 0.5rem;
-    border-bottom: 3px solid transparent;
-    transition: border-bottom 0.2s;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
-.tab-content button:hover,
-.tab-content button:active,
-.tab-content button.active {
-    border-bottom: 3px solid black;
+.rev{
+    font-size: 25px;
+    margin-left: 10px;
 }
 
-.tab-content-display {
-    margin-top: 2rem;
-}
-
-.noButtons {
-    margin-left: 37%;
+.sold{
+    font-size: 25px;
+    margin-left: 10px;
 }
 
 @media (max-width: 960px) {
@@ -159,49 +285,19 @@ export default {
         font-size: 25px;
     }
 
-
     .ghostTitle {
         font-size: 65px;
         margin-top: 30px;
     }
 
-    .tab-content {
-        display: flex;
-        gap: 1rem;
-        padding: 0.5rem;
-        margin-left: 0px;
+    .cards-container {
+        margin: 10px 0; // Adjust spacing for smaller screens
     }
 
-    .tab-content button {
-        position: relative;
-        color: var(--dark);
-        font-size: 0.7rem;
-        font-weight: 600;
-        border: none;
-        background: none;
-        cursor: pointer;
-        padding-bottom: 0.25rem;
-        border-bottom: 2px solid transparent;
-        transition: border-bottom 0.2s;
-    }
-
-    .tab-content button:hover,
-    .tab-content button:active,
-    .tab-content button.active {
-        border-bottom: 2px solid black;
-    }
-
-    .tab-content-display {
-        margin-top: 1rem;
-    }
-
-    .inventory2{
+    .inventory2 {
         padding: 0.20rem;
         margin-bottom: 5px;
     }
-
-    .noButtons {
-        margin-left: 0%;
-    }
 }
 </style>
+
