@@ -41,7 +41,8 @@
             </div>
 
             <!-- Display the stock for the selected color -->
-            <p v-if="selectedColor">Stock for {{ selectedColor }}: {{ selectedColorStock }}</p>
+            <p v-if="isLoggedIn">Stock for {{ selectedColor }}: {{ selectedColorStock }}</p>
+
           </div>
 
           <div class="offers">
@@ -95,22 +96,23 @@
     </v-dialog>
 
     <!--LOGIN DIALOG-->
-    <v-dialog v-model="loginDialog" persistent max-width="400px" class="login-dialog">
+    <v-dialog v-model="loginDialog" persistent max-width="650px" class="login-dialog">
       <v-card class="login-card elevation-8">
         <!-- Header with logo and title -->
-        <v-card-title class="login-header">
-          <v-img src="../src/assets/MVC_logo.png" class="mvcLogo" contain></v-img>
-          <span class="login-title">Log in to continue</span>
+        <v-card-title class="login-header justify-center">
+          <!-- <v-img src="../src/assets/MVC_logo.png" class="mvcLogo mr-2" contain></v-img> -->
+          <span class="login-title">Sign In To Continue</span>
         </v-card-title>
 
         <v-card-text>
           <!-- Email input with icon -->
-          <v-text-field label="Email" v-model="loginForm.email" required outlined prepend-icon="mdi-email" class="mb-4"
-            color="primary"></v-text-field>
+          <v-text-field label="Email Address" v-model="loginForm.email" required outlined prepend-icon="mdi-email"
+            color="primary" class="mb-4" dense>
+          </v-text-field>
 
           <!-- Password input with show/hide icon -->
           <v-text-field :type="showPassword ? 'text' : 'password'" label="Password" v-model="loginForm.password"
-            required outlined prepend-icon="mdi-lock" class="mb-4" color="primary">
+            required outlined prepend-icon="mdi-lock" color="primary" class="mb-4" dense>
             <template v-slot:append>
               <v-icon @click="togglePasswordVisibility" class="eye-icon" style="cursor: pointer;">
                 {{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}
@@ -129,9 +131,9 @@
         </v-card-text>
 
         <!-- Actions: Log In and Back -->
-        <v-card-actions class="justify-center">
-          <v-btn color="primary" @click="login" class="login-button" elevation="2">Log In</v-btn>
-          <v-btn text @click="loginDialog = false" class="rounded-button">Back</v-btn>
+        <v-card-actions class="justify-center mt-4">
+          <v-btn @click="login" class="login-button px-8 py-2" elevation="2">Log In</v-btn>
+          <v-btn text @click="loginDialog = false" class="rounded-button px-6">Back</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -150,6 +152,7 @@ export default {
     return {
       baseURL: 'http://127.0.0.1:8000', 
       photos: [],
+      isLoggedIn: false,
       currentIndex: 0,
       zoomed: false,
       zoomPosition: '0% 0%',
@@ -175,6 +178,11 @@ export default {
   },
   computed: {
     currentPhoto() {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        this.isLoggedIn = true;
+      }
       return this.photos[this.currentIndex];
     },
     ...mapState({
@@ -362,14 +370,20 @@ export default {
     },
   },
 
-  mounted() {
-    const productId = this.$route.query.id;
-    if (productId) {
-      this.fetchProductData(productId);
-    } else {
-      console.error('No product ID provided in query parameters.');
-    }
-  }
+      mounted() {
+        const productId = this.$route.query.id;
+
+        // Check if the user is logged in
+        const token = sessionStorage.getItem('token');
+        this.isLoggedIn = !!token; // Set to true if token exists
+
+        // Fetch product data if product ID is available
+        if (productId) {
+          this.fetchProductData(productId);
+        } else {
+          console.error('No product ID provided in query parameters.');
+        }
+      }
 };
 </script>
 
@@ -610,14 +624,6 @@ export default {
       border-radius: 10px;
     }
 
-    .mvcLogo {
-      width: 100%;
-      height: auto;
-      max-width: 300px;
-      margin: 0 auto 16px;
-      display: block;
-    }
-
     .input-group {
       margin-bottom: 16px;
     }
@@ -636,13 +642,6 @@ export default {
       box-sizing: border-box;
     }
 
-    .mvcLogo {
-      width: 520px;
-      /* Adjust logo size as needed */
-      margin-bottom: 20px;
-      margin-top: -40px;
-    }
-
     .eye-icon {
       cursor: pointer;
     }
@@ -651,50 +650,18 @@ export default {
       color: red;
       font-weight: bold;
       margin-top: 10px;
-      /* Spacing above error message */
     }
 
-    .rounded-button {
-      border-radius: 20px;
-      font-weight: bold;
-      min-width: 120px;
-      /* Ensures buttons have a consistent width */
-      transition: background-color 0.3s ease;
-      /* Smooth transition for button hover */
-    }
-
-    /* Optional: Button Hover Effect */
     .v-btn:hover {
       background-color: rgba(0, 191, 255, 0.2);
-      /* Lighten the button color on hover */
     }
 
-    /* Centering and Spacing */
     .v-card-title {
       margin-bottom: 20px;
     }
 
     .mb-4 {
       margin-bottom: 16px !important;
-      /* Ensures consistent spacing */
-    }
-
-    .login-dialog {
-      padding: 20px;
-    }
-
-    .login-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    .mvcLogo {
-      height: 50px;
-      width: 50px;
-      margin-right: 10px;
     }
 
     .login-title {
@@ -712,29 +679,67 @@ export default {
       font-size: 14px;
     }
 
-    .login-button {
-      width: 100%;
-      background-color: #3f51b5;
-      color: white;
+    .login-dialog {
+      border-radius: 10px;
+    }
+
+    .login-card {
+      padding: 20px;
+    }
+
+    .login-header {
+      font-size: 24px;
       font-weight: bold;
-      border-radius: 5px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .login-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .mvcLogo {
+      width: 40px;
+      height: 40px;
+    }
+
+    .v-text-field {
+      margin-bottom: 16px;
+    }
+
+    .login-button {
+      background-color: #596f93;
+      color: rgb(49, 49, 49);
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-button:hover {
+      background-color: #424c8b;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 8px;
     }
 
     .forgot-password {
       font-size: 14px;
       color: #3f51b5;
+      text-decoration: underline;
     }
 
-    .eye-icon {
-      color: #757575;
+    .rounded-button {
+      background-color: rgb(188, 92, 92);
+      color: #000000;
     }
 
-    .v-card-actions {
-      padding-bottom: 20px;
+    .rounded-button:hover {
+      background-color: rgb(176, 48, 48);
     }
-
-
-
 
     @media screen and (max-width: 960px) {
       .container {
@@ -773,8 +778,8 @@ export default {
       }
 
       .image-container {
-        width: 100%;
-        height: 300px;
+        width: auto;
+        height: auto;
         margin-top: 50px;
       }
 
