@@ -137,15 +137,29 @@ export default {
     fetchProducts() {
       axios.get('/allProducts')
         .then(response => {
-          this.products = response.data.map(product => ({
-            ...product,
-            currentImage: product.images[0] // Set the default image
-          }));
+          console.log('Response data:', response.data); // Inspect the structure here
+          this.products = response.data.map(product => {
+            const colorStock = JSON.parse(product.color_stock || "[]");
+
+            // Prepend the base URL to each color stock image
+            const colorStockImages = colorStock.map(color =>
+              color.image ? `http://127.0.0.1:8000/${color.image}` : null
+            );
+
+            const allImages = [...product.images, ...colorStockImages].filter(Boolean); // Filter out null values
+
+            return {
+              ...product,
+              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage
+            };
+          });
+          console.log('Products after mapping:', this.products); // Check final product structure
         })
         .catch(error => {
           console.error('Error fetching products:', error);
         });
     },
+
     changeImage(product, action) {
       if (product.images && product.images.length > 1) {
         if (action === 'hover') {

@@ -47,7 +47,7 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" v-if="showProductImage">
             <label for="images">Product Images</label>
             <input type="file" id="images" class="form-input" multiple @change="handleImageUpload" />
           </div>
@@ -57,6 +57,7 @@
               <input type="text" v-model="colorStock.color" placeholder="Color" class="form-input" required />
               <input type="number" v-model.number="colorStock.stock" @input="updateQuantity" placeholder="Stock"
                 class="form-input" required />
+              <input type="file" @change="handleColorImageUpload($event, index)" class="form-input" />
               <button type="button" @click="removeColorStock(index)">Remove</button>
             </div>
             <button type="button" @click="addColorStock">Add Color Stock</button>
@@ -100,19 +101,28 @@ export default {
   computed: {
     showColorStock() {
       return ['Frames'].includes(this.editedItem.type);
+    },
+    showProductImage() {
+      return ['Lens', 'Contact Lenses', 'Accessories'].includes(this.editedItem.type);
     }
   },
   methods: {
     addColorStock() {
-      this.editedItem.color_stock.push({ color: '', stock: 0 });
+      this.editedItem.color_stock.push({ color: '', stock: 0, image: null });
     },
     removeColorStock(index) {
       this.editedItem.color_stock.splice(index, 1);
-      this.updateQuantity(); 
+      this.updateQuantity();
     },
     updateQuantity() {
       const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
       this.editedItem.quantity = totalStock;
+    },
+    handleColorImageUpload(event, index) {
+      const file = event.target.files[0];
+      if (file) {
+        this.editedItem.color_stock[index].image = file; // Assign the image file to the color stock
+      }
     },
     handleImageUpload(event) {
       this.editedItem.images = Array.from(event.target.files);
@@ -135,13 +145,20 @@ export default {
       formData.append('price', this.editedItem.price);
       formData.append('type', this.editedItem.type);
       formData.append('gender', this.editedItem.gender);
-      formData.append('color_stock', JSON.stringify(this.editedItem.color_stock)); // Add color stock
+      formData.append('color_stock', JSON.stringify(this.editedItem.color_stock.map(({ color, stock }) => ({ color, stock }))));
 
       if (this.editedItem.images && this.editedItem.images.length > 0) {
         this.editedItem.images.forEach(image => {
           formData.append('product_images[]', image);
         });
       }
+      
+      // Append the images for each color stock
+      this.editedItem.color_stock.forEach((colorStock, index) => {
+        if (colorStock.image) {
+          formData.append(`color_images[${index}]`, colorStock.image); // Send images with a key per color
+        }
+      });
 
       axios.post('/products', formData, {
         headers: {

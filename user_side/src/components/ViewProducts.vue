@@ -37,9 +37,11 @@
             <p>Available Colors:</p>
             <div class="colors">
               <div v-for="item in product.color_stock" :key="item.color" class="color-palette"
-                :style="{ backgroundColor: item.color }">
-              </div>
+                :style="{ backgroundColor: item.color }" @click="selectColor(item)"></div>
             </div>
+
+            <!-- Display the stock for the selected color -->
+            <p v-if="selectedColor">Stock for {{ selectedColor }}: {{ selectedColorStock }}</p>
           </div>
 
           <div class="offers">
@@ -60,7 +62,7 @@
           <div class="colors">
             <div v-for="item in product.color_stock" :key="item.color"
               :class="['color-palette', { selected: selectedColor === item.color }]"
-              :style="{ backgroundColor: item.color }" @click="selectColor(item.color)">
+              :style="{ backgroundColor: item.color }" @click="selectColor(item)">
             </div>
           </div>
 
@@ -94,55 +96,45 @@
 
     <!--LOGIN DIALOG-->
     <v-dialog v-model="loginDialog" persistent max-width="400px" class="login-dialog">
-    <v-card class="login-card elevation-8">
-      <v-card-title class="login-title text-center">Log in to continue.</v-card-title>
+      <v-card class="login-card elevation-8">
+        <!-- Header with logo and title -->
+        <v-card-title class="login-header">
+          <v-img src="../src/assets/MVC_logo.png" class="mvcLogo" contain></v-img>
+          <span class="login-title">Log in to continue</span>
+        </v-card-title>
 
-      <v-card-text class="text-center">
-        <v-img src="../src/assets/MVC_logo.png" class="mvcLogo" contain></v-img>
+        <v-card-text>
+          <!-- Email input with icon -->
+          <v-text-field label="Email" v-model="loginForm.email" required outlined prepend-icon="mdi-email" class="mb-4"
+            color="primary"></v-text-field>
 
-        <v-text-field
-          label="Email"
-          v-model="email"
-          required
-          outlined
-          class="mb-4"
-          prepend-icon="mdi-email"
-        ></v-text-field>
+          <!-- Password input with show/hide icon -->
+          <v-text-field :type="showPassword ? 'text' : 'password'" label="Password" v-model="loginForm.password"
+            required outlined prepend-icon="mdi-lock" class="mb-4" color="primary">
+            <template v-slot:append>
+              <v-icon @click="togglePasswordVisibility" class="eye-icon" style="cursor: pointer;">
+                {{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </template>
+          </v-text-field>
 
-        <v-text-field
-          :type="passwordType"
-          label="Password"
-          v-model="password"
-          required
-          outlined
-          class="mb-4"
-          prepend-icon="mdi-lock"
-        >
-          <template v-slot:append>
-            <v-icon
-              @click="togglePasswordVisibility"
-              class="eye-icon"
-              style="cursor: pointer;"
-            >
-              {{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}
-            </v-icon>
-          </template>
-        </v-text-field>
+          <!-- Error message (if any) -->
+          <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
 
-        <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-      </v-card-text>
+          <!-- Remember me and forgot password links -->
+          <v-row justify="space-between" align="center" class="mt-2">
+            <v-checkbox v-model="rememberMe" label="Remember Me" class="ma-0"></v-checkbox>
+            <v-btn text @click="forgotPassword" class="forgot-password">Forgot Password?</v-btn>
+          </v-row>
+        </v-card-text>
 
-      <v-card-actions class="justify-center">
-        <v-btn color="#00BFFF" @click="login" class="mr-2 rounded-button" elevation="2">Log In</v-btn>
-        <v-btn text @click="loginDialog = false" class="rounded-button">Back</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-
-
-
-
+        <!-- Actions: Log In and Back -->
+        <v-card-actions class="justify-center">
+          <v-btn color="primary" @click="login" class="login-button" elevation="2">Log In</v-btn>
+          <v-btn text @click="loginDialog = false" class="rounded-button">Back</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -156,6 +148,7 @@ export default {
   name: 'ProductPage',
   data() {
     return {
+      baseURL: 'http://127.0.0.1:8000', 
       photos: [],
       currentIndex: 0,
       zoomed: false,
@@ -171,7 +164,9 @@ export default {
       },
       colorDialog: false,
       selectedColor: null,
+      selectedColorImage: null,
       loginDialog: false,
+      reserveQuantity: 1,
       loginForm: {
         email: '',
         password: '',
@@ -185,21 +180,62 @@ export default {
     ...mapState({
       patientId: state => state.patientId || localStorage.getItem('patientId'),
     }),
+    selectedColorStock() {
+      const selected = this.product.color_stock.find(item => item.color === this.selectedColor);
+      return selected ? selected.stock : 0; // Return stock or 0 if no color is selected
+    },
   },
   methods: {
     fetchProductData(productId) {
       axios.get(`/viewProduct/${productId}`)
         .then(response => {
           const product = response.data;
+
           // Parse color_stock JSON string into an array
-          product.color_stock = JSON.parse(product.color_stock);
-          this.product = product;
-          this.photos = product.images; // Ensure this is an array of image URLs
+          const colorStock = JSON.parse(product.color_stock || "[]");
+
+          // Prepend the base URL to each color stock image
+          const colorStockImages = colorStock.map(color =>
+            color.image ? `${this.baseURL}/${color.image}` : null
+          );
+
+          // Combine product images and color stock images
+          const allImages = [...product.images.map(image => `${this.baseURL}/${image}`), ...colorStockImages].filter(Boolean);
+
+          // Set the product data
+          this.product = {
+            ...product,
+            color_stock: colorStock, // Store the parsed color stock
+            images: allImages // Combine images
+          };
+
+          this.photos = allImages; // Ensure this is an array of image URLs
+          this.currentIndex = 0; // Reset current index to display the first image
         })
         .catch(error => {
           console.error('Error fetching product data:', error);
         });
     },
+    selectColor(item) {
+      this.selectedColor = item.color;
+      this.selectedColorImage = item.image; // Update the selected color image
+
+      // Update currentPhoto to the selected color image
+      const colorImage = `${this.baseURL}/${item.image}`; // Ensure correct URL
+      this.currentIndex = this.photos.findIndex(photo => photo === colorImage); // Update current index if the image exists in photos
+
+      // If the selected color image is not in photos, add it to photos
+      if (!this.photos.includes(colorImage)) {
+        this.photos.push(colorImage);
+      }
+
+      this.updateRightPhoto(this.currentIndex); // Update the displayed image
+    },
+
+    updateRightPhoto(index) {
+      // Your logic to update the displayed image based on the index
+    },
+
     login() {
       axios.post('/login', {
         email: this.loginForm.email,  
@@ -264,9 +300,6 @@ export default {
 
       this.colorDialog = true; // Open the color selection dialog if logged in
     },
-        selectColor(color) {
-          this.selectedColor = color; // Set the selected color
-        },
     confirmColor() {
       if (!this.selectedColor) {
         this.colorDialog = false;
@@ -326,7 +359,7 @@ export default {
     },
     goBack() {
       this.$router.go(-1);
-    }
+    },
   },
 
   mounted() {
@@ -603,79 +636,105 @@ export default {
       box-sizing: border-box;
     }
 
+    .mvcLogo {
+      width: 520px;
+      /* Adjust logo size as needed */
+      margin-bottom: 20px;
+      margin-top: -40px;
+    }
+
     .eye-icon {
       cursor: pointer;
-      position: absolute;
-      right: 10px;
-      top: 250 px;
     }
 
-    .loginButton {
-      width: 100%;
-      background-color: #b3e5fc;
-      color: #000;
-      text-transform: none;
-      font-weight: bold;
-    }
-
-    .error {
+    .error-message {
       color: red;
-      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+      /* Spacing above error message */
+    }
+
+    .rounded-button {
+      border-radius: 20px;
+      font-weight: bold;
+      min-width: 120px;
+      /* Ensures buttons have a consistent width */
+      transition: background-color 0.3s ease;
+      /* Smooth transition for button hover */
+    }
+
+    /* Optional: Button Hover Effect */
+    .v-btn:hover {
+      background-color: rgba(0, 191, 255, 0.2);
+      /* Lighten the button color on hover */
+    }
+
+    /* Centering and Spacing */
+    .v-card-title {
+      margin-bottom: 20px;
+    }
+
+    .mb-4 {
+      margin-bottom: 16px !important;
+      /* Ensures consistent spacing */
     }
 
     .login-dialog {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.9)); /* Gradient background */
-}
+      padding: 20px;
+    }
 
-.login-card {
-  padding: 30px;
-  border-radius: 12px; /* Increased border-radius for softness */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
-}
+    .login-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
 
-.login-title {
-  font-size: 20px; /* Smaller font size for title */
-}
+    .mvcLogo {
+      height: 50px;
+      width: 50px;
+      margin-right: 10px;
+    }
 
-.mvcLogo {
-  width: 520px; /* Adjust logo size as needed */
-  margin-bottom: 20px;
-  margin-top: -40px;
-}
+    .login-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
 
-.eye-icon {
-  cursor: pointer;
-}
+    .mb-4 {
+      margin-bottom: 20px;
+    }
 
-.error-message {
-  color: red;
-  font-weight: bold;
-  margin-top: 10px; /* Spacing above error message */
-}
+    .error-message {
+      color: red;
+      text-align: center;
+      font-size: 14px;
+    }
 
-.rounded-button {
-  border-radius: 20px;
-  font-weight: bold;
-  min-width: 120px; /* Ensures buttons have a consistent width */
-  transition: background-color 0.3s ease; /* Smooth transition for button hover */
-}
+    .login-button {
+      width: 100%;
+      background-color: #3f51b5;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+    }
 
-/* Optional: Button Hover Effect */
-.v-btn:hover {
-  background-color: rgba(0, 191, 255, 0.2); /* Lighten the button color on hover */
-}
+    .forgot-password {
+      font-size: 14px;
+      color: #3f51b5;
+    }
 
-/* Centering and Spacing */
-.v-card-title {
-  margin-bottom: 20px;
-}
+    .eye-icon {
+      color: #757575;
+    }
 
-.mb-4 {
-  margin-bottom: 16px !important; /* Ensures consistent spacing */
-}
+    .v-card-actions {
+      padding-bottom: 20px;
+    }
 
 
-    
+
 
     @media screen and (max-width: 960px) {
       .container {

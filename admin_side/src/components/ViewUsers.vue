@@ -70,7 +70,7 @@
                     <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
                       <v-icon left>mdi-file-chart</v-icon>
                       Generate Report
-                      <v-icon right>mdi-menu-down"></v-icon>
+                      <v-icon right>mdi-menu-down</v-icon>
                     </v-btn>
                   </template>
                   <v-list>
@@ -91,9 +91,13 @@
               </v-col>
             </v-row>
 
+            <!-- Check if there are prescriptions -->
+            <div v-if="sortedPrescriptions.length === 0" class="no-data-message">
+              No Data Available
+            </div>
 
-            <!-- Loop through selectedUserPrescriptions -->
-            <v-card v-for="(prescription, index) in sortedPrescriptions" :key="index" class="mb-4 presCard">
+            <!-- Loop through selectedUserPrescriptions if available -->
+            <v-card v-else v-for="(prescription, index) in sortedPrescriptions" :key="index" class="mb-4 presCard">
               <v-row class="align-center justify-space-between">
                 <v-col>
                   <v-card-title class="font-weight-bold presDate">
@@ -184,10 +188,20 @@
                   </v-menu>
                 </v-col>
               </v-row>
-              <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4 presCard">
+
+              <div v-if="sortedPrescriptions.length === 0" class="no-data-message">
+                No Data Available
+              </div>
+
+              <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4 presCard"
+                :class="{ 'highlight-card': glasses.due_date }"
+                >
                 <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.date) }}</v-card-title>
+                <v-card-title v-if="glasses.due_date" class="glassDate due-date">
+                  Due Date: {{ formatPrescriptionDate(glasses.due_date) }}
+                </v-card-title>
                 <v-card-text>
-                  <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid black;">
+                  <v-row class="text-center" style="border-bottom: 1px solid black;">
                     <v-col cols="12" sm="4" class="label-col"><strong>Frame:</strong></v-col>
                     <v-col cols="12" sm="8">
                       <span v-if="glasses.product_id">{{ glasses.product.product_name }}</span>
@@ -213,7 +227,11 @@
                     <v-col cols="12" sm="8">₱{{ glasses.price }}</v-col>
                   </v-row>
 
-                  <!-- Delete Button -->
+                  <v-row v-if="glasses.due_date" class="text-center" style="border-bottom: 1px solid lightgray;">
+                    <v-col cols="12" sm="4" class="label-col"><strong>Balance:</strong></v-col>
+                    <v-col cols="12" sm="8">₱{{ glasses.balance }}</v-col>
+                  </v-row>
+
                   <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
                     <v-col cols="12">
                       <v-btn color="#35623D" @click="editSpectacles(selectedPatient, glasses)">
@@ -266,10 +284,14 @@
               </v-col>
             </v-row>
 
+            <div v-if="sortedPrescriptions.length === 0" class="no-data-message">
+              No Data Available
+            </div>
+
             <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4 presCard">
               <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.date) }}</v-card-title>
               <v-card-text>
-                <v-row class="text-center font-weight-bold" style="border-bottom: 1px solid lightgray;">
+                <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
                   <v-col cols="12" sm="4" class="label-col"><strong>Medical History:</strong></v-col>
                   <v-col cols="12" sm="8">{{ history.medical_history }}</v-col>
                 </v-row>
@@ -1305,6 +1327,24 @@ td{
 .presCard{
   border-width: 1px 1px 2px 4px;
   border-color: rgb(67, 100, 101);
+}
+
+.no-data-message {
+  text-align: center;
+  /* background-color: #bdd1dd; */
+  font-size: 1.0em;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.highlight-card {
+  background-color: #fbe7c6; 
+  border: 2px solid #f5a623;
+}
+
+.due-date {
+  color: #d9534f; 
+  font-weight: bold; 
 }
 
 @media (max-width: 960px) {

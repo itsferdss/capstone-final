@@ -11,6 +11,11 @@
                         <input type="date" v-model="prescriptionDate" id="prescription_date" class="date-input" />
                     </div>
 
+                    <div class="input-box-container">
+                        <label for="due_date" class="presDate">Due Date:</label>
+                        <input type="date" v-model="dueDate" id="due_date" class="date-input" />
+                    </div>
+
                     <div class="form-row">
                         <div class="form-column">
                             <div class="form-group">
@@ -59,6 +64,11 @@
                                 <input type="number" step="0.01" v-model.number="editedItem.price" id="price"
                                     class="form-input" required placeholder="Enter price" />
                             </div>
+                            <div class="form-group">
+                                <label for="balance">Balance</label>
+                                <input type="number" step="0.01" v-model.number="editedItem.balance" id="balance"
+                                    class="form-input" placeholder="Enter balance" />
+                            </div>
                         </div>
                     </div>
                     <hr />
@@ -88,6 +98,7 @@ export default {
 
         return {
             prescriptionDate: '',
+            dueDate: '',
             editedItem: {
                 frame: '', // Dropdown to select frame
                 type_of_lens: '',
@@ -96,6 +107,7 @@ export default {
                 price: '',
                 customLens: '',
                 customFrame: '',
+                balance: '',
             },
             frames: [], // Array to store frames fetched from API
             lenses: [],
@@ -123,6 +135,7 @@ export default {
 
                     // Use this.spectacles instead of spectacles
                     this.prescriptionDate = this.spectacles.date;
+                    this.dueDate = this.spectacles.due_date
                     this.editedItem = {
                         customFrame: this.spectacles.custom_frame,  // Match the key with editedItem
                         customLens: this.spectacles.custom_lens,
@@ -131,7 +144,8 @@ export default {
                         price: this.spectacles.price,
                         remarks: this.spectacles.remarks,
                         type_of_lens: this.spectacles.type_of_lens,
-                        patient_id: patientId
+                        patient_id: patientId,
+                        balance: this.spectacles.balance,
                     };
                 })
                 .catch(error => {
@@ -158,6 +172,8 @@ export default {
                 customLens: this.editedItem.customLens,
                 customFrame: this.editedItem.customFrame,
                 date: this.prescriptionDate,
+                due_date: this.dueDate,
+                balance: this.editedItem.balance,
             };
 
             axios.put(`/patients/${patientId}/glasses/${glassId}`, glassesData)

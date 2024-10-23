@@ -23,10 +23,13 @@
                                     required />
                                 <input type="number" v-model.number="colorStock.stock" @input="updateQuantity"
                                     placeholder="Stock" class="edit-input" required />
-                                <input type="number" v-model.number="colorStock.restockQuantity" placeholder="Restock"
+                                <input type="number" v-model.number="colorStock.restockQuantity"
+                                    :disabled="colorStock.isRestocked" placeholder="Restock"
                                     class="edit-input restock-input" />
-                                <button type="button" class="btn restock-btn" @click="restockQuantity(index)">
-                                    Restock
+                                <button type="button" class="btn restock-btn" @click="restock(index)"
+                                    :disabled="colorStock.isRestocking">
+                                    <span v-if="colorStock.isRestocking">Loading...</span>
+                                    <span v-else>{{ colorStock.isRestocked ? 'Restocked' : 'Restock' }}</span>
                                 </button>
                                 <button type="button" class="btn remove-btn" @click="removeColorStock(index)">
                                     Remove
@@ -58,7 +61,7 @@ export default {
                 product_name: '',
                 quantity: 0,
                 price: '',
-                color_stock: [{ color: '', stock: 0, restockQuantity: 0 }]
+                color_stock: [{ color: '', stock: 0, restockQuantity: 0, isRestocked: false, isRestocking: false }] // Added isRestocking
             },
         };
     },
@@ -78,7 +81,12 @@ export default {
                         product_name: productData.product_name,
                         quantity: productData.quantity,
                         price: productData.price,
-                        color_stock: JSON.parse(productData.color_stock).map(item => ({ ...item, restockQuantity: 0 }))
+                        color_stock: JSON.parse(productData.color_stock).map(item => ({
+                            ...item,
+                            restockQuantity: 0,
+                            isRestocked: false,
+                            isRestocking: false // Initialize isRestocking
+                        }))
                     };
                     this.removeEmptyColorStocks();
                 })
@@ -87,7 +95,7 @@ export default {
                 });
         },
         addColorStock() {
-            this.editedItem.color_stock.push({ color: '', stock: 0, restockQuantity: 0 });
+            this.editedItem.color_stock.push({ color: '', stock: 0, restockQuantity: 0, isRestocked: false, isRestocking: false }); // Added isRestocking
         },
         removeColorStock(index) {
             this.editedItem.color_stock.splice(index, 1);
@@ -100,14 +108,31 @@ export default {
             this.removeEmptyColorStocks();
             this.editedItem.quantity = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
         },
-        restockQuantity(index) {
+        restock(index) {
             const colorStock = this.editedItem.color_stock[index];
-            colorStock.stock += colorStock.restockQuantity || 0;
-            this.updateQuantity();
-            colorStock.restockQuantity = 0;
+
+            // Check if already restocking
+            if (colorStock.isRestocking) return;
+
+            // Set loading state
+            colorStock.isRestocking = true;
+
+            // Simulate a delay for the restock action (e.g., an API call)
+            setTimeout(() => {
+                colorStock.stock += colorStock.restockQuantity || 0; // Update stock with restock quantity
+                this.updateQuantity();
+                colorStock.isRestocked = true; // Set isRestocked to true
+                // Do not reset restockQuantity to keep the value
+
+                // Reset loading state
+                colorStock.isRestocking = false;
+            }, 1000); // Simulated delay of 1 second
         },
         saveEditedProduct() {
-            axios.put(`/products/${this.editedItem.product_id}`, this.editedItem)
+            axios.put(`/products/${this.editedItem.product_id}`, {
+                ...this.editedItem,
+                color_stock: this.editedItem.color_stock // Send the updated color stock directly
+            })
                 .then(() => {
                     Swal.fire({
                         title: 'Success!',

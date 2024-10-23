@@ -3,12 +3,15 @@
     <h1 class="bg-title">Enter {{ patient.full_name }}'s Spectacles</h1>
     <div class="form-container">
       <div class="form-box">
-        <!-- Update form to call correct method -->
         <form @submit.prevent="saveChildGlasses">
-
           <div class="input-box-container">
             <label for="prescription_date" class="presDate">Prescription Date:</label>
             <input type="date" v-model="prescriptionDate" id="prescription_date" class="date-input" />
+          </div>
+
+          <div class="input-box-container">
+            <label for="due_date" class="presDate">Due Date:</label>
+            <input type="date" v-model="dueDate" id="due_date" class="date-input" />
           </div>
 
           <div class="form-row">
@@ -20,11 +23,10 @@
                   <option v-for="frame in frames" :key="frame.id" :value="frame.id">
                     {{ frame.product_name }}
                   </option>
-                  <option value="other">Other</option> <!-- Option for custom input -->
+                  <option value="other">Other</option>
                 </select>
               </div>
 
-              <!-- Conditionally render input field when "Other" is selected -->
               <div v-if="editedItem.frame === 'other'" class="form-group">
                 <label for="customFrame">Enter custom frame</label>
                 <input v-model="editedItem.customFrame" id="customFrame" type="text" placeholder="Type the frame here"
@@ -38,11 +40,10 @@
                   <option v-for="lens in lenses" :key="lens.id" :value="lens.id">
                     {{ lens.product_name }}
                   </option>
-                  <option value="other">Other</option> <!-- Option for custom input -->
+                  <option value="other">Other</option>
                 </select>
               </div>
 
-              <!-- Conditionally render input field when "Other" is selected -->
               <div v-if="editedItem.type_of_lens === 'other'" class="form-group">
                 <label for="customLens">Enter custom lens</label>
                 <input v-model="editedItem.customLens" id="customLens" type="text" placeholder="Type the lens here"
@@ -53,10 +54,17 @@
                 <label for="remarks">Remarks</label>
                 <input type="text" v-model="editedItem.remarks" id="remarks" class="form-input" required />
               </div>
+
               <div class="form-group">
                 <label for="price">Price</label>
                 <input type="number" step="0.01" v-model.number="editedItem.price" id="price" class="form-input"
                   required placeholder="Enter price" />
+              </div>
+
+              <div class="form-group">
+                <label for="balance">Balance</label>
+                <input type="number" step="0.01" v-model.number="editedItem.balance" id="balance" class="form-input"
+                  placeholder="Enter balance" />
               </div>
             </div>
           </div>
@@ -74,6 +82,7 @@
     </div>
   </main>
 </template>
+
 
 
 
@@ -96,6 +105,7 @@ export default {
         price: '',
         customLens: '',
         customFrame: '',
+        balance: '',
       },
       frames: [], // Array to store frames fetched from API
       lenses: [],
@@ -129,9 +139,13 @@ export default {
         lens_id: this.editedItem.type_of_lens,
         remarks: this.editedItem.remarks,
         price: this.editedItem.price,
+        balance: this.editedItem.balance,
         customLens: this.editedItem.customLens,
         customFrame: this.editedItem.customFrame,
         date: this.prescriptionDate,
+        due_date: this.dueDate,
+        
+
       };
 
       axios.post(`/patients/${patientId}/glasses`, glassesData)
@@ -193,6 +207,7 @@ export default {
         remarks: '',
         patient_id: '',
         price: '',
+        balance: '',
       };
     },
     goBack() {

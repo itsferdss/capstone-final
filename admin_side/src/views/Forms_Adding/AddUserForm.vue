@@ -20,7 +20,7 @@
               </div>
               <div class="form-group">
                 <label for="birthdate">Birthdate</label>
-                <input type="date" v-model="editedItem.birthdate" id="birthdate" class="form-input" required />
+                <input type="date" v-model="editedItem.birthdate" id="birthdate" class="form-input" />
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
@@ -34,7 +34,7 @@
               </div>
               <div class="form-group">
                 <label for="age">Age</label>
-                <input type="text" v-model="age" id="age" class="form-input" readonly />
+                <input type="text" v-model="age" id="age" class="form-input" required />
               </div>
               <div class="form-group">
                 <label for="confirm_password">Confirm Password</label>
