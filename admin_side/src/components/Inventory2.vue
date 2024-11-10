@@ -9,9 +9,23 @@
                         Inventory
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
+
                     <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search Product"
                         prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
                         style="max-width: 300px;"></v-text-field>
+
+                        
+                    <v-select
+                        v-model="selectedType"
+                        :items="productTypes"
+                        label="Filter by Type"
+                        clearable
+                        class="mr-4"
+                        density="compact"
+                        solo
+                    ></v-select>
+
+
                 </v-toolbar>
             </template>
 
@@ -56,7 +70,7 @@
                                 <th style="text-align: center; padding: 10px;">Stock</th>
                                 <th style="text-align: center; padding: 10px;">New Stock Added</th>
                                 <th style="text-align: center; padding: 10px;">Sold</th>
-                                <th style="text-align: center; padding: 10px;">Date of Restock</th>
+                                <th style="text-align: center; padding: 10px;">Last Updated</th>
                                 <th style="text-align: center; padding: 10px;">Status</th>
                             </tr>
                         </thead>
@@ -103,6 +117,7 @@ export default {
             dialog: false,
             infoDialog: false,
             stockDialog: false,
+            selectedType: '',
             editedItem: {
                 product_image: '',
                 product_id: '',
@@ -115,6 +130,7 @@ export default {
                 images: [],
                 color_stock: [],
             },
+            productTypes: ['Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
                 { title: 'Product Name', align: 'center', key: 'product_name' },
@@ -136,7 +152,18 @@ export default {
     computed: {
         displayedProducts() {
             const searchTerm = this.search.toLowerCase();
-            return this.products.filter((product) =>
+
+            // Filter by type if selectedType is chosen
+            let filteredProducts = this.products;
+
+            if (this.selectedType) {
+                filteredProducts = filteredProducts.filter(
+                    product => product.type === this.selectedType
+                );
+            }
+
+            // Apply search filter on the filtered products
+            return filteredProducts.filter((product) =>
                 Object.values(product).some(
                     (value) =>
                         typeof value === 'string' && value.toLowerCase().includes(searchTerm)

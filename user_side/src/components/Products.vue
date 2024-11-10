@@ -1,7 +1,7 @@
 <template>
   <div class="sunglasses-page">
     <!-- Navigation Bar -->
-    <nav class="category-nav">
+    <nav ref="categoryNav" :class="['category-nav', { fixed: isFixed }]">
       <ul>
         <li><a href="#" @click.prevent="scrollToSection('sunglasses')"
             :class="{ active: activeSection === 'sunglasses' }">FRAMES</a></li>
@@ -13,24 +13,16 @@
             :class="{ active: activeSection === 'readers' }">ACCESSORIES</a></li>
       </ul>
 
-      <div class="dropdown" @click="toggleDropdown">
+      <div :class="['dropdown', { fixed: isFixed }]" @click="toggleDropdown">
         <button class="dropbtn">
           {{ selectedCategory ? selectedCategory : 'Filter by Gender' }}
           <i :class="isDropdownVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
         </button>
         <div class="dropdown-content" v-if="isDropdownVisible">
-          <a href="#" @click.prevent="filterByCategory('Men')">
-            <i class="fas fa-male"></i> Men
-          </a>
-          <a href="#" @click.prevent="filterByCategory('Women')">
-            <i class="fas fa-female"></i> Women
-          </a>
-          <a href="#" @click.prevent="filterByCategory('Unisex')">
-            <i class="fas fa-venus-mars"></i> Unisex
-          </a>
-          <a href="#" @click.prevent="filterByCategory(null)">
-            <i class="fas fa-circle"></i> All
-          </a>
+          <a href="#" @click.prevent="filterByCategory('Men')"><i class="fas fa-male"></i> Men</a>
+          <a href="#" @click.prevent="filterByCategory('Women')"><i class="fas fa-female"></i> Women</a>
+          <a href="#" @click.prevent="filterByCategory('Unisex')"><i class="fas fa-venus-mars"></i> Unisex</a>
+          <a href="#" @click.prevent="filterByCategory(null)"><i class="fas fa-circle"></i> All</a>
         </div>
       </div>
     </nav>
@@ -126,11 +118,12 @@ import logoImage from '../assets/MVC_logo.png';
 export default {
   data() {
     return {
+      isFixed: false,
       products: [],
       activeSection: 'sunglasses',
       isDropdownVisible: false,
       selectedCategory: null,
-      defaultImage: logoImage
+      defaultImage: logoImage,
     };
   },
   methods: {
@@ -143,7 +136,7 @@ export default {
 
             // Prepend the base URL to each color stock image
             const colorStockImages = colorStock.map(color =>
-              color.image ? `http://127.0.0.1:8000/${color.image}` : null
+              color.image ? `${color.image}` : null
             );
 
             const allImages = [...product.images, ...colorStockImages].filter(Boolean); // Filter out null values
@@ -174,6 +167,15 @@ export default {
       if (section) {
         section.scrollIntoView({ behavior: 'smooth' });
         this.activeSection = sectionId;
+      }
+    },
+    handleScroll() {
+      const navTop = this.$refs.categoryNav.offsetTop;  // Get the initial top offset of the navigation bar
+
+      if (window.scrollY > navTop) {
+        this.isFixed = true;
+      } else {
+        this.isFixed = false;
       }
     },
     viewProduct(productId) {
@@ -223,6 +225,11 @@ export default {
   },
   created() {
     this.fetchProducts();
+
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 };
 </script>
@@ -231,6 +238,25 @@ export default {
 .sunglasses-page {
   padding: 20px;
   text-align: center;
+}
+
+.category-nav {
+  background-color: #fff;
+  padding: 10px;
+  position: relative;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: none;
+  transition: all 0.5s ease-in-out;
+}
+
+.category-nav.fixed {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .category-nav ul {
@@ -359,6 +385,14 @@ export default {
   position: relative;
   display: inline-block;
   margin-left: -80%;
+  transition: all 0.5s ease-in-out;
+}
+
+.dropdown.fixed {
+  margin-left: 0;
+  margin-top: 20px;
+  left: 0;
+  right: 0;
 }
 
 .dropbtn {
@@ -437,6 +471,16 @@ export default {
   .dropdown{
     margin-left: -200px;
     margin-top: 20px;
+  }
+
+  .category-nav.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 }
 </style>

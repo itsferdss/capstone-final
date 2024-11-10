@@ -31,14 +31,15 @@
                         <td>{{ formatPrescriptionDate(item.created_at) }}</td>
                         <td>{{ item.product.product_name }}</td>
                         <td>
-                            <span :style="{ color: item.color, textTransform: 'uppercase' }">
-                                {{ item.color }}
+                            <span :style="{ color: item.color || 'gray', textTransform: 'uppercase' }">
+                                {{ item.color ? item.color : 'N/A' }}
                             </span>
                         </td>
-                        <td>{{ item.product.quantity }}</td>
+                        <td>{{ getColorStock(item) }}</td>
                         <td>₱{{ item.product.price }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>
+                            <v-icon size="small" style="color: teal" @click="seeItem(item.id)">mdi-eye</v-icon>
                             <v-icon size="small" style="color: green"
                                 @click="acceptAppointment(item.id)">mdi-check</v-icon>
                             <v-icon size="small" style="color: red"
@@ -49,6 +50,71 @@
             </v-data-table>
         </v-card>
     </v-container>
+
+    <v-dialog v-model="dialog" max-width="600px">
+  <v-card elevation="8" class="pa-4">
+    <!-- Title Section -->
+    <v-card-title class="headline font-weight-bold">
+      {{ selectedItem?.patient.full_name }}'s Reservation
+    </v-card-title>
+
+    <!-- Divider for a cleaner separation -->
+    <v-divider></v-divider>
+
+    <!-- Content Section -->
+    <v-card-text>
+      <v-container>
+        <v-row>
+          <!-- Image Section -->
+          <v-col cols="12" sm="6">
+            <v-img :src="selectedItem?.image" aspect-ratio="1.5" class="rounded-lg mb-4" max-width="100%"></v-img>
+          </v-col>
+
+          <!-- Details Section -->
+          <v-col cols="12" sm="6">
+            <v-row class="mb-2">
+              <v-col>
+                <strong>Product Name:</strong>
+                <span>{{ selectedItem?.product.product_name }}</span>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col>
+                <strong>Color:</strong>
+                <span>{{ selectedItem?.color }}</span>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col>
+                <strong>Stock Quantity:</strong>
+                <span>{{ selectedItem?.stockQuantity }}</span>
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col>
+                <strong>Price:</strong>
+                <span>₱{{ selectedItem?.product.price }}</span>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <strong>Reservation Date:</strong>
+                <span>{{ formatPrescriptionDate(selectedItem?.created_at) }}</span>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+
+    <!-- Actions Section -->
+    <v-divider></v-divider>
+    <v-card-actions class="d-flex justify-end">
+      <v-btn color="primary" dark @click="dialog = false">Close</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 </template>
 
 <script>
@@ -72,12 +138,24 @@ export default {
                 { title: 'Quantity', align: 'center' },
                 { title: 'Actions', align: 'center', sortable: false },
             ],
+            dialog: false, 
+            selectedItem: null,
         };
     },
     created() {
         this.fetchPendingAppointments();
     },
     methods: {
+        getColorStock(item) {
+            try {
+                const colorStockArray = JSON.parse(item.product.color_stock);
+                const colorData = colorStockArray.find(colorItem => colorItem.color === item.color);
+                return colorData ? colorData.stock : 'N/A'; // Return stock if found, otherwise 'N/A'
+            } catch (error) {
+                console.error("Error parsing color_stock:", error);
+                return 'N/A';
+            }
+        },
         fetchPendingAppointments() {
             axios.get('/reservations/pending')
                 .then(response => {
@@ -114,6 +192,53 @@ export default {
                         text: 'Failed to accept the reservation. Please try again later.',
                     });
                 });
+        },
+        seeItem(id) {
+            const item = this.pendingAppointments.find(appointment => appointment.id === id);
+            if (item) {
+                const baseUrl = 'http://127.0.0.1:8000/'; // Define the backend base URL
+
+                // Safely parse color_stock
+                const colorStockArray = item.product.color_stock ? JSON.parse(item.product.color_stock) : [];
+                const colorData = colorStockArray.find(colorItem => colorItem.color === item.color);
+
+                // Prepend the base URL to each color stock image only if needed
+                const colorStockImages = colorStockArray.map(color =>
+                    color.image && !color.image.startsWith('http') ? `${baseUrl}${color.image}` : color.image
+                );
+
+                // Safely parse item.product.images and prepend the base URL
+                const productImages = item.product.image ? JSON.parse(item.product.image) : []; // Parse JSON string
+                const allImages = [
+                    ...productImages.map(image =>
+                        image.startsWith('http') ? image : `${baseUrl}${image}`
+                    ),
+                    ...colorStockImages
+                ].filter(Boolean);
+
+                // Determine the image source
+                let imageUrl = '';
+
+                if (colorData && colorData.image) {
+                    // Use color stock image if available
+                    imageUrl = `${baseUrl}${colorData.image}`;
+                } else if (allImages.length > 0) {
+                    // Use the first image from all images if no color stock image is available
+                    imageUrl = allImages[0];
+                } else {
+                    // Use a fallback image if no image is found
+                    imageUrl = `${baseUrl}/path/to/fallback-image.jpg`;
+                }
+
+                this.selectedItem = {
+                    ...item,
+                    stockQuantity: colorData ? colorData.stock : 'N/A',
+                    image: imageUrl,
+                    images: allImages // Store all images for potential future use
+                };
+
+                this.dialog = true;
+            }
         },
 
         goBack() {
@@ -246,6 +371,11 @@ export default {
 }
 
 td{
+    text-align: center;
+}
+
+.headline{
+    background-color: rgb(174, 209, 251);
     text-align: center;
 }
 

@@ -53,6 +53,20 @@ const router = createRouter({
             // },
         },
         {
+            path: '/forgot-password',
+            component: () => import('../components/ForgotPassword.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
+        {
+            path: '/reset-password',
+            component: () => import('../components/ResetPassword.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
+        {
             path: '/viewReservation',
             component: () => import('../views/Viewing/ViewReservation.vue'),
             // meta: {
@@ -61,6 +75,7 @@ const router = createRouter({
         }
     ],
 });
+
 
 router.beforeEach((to, from, next) => {
     const token = getToken(); // Get token from sessionStorage

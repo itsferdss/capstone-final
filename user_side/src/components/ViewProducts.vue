@@ -9,7 +9,7 @@
       <div class="photo-grid">
         <a v-for="(photo, index) in photos" :key="index" @click="updateRightPhoto(index)"
           :class="{ selected: currentIndex === index }">
-          <img :src="photo" :alt="'Photo ' + (index + 1)" />
+          <img :src="photo" />
         </a>
       </div>
     </aside>
@@ -33,16 +33,16 @@
           <h1>{{ product.product_name }}</h1>
           <p class="description-text">Total Stock: {{ product.quantity }}</p>
           <h2 class="price">₱{{ product.price }}</h2>
-          <div class="color-options">
+          <div v-if="hasColorOptions" class="color-options">
             <p>Available Colors:</p>
             <div class="colors">
               <div v-for="item in product.color_stock" :key="item.color" class="color-palette"
-                :style="{ backgroundColor: item.color }" @click="selectColor(item)"></div>
+                :style="{ backgroundColor: item.color }" @click="selectColor(item)">
+              </div>
             </div>
 
             <!-- Display the stock for the selected color -->
             <p v-if="isLoggedIn">Stock for {{ selectedColor }}: {{ selectedColorStock }}</p>
-
           </div>
 
           <div class="offers">
@@ -58,9 +58,9 @@
     <!-- Color selection dialog -->
     <v-dialog v-model="colorDialog" max-width="600px">
       <v-card>
-        <v-card-title class="colorTitle">Please select a color</v-card-title>
+        <v-card-title class="colorTitle">Enter your Reservation Information</v-card-title>
         <v-card-text>
-          <div class="colors">
+          <div v-if="hasColorOptions" class="colors">
             <div v-for="item in product.color_stock" :key="item.color"
               :class="['color-palette', { selected: selectedColor === item.color }]"
               :style="{ backgroundColor: item.color }" @click="selectColor(item)">
@@ -68,7 +68,7 @@
           </div>
 
           <!-- Display the selected color -->
-          <v-row class="mt-4">
+          <v-row v-if="hasColorOptions" class="mt-4">
             <v-col cols="12">
               <div v-if="selectedColor">
                 Selected color: <strong :style="{ color: selectedColor }">{{ selectedColor }}</strong>
@@ -76,6 +76,7 @@
               <div v-else>
                 No color selected
               </div>
+              <strong v-if="isLoggedIn">Stock: {{ selectedColorStock }}</strong>
             </v-col>
           </v-row>
 
@@ -98,19 +99,15 @@
     <!--LOGIN DIALOG-->
     <v-dialog v-model="loginDialog" persistent max-width="650px" class="login-dialog">
       <v-card class="login-card elevation-8">
-        <!-- Header with logo and title -->
         <v-card-title class="login-header justify-center">
-          <!-- <v-img src="../src/assets/MVC_logo.png" class="mvcLogo mr-2" contain></v-img> -->
           <span class="login-title">Sign In To Continue</span>
         </v-card-title>
 
         <v-card-text>
-          <!-- Email input with icon -->
           <v-text-field label="Email Address" v-model="loginForm.email" required outlined prepend-icon="mdi-email"
             color="primary" class="mb-4" dense>
           </v-text-field>
 
-          <!-- Password input with show/hide icon -->
           <v-text-field :type="showPassword ? 'text' : 'password'" label="Password" v-model="loginForm.password"
             required outlined prepend-icon="mdi-lock" color="primary" class="mb-4" dense>
             <template v-slot:append>
@@ -120,13 +117,8 @@
             </template>
           </v-text-field>
 
-          <!-- Error message (if any) -->
-          <p class="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-
-          <!-- Remember me and forgot password links -->
-          <v-row justify="space-between" align="center" class="mt-2">
-            <v-checkbox v-model="rememberMe" label="Remember Me" class="ma-0"></v-checkbox>
-            <v-btn text @click="forgotPassword" class="forgot-password">Forgot Password?</v-btn>
+          <v-row justify="center" class="mt-2">
+            <v-btn @click="forgotPassword" class="forgot-password">Forgot Password?</v-btn>
           </v-row>
         </v-card-text>
 
@@ -141,7 +133,7 @@
 </template>
 
 
-    <script>
+<script>
 import axios from 'axios';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import { mapState } from 'vuex';
@@ -169,6 +161,7 @@ export default {
       selectedColor: null,
       selectedColorImage: null,
       loginDialog: false,
+      showPassword: false,
       reserveQuantity: 1,
       loginForm: {
         email: '',
@@ -192,6 +185,10 @@ export default {
       const selected = this.product.color_stock.find(item => item.color === this.selectedColor);
       return selected ? selected.stock : 0; // Return stock or 0 if no color is selected
     },
+    hasColorOptions() {
+      return Array.isArray(this.product.color_stock) &&
+        this.product.color_stock.some(item => item.color); // Checks if there’s a non-empty color
+    }
   },
   methods: {
     fetchProductData(productId) {
@@ -202,13 +199,27 @@ export default {
           // Parse color_stock JSON string into an array
           const colorStock = JSON.parse(product.color_stock || "[]");
 
-          // Prepend the base URL to each color stock image
-          const colorStockImages = colorStock.map(color =>
-            color.image ? `${this.baseURL}/${color.image}` : null
-          );
+          // Prepend the base URL to each color stock image if needed
+          const colorStockImages = colorStock.map(color => {
+            if (color.image && !color.image.startsWith('http') && !color.image.startsWith('127.0.0.1')) {
+              // Prepend the base URL to the image path if it doesn't contain 'http' or '127.0.0.1'
+              return `${this.baseURL}/${color.image}`;
+            }
+            return color.image; // Return as is if it starts with 'http' or '127.0.0.1'
+          });
 
-          // Combine product images and color stock images
-          const allImages = [...product.images.map(image => `${this.baseURL}/${image}`), ...colorStockImages].filter(Boolean);
+          // Combine product images and color stock images, ensuring base URL is only prepended if needed
+          const allImages = [
+            ...product.images.map(image => {
+              // Check if the image URL starts with 'http' or '127.0.0.1'
+              if (!image.startsWith('http') && !image.startsWith('127.0.0.1')) {
+                // Prepend the base URL if image doesn't start with 'http' or '127.0.0.1'
+                return `${this.baseURL}/${image}`;
+              }
+              return image; // Return the image as is if it starts with 'http' or '127.0.0.1'
+            }),
+            ...colorStockImages
+          ].filter(Boolean); // Remove any invalid (null or undefined) values
 
           // Set the product data
           this.product = {
@@ -217,6 +228,7 @@ export default {
             images: allImages // Combine images
           };
 
+          // Use the combined images (allImages)
           this.photos = allImages; // Ensure this is an array of image URLs
           this.currentIndex = 0; // Reset current index to display the first image
         })
@@ -224,26 +236,30 @@ export default {
           console.error('Error fetching product data:', error);
         });
     },
+
     selectColor(item) {
       this.selectedColor = item.color;
       this.selectedColorImage = item.image; // Update the selected color image
 
-      // Update currentPhoto to the selected color image
-      const colorImage = `${this.baseURL}/${item.image}`; // Ensure correct URL
-      this.currentIndex = this.photos.findIndex(photo => photo === colorImage); // Update current index if the image exists in photos
+      // Determine the two possible image URLs
+      const baseColorImage = `${this.baseURL}/${item.image}`; // Image with base URL
+      const altColorImage = item.image.startsWith('http') || item.image.startsWith('127.0.0.1') ? item.image : `${this.baseURL}/${item.image}`; // Image without base URL if already contains 'http' or '127.0.0.1'
 
-      // If the selected color image is not in photos, add it to photos
-      if (!this.photos.includes(colorImage)) {
-        this.photos.push(colorImage);
-      }
+      // Create an array of possible images to check
+      const possibleImages = [baseColorImage, altColorImage];
+
+      // Update currentPhoto to the selected color image
+      this.currentIndex = this.photos.findIndex(photo => possibleImages.includes(photo)); // Find the image's index in photos
+
+      // If neither the base URL version nor the alt version is in photos, add both versions
+      possibleImages.forEach(image => {
+        if (!this.photos.includes(image)) {
+          this.photos.push(image);
+        }
+      });
 
       this.updateRightPhoto(this.currentIndex); // Update the displayed image
     },
-
-    updateRightPhoto(index) {
-      // Your logic to update the displayed image based on the index
-    },
-
     login() {
       axios.post('/login', {
         email: this.loginForm.email,  
@@ -309,7 +325,17 @@ export default {
       this.colorDialog = true; // Open the color selection dialog if logged in
     },
     confirmColor() {
-      if (!this.selectedColor) {
+      // Check if color selection is required
+      if (!this.product.color_stock || this.product.color_stock.length === 0) {
+        // If no color stock is available, skip color selection
+        this.selectedColor = null;
+      } else if (this.product.color_stock.length === 1) {
+        // If only one color is available, set it as the selected color
+        this.selectedColor = this.product.color_stock[0].color;
+      }
+
+      // If selectedColor is still empty and color stock is available, prompt the user to select a color
+      if (this.product.color_stock.length > 1 && !this.selectedColor) {
         this.colorDialog = false;
         Swal.fire({
           icon: 'warning',
@@ -321,6 +347,7 @@ export default {
         return;
       }
 
+      // Validate the quantity
       if (!this.reserveQuantity || this.reserveQuantity < 1) {
         Swal.fire({
           icon: 'warning',
@@ -332,6 +359,7 @@ export default {
         return;
       }
 
+      // Send reservation request
       axios.post('/reserve', {
         product_id: this.product.id,
         product_name: this.product.product_name,
@@ -348,7 +376,7 @@ export default {
           Swal.fire({
             icon: 'success',
             title: 'Reservation Successful',
-            text: `Product (${this.selectedColor}) with quantity ${this.reserveQuantity} has been reserved successfully.`,
+            text: `Product ${this.selectedColor ? `(${this.selectedColor})` : ''} with quantity ${this.reserveQuantity} has been reserved successfully.`,
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'OK'
           });
@@ -365,9 +393,16 @@ export default {
           });
         });
     },
+    forgotPassword() {
+      this.$router.push('/forgot-password'); // Redirect to the forgot password page
+    },
     goBack() {
       this.$router.go(-1);
     },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword; // Toggle the visibility state
+    }
+
   },
 
       mounted() {
@@ -798,6 +833,18 @@ export default {
         left: auto;
         transform: translateX(0%);
         margin: 15px 0;
+      }
+
+      .productPhoto {
+        width: 10px;
+      }
+
+      .prev {
+        display: none;
+      }
+
+      .next{
+        display: none;
       }
     }
   </style>

@@ -11,6 +11,9 @@
           <a href="#section3" class="nav-link" :class="{ active: activeSection === 'section3' }">Team</a>
           <a href="#section4" class="nav-link" :class="{ active: activeSection === 'section4' }">Contact Us</a>
         </div>
+
+        <router-link to="/login" class="nav-link-login" :class="{ active: activeSection === 'login' }">Log in</router-link>
+
       </div>
     </header>
     <div id="section1" class="full-height">
@@ -165,7 +168,7 @@
               <p class="mvcAdd">Instagram</p>
             </div>
           </div>
-          <div class="text-section-computer" :class="journey">
+          <div class="text-section-computer">
             <i class="mdi mdi-account-group mvc-icon"></i>
             <div>
               <p class="mvcInfo">Join Our Journey!</p>
@@ -330,6 +333,16 @@ html {
   text-decoration: none;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin-left: 10px;
+}
+
+.nav-link-login {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 15px;
+  font-size: 16px;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s;
 }
 
 .topnav a.active {
@@ -897,6 +910,10 @@ html {
    #section2{
     height: 100%;
     margin-top: 200px;
+  }
+
+  .nav-link-login {
+    margin-left: auto;
   }
   
 }

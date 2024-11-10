@@ -287,7 +287,7 @@ export default {
   position: relative;
   flex: 1;
   overflow: hidden;
-  border-radius: 12px;
+
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -372,7 +372,6 @@ export default {
   width: 100%;
   height: 400px; /* Adjust as needed */
   object-fit: cover;
-  border-radius: 12px;
 }
 
 .banner-card .overlay {

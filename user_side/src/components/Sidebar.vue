@@ -1,13 +1,7 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    :permanent="!isMobile"
-    class="navigation-drawer"
-    :mini-variant="miniVariant"
+  <v-navigation-drawer v-model="drawer" :permanent="!isMobile" class="navigation-drawer" :mini-variant="miniVariant"
     @update:mini-variant="toggleMiniVariant"
-    :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }"
-    app
-  >
+    :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }" app>
     <div class="admin-title">
       <v-icon class="admin-icon">mdi-account-circle-outline</v-icon>
       <h1 class="admin-text" :class="{ 'hide-text': miniVariant }">User</h1>
@@ -20,10 +14,10 @@
         <span class="link-text" :class="{ 'hide-text': miniVariant }">Home</span>
       </router-link>
 
-      <router-link :to="{ path: '/profile' }" active-class="active-link" class="sidebar-link">
+      <v-list-item @click="handleProfileClick" class="sidebar-link">
         <v-icon class="link-icon">mdi-account</v-icon>
         <span class="link-text" :class="{ 'hide-text': miniVariant }">Profile</span>
-      </router-link>
+      </v-list-item>
 
       <router-link :to="{ path: '/products' }" active-class="active-link" class="sidebar-link">
         <v-icon class="link-icon">mdi-cart</v-icon>
@@ -31,9 +25,9 @@
       </router-link>
     </v-list>
 
-    <v-list-item class="logout-link"  @click="confirmLogout">
-        <v-icon class="link-icon">mdi-logout</v-icon>
-        <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>  
+    <v-list-item class="logout-link" @click="confirmLogout">
+      <v-icon class="link-icon">mdi-logout</v-icon>
+      <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>
     </v-list-item>
   </v-navigation-drawer>
 </template>
@@ -60,6 +54,10 @@ export default {
       set(value) {
         this.$emit('update:modelValue', value);
       }
+    },
+    isAuthenticated() {
+      // Check if a token or auth flag exists
+      return !!sessionStorage.getItem('token');
     }
   },
   data() {
@@ -86,6 +84,24 @@ export default {
         this.miniVariant = false;
       } else {
         this.miniVariant = !this.miniVariant;
+      }
+    },
+    handleProfileClick() {
+      if (this.isAuthenticated) {
+        this.$router.push('/profile');
+      } else {
+        Swal.fire({
+          title: 'Login Required',
+          text: 'Please login to access your profile.',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonText: 'Login',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push('/login');
+          }
+        });
       }
     },
     confirmLogout() {

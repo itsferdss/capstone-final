@@ -12,8 +12,10 @@ import fontAwesomeApp from './fontAwesome.js';
 window.axios = axios;
 axios.defaults.withCredentials = false;
 
-// Set base URL dynamically based on environment
 axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+
+// Set base URL dynamically based on environment
+// axios.defaults.baseURL = 'https://opticare.fun/api';
 
 const app = createApp(App);
 app.use(router).use(store).use(vuetify).component('font-awesome-icon', fontAwesomeApp.component('font-awesome-icon')).mount('#app');

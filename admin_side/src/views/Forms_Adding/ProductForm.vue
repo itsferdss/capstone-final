@@ -58,9 +58,9 @@
               <input type="number" v-model.number="colorStock.stock" @input="updateQuantity" placeholder="Stock"
                 class="form-input" required />
               <input type="file" @change="handleColorImageUpload($event, index)" class="form-input" />
-              <button type="button" @click="removeColorStock(index)">Remove</button>
+              <button type="button" class="removeBtn" @click="removeColorStock(index)">Remove</button>
             </div>
-            <button type="button" @click="addColorStock">Add Color Stock</button>
+            <button type="button" class="addClrBtn" @click="addColorStock">Add Color Stock</button>
           </div>
           <hr />
           <div class="form-buttons">
@@ -315,6 +315,21 @@ select:focus {
 
 .close:hover {
   background-color: #93222b;
+}
+
+.removeBtn{
+  background-color: #be5259;
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+}
+
+.addClrBtn{
+  background-color: #479176;
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  margin-top: 10px;
 }
 
 @media (max-width: 768px) {

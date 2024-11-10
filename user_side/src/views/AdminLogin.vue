@@ -16,6 +16,7 @@
           </i>
         </div>
         <button @click="login">Log in</button>
+        <p class="forgot-password" @click="navigateToForgotPassword">Forgot Password?</p> <!-- Forgot Password link -->
         <p>{{ errorMessage }}</p>
       </div>
     </div>
@@ -78,6 +79,9 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
+    navigateToForgotPassword() {
+      this.$router.push('/forgot-password'); 
+    }
   }
 };
 
@@ -291,6 +295,17 @@ button:hover {
   right: 0;
   margin-right: 10px;
 }
+
+.forgot-password {
+  color: #007BFF; 
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px; 
+}
+
+.forgot-password:hover {
+  text-decoration: underline; 
+}
 @media (max-width: 960px) {
   .container {
     flex-direction: column;
@@ -362,7 +377,7 @@ button:hover {
     position: relative; /* Adjust logo position */
     bottom: auto;
     left: 40%;
-    width: auto; /* Make logo responsive */
+    width: 150px; /* Make logo responsive */
     height: 100px;
     margin-top: 55%; /* Adjust margin */
   }
@@ -371,8 +386,8 @@ button:hover {
     position: relative; /* Adjust EchoDE logo position */
     bottom: auto;
     left: 40%;
-    width: auto; /* Make EchoDE logo responsive */
-    height: 150px;
+    width: 100px; /* Make EchoDE logo responsive */
+    height: 100px;
     margin-top: 55%; /* Adjust margin */
   }
 }

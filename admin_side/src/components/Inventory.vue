@@ -219,14 +219,26 @@ export default {
     fetchProducts() {
       axios.get('/allProducts')
         .then(response => {
-          if (Array.isArray(response.data)) {
-            this.products = response.data;
-          } else {
-            this.error = 'Unexpected response format';
-          }
+          this.products = response.data.map(product => {
+            const colorStock = JSON.parse(product.color_stock || "[]");
+
+            // Combine base product image with color stock images
+            const colorStockImages = colorStock.map(color =>
+              color.image ? `${color.image}` : null
+            );
+
+            // All images: product image + color stock images
+            const allImages = [product.image, ...colorStockImages].filter(Boolean);
+
+            return {
+              ...product,
+              images: allImages,  // Store all images for this product
+              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage
+            };
+          });
         })
         .catch(error => {
-          this.error = 'Error fetching products: ' + error.message;
+          console.error('Error fetching products:', error);
         });
     },
     openDialog() {

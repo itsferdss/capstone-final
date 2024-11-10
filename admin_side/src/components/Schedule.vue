@@ -45,6 +45,7 @@
         </td>
         <td>{{ appointments.quantity }}</td>
         <td>
+          <v-icon size="small" style="color: teal" @click="seeItem(appointments.id)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #d33" @click="declineAppointment(appointments.id)">mdi-cancel</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="pickedUp(appointments)">mdi-truck</v-icon>
         </td>
@@ -52,6 +53,72 @@
     </template>
 
   </v-data-table>
+
+  <v-dialog v-model="dialog" max-width="700px">
+    <v-card elevation="10" class="pa-4">
+      <!-- Dialog Title -->
+      <v-card-title class="headline font-weight-bold">
+        {{ selectedItem?.patient.full_name }}'s Reservation
+      </v-card-title>
+
+      <!-- Divider for a cleaner layout -->
+      <v-divider></v-divider>
+
+      <!-- Dialog Content -->
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <!-- Product Image Section -->
+            <v-col cols="12" sm="6">
+              <v-img :src="selectedItem?.image" aspect-ratio="1.5" class="rounded-lg mb-4" max-width="100%"></v-img>
+            </v-col>
+
+            <!-- Product Details Section -->
+            <v-col cols="12" sm="6">
+              <v-row class="mb-2">
+                <v-col>
+                  <strong>Product Name:</strong>
+                  <span>{{ selectedItem?.product.product_name }}</span>
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-col>
+                  <strong>Color:</strong>
+                  <span>{{ selectedItem?.color }}</span>
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-col>
+                  <strong>Stock Quantity:</strong>
+                  <span>{{ selectedItem?.stockQuantity }}</span>
+                </v-col>
+              </v-row>
+              <v-row class="mb-2">
+                <v-col>
+                  <strong>Price:</strong>
+                  <span>₱{{ selectedItem?.product.price }}</span>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <strong>Reservation Date:</strong>
+                  <span>{{ formatPrescriptionDate(selectedItem?.created_at) }}</span>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+
+      <!-- Dialog Actions -->
+      <v-divider></v-divider>
+      <v-card-actions class="d-flex justify-end">
+        <v-btn color="primary" dark @click="dialog = false">Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
 </template>
 
 <script>
@@ -77,6 +144,7 @@ export default {
       appointments: [],
       dialogDelete: false,
       deleteRecordIndex: -1,
+      dialog: false, 
     };
   },
   created() {
@@ -224,6 +292,57 @@ export default {
     }
   });
 },
+    seeItem(id) {
+      const item = this.acceptedAppointments.find(appointment => appointment.id === id);
+      if (item) {
+
+        // Safely parse color_stock
+        const colorStockArray = item.product.color_stock ? JSON.parse(item.product.color_stock) : [];
+        const colorData = colorStockArray.find(colorItem => colorItem.color === item.color);
+
+        // Prepend the base URL (127.0.0.1) to each color stock image only if needed
+        const colorStockImages = colorStockArray.map(color =>
+          color.image && !color.image.startsWith('http') ? `http://127.0.0.1:8000/${color.image}` : color.image
+        );
+
+        // Safely parse item.product.images and prepend the base URL
+        const productImages = item.product.image ? JSON.parse(item.product.image) : []; // Parse JSON string
+        const allImages = [
+          ...productImages.map(image =>
+            image.startsWith('http') ? image : `http://127.0.0.1:8000/${image}`
+          ),
+          ...colorStockImages
+        ].filter(Boolean);
+
+        // Determine the image source
+        let imageUrl = '';
+
+        if (colorData && colorData.image) {
+          // Use color stock image if available
+          imageUrl = colorData.image.startsWith('http') ? colorData.image : `http://127.0.0.1:8000/${colorData.image}`;
+        } else if (allImages.length > 0) {
+          // Use the first image from all images if no color stock image is available
+          imageUrl = allImages[0];
+        } else {
+          // Use a fallback image if no image is found
+          imageUrl = `/path/to/fallback-image.jpg`;
+        }
+
+        // Setting selected item for dialog
+        this.selectedItem = {
+          ...item,
+          stockQuantity: colorData ? colorData.stock : 'N/A',
+          image: imageUrl,
+          images: allImages // Store all images for potential future use
+        };
+
+        this.dialog = true; // Open the dialog
+      } else {
+        console.error('Item not found:', id); // Log if the item is not found
+      }
+    },
+
+
 
   },
    computed: {
@@ -291,6 +410,10 @@ td{
   color: black;
 }
 
+.headline{
+  background-color: rgb(174, 204, 240);
+  text-align: center;
+}
 
 @media (max-width: 960px) {
   .pending-text{
