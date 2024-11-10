@@ -805,7 +805,7 @@ export default {
     exportPrescriptionPDF(patients, title) {
       try {
         const doc = new jsPDF();
-        const logoImage = '../assets/MVC_logo.png';
+        const logoImage = '../src/assets/MVC_logo.png';
  // Constants for layout
         const marginTop = 10;
         const pageHeight = doc.internal.pageSize.height; // Get the height of the page

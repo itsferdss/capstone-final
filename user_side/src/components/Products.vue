@@ -132,18 +132,20 @@ export default {
         .then(response => {
           console.log('Response data:', response.data); // Inspect the structure here
           this.products = response.data.map(product => {
+            // Parse color_stock to get an array of images
             const colorStock = JSON.parse(product.color_stock || "[]");
 
-            // Prepend the base URL to each color stock image
+            // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
             const colorStockImages = colorStock.map(color =>
-              color.image ? `${color.image}` : null
+              color.image && !color.image.startsWith('http://127.0.0.1:8000') ? `http://127.0.0.1:8000/${color.image}` : color.image
             );
 
-            const allImages = [...product.images, ...colorStockImages].filter(Boolean); // Filter out null values
+            // Concatenate images from both product.images and colorStockImages, filter out null values
+            const allImages = [...product.images, ...colorStockImages].filter(Boolean);
 
             return {
               ...product,
-              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage
+              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage // Use the first image as currentImage
             };
           });
           console.log('Products after mapping:', this.products); // Check final product structure
@@ -152,7 +154,6 @@ export default {
           console.error('Error fetching products:', error);
         });
     },
-
     changeImage(product, action) {
       if (product.images && product.images.length > 1) {
         if (action === 'hover') {

@@ -96,7 +96,8 @@
                     label="Type" prepend-icon="mdi-glasses" disabled></v-select>
                 </v-col>
 
-                <v-col cols="12">
+                <v-col cols="12" v-if="parsedColorStock && parsedColorStock.length > 1">
+                  <!-- Only show if parsedColorStock is valid and has items -->
                   <h4>Color Stock</h4>
                   <v-row>
                     <v-col v-for="(colorStock, index) in parsedColorStock" :key="index" cols="12" sm="4">
@@ -108,6 +109,7 @@
                           <v-text-field :label="'Stock for ' + colorStock.color"
                             v-model="colorStock.stock"></v-text-field>
                         </v-card-subtitle>
+
                       </v-card>
                     </v-col>
                   </v-row>
@@ -161,8 +163,6 @@ export default {
         { title: 'Price', align: 'center', key: 'price' },
         { title: 'Status', align: 'center', },
         { title: 'Actions', align: 'center', sortable: false },
-        
-
       ],
       currentImageIndex: 0,
       viewingRecords: false,
@@ -185,7 +185,9 @@ export default {
     },
     parsedColorStock() {
       try {
-        return JSON.parse(this.editedItem.color_stock);
+        const parsed = JSON.parse(this.editedItem.color_stock || "[]");
+        console.log('Parsed color stock:', parsed); // Check the parsed data
+        return parsed;
       } catch (error) {
         console.error('Invalid color_stock format', error);
         return [];
@@ -219,21 +221,23 @@ export default {
     fetchProducts() {
       axios.get('/allProducts')
         .then(response => {
+          console.log('Response data:', response.data); // Inspect the structure here
           this.products = response.data.map(product => {
+            // Parse color_stock to get an array of images
             const colorStock = JSON.parse(product.color_stock || "[]");
 
-            // Combine base product image with color stock images
+            // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
             const colorStockImages = colorStock.map(color =>
-              color.image ? `${color.image}` : null
+              color.image && !color.image.startsWith('http://127.0.0.1:8000') ? `http://127.0.0.1:8000/${color.image}` : color.image
             );
 
-            // All images: product image + color stock images
-            const allImages = [product.image, ...colorStockImages].filter(Boolean);
+            // Concatenate images from both product.images and colorStockImages, filter out null values
+            const allImages = [...product.images, ...colorStockImages].filter(Boolean);
 
             return {
               ...product,
-              images: allImages,  // Store all images for this product
-              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage
+              currentImage: allImages.length > 0 ? allImages[0] : '', // Set default image if none exists
+              images: allImages // Store combined images array
             };
           });
         })
@@ -252,6 +256,7 @@ export default {
     },
     openInfoItem(item) {
       this.editedItem = { ...item, images: item.images || [] };
+      console.log('Images:', this.editedItem.images); // Check if the image URLs are correct
       this.currentImageIndex = 0;
       this.infoDialog = true;
     },

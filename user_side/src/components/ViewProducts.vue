@@ -271,14 +271,19 @@ export default {
           localStorage.setItem('patientId', id);
           sessionStorage.setItem('token', token); // Store the token in sessionStorage
           this.$store.commit('setPatientId', id);
+
+          this.loginDialog = false;
+
           Swal.fire({
             icon: 'success',
             title: 'Login Successful',
             text: 'Welcome!',
           });
-          this.$router.push('/home'); // Redirect to home after successful login
         })
         .catch(error => {
+
+          this.loginDialog = false;
+          
           Swal.fire({
             icon: 'error',
             title: 'Login Failed',
