@@ -16,10 +16,16 @@
           style="max-width: 300px;"></v-text-field>
 
         <!-- Pending Reservations Dialog -->
-        <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
-          <v-icon left>mdi-clock-outline</v-icon>
-          <span class="pending-text">Pending Reservations</span>
-        </v-btn>
+
+        <div class="badge-container">
+          <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
+            <v-icon left>mdi-clock-outline</v-icon>
+            <span class="pending-text">Pending Reservations</span>
+          </v-btn>
+
+          <v-badge :content="pendingAppointments.length" color="green" overlap class="notif"></v-badge>
+        </div>
+
 
         <!-- Picked Up Reservations Dialog -->
         <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
@@ -142,13 +148,20 @@ export default {
         { title: 'Actions', align: 'center', sortable: false },
       ],
       appointments: [],
+      pendingAppointments: [],
       dialogDelete: false,
       deleteRecordIndex: -1,
       dialog: false, 
     };
   },
+  computed: {
+    pendingCount() {
+      return this.pendingAppointments.length;
+    },
+  },
   created() {
     this.fetchAppointments();
+    this.fetchPendingAppointments();
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -168,6 +181,16 @@ export default {
         })
         .catch(error => {
           console.error('Error fetching appointments:', error);
+        });
+    },
+    fetchPendingAppointments() {
+      axios.get('/reservations/pending')
+        .then(response => {
+          this.pendingAppointments = response.data;
+          console.log('Pending Appointments:', this.pendingAppointments);
+        })
+        .catch(error => {
+          console.error('Error fetching pending appointments:', error);
         });
     },
     openDialogPr() {
@@ -413,6 +436,18 @@ td{
 .headline{
   background-color: rgb(174, 204, 240);
   text-align: center;
+}
+
+.badge-container {
+  position: relative;
+  display: inline-block;
+}
+
+.notif {
+  position: absolute;
+  top: 0px; /* Adjusts how high above the button the badge appears */
+  right: 15px; /* Adjusts horizontal overflow; modify as needed */
+  z-index: 100;
 }
 
 @media (max-width: 960px) {

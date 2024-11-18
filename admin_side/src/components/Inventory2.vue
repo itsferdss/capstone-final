@@ -1,5 +1,30 @@
 <template>
     <v-container>
+        <div>
+            <v-row class="mt-4">
+                <v-col class="d-flex justify-end">
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ props }">
+                            <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+                                <v-icon left>mdi-file-chart</v-icon>
+                                Generate Report
+                                <v-icon right>mdi-menu-down</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item @click="exportProductPDF" class="mb-2 rounded-l add-record-button">
+                                <v-list-item-icon></v-list-item-icon>
+                                <v-list-item-title>Generate PDF</v-list-item-title>
+                            </v-list-item>
+                            <v-list-item @click="exportProductExcel" class="mb-2 rounded-l add-record-button">
+                                <v-list-item-icon></v-list-item-icon>
+                                <v-list-item-title>Generate Excel</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </v-col>
+            </v-row>
+        </div>
         <v-data-table :search="search" :headers="headers" :items="displayedProducts"
             :sort-by="[{ key: 'product_id', order: 'asc' }]">
             <template v-slot:top>
@@ -14,16 +39,9 @@
                         prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
                         style="max-width: 300px;"></v-text-field>
 
-                        
-                    <v-select
-                        v-model="selectedType"
-                        :items="productTypes"
-                        label="Filter by Type"
-                        clearable
-                        class="mr-4"
-                        density="compact"
-                        solo
-                    ></v-select>
+
+                    <v-select v-model="selectedType" :items="productTypes" label="Filter by Type" clearable class="mr-4"
+                        density="compact" solo></v-select>
 
 
                 </v-toolbar>
@@ -109,6 +127,10 @@
 <script>
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 export default {
     data() {
@@ -178,6 +200,271 @@ export default {
         this.fetchProducts();
     },
     methods: {
+        exportProductPDF() {
+            try {
+                const doc = new jsPDF('landscape');  // Set to landscape orientation
+                const logoImage = '../src/assets/MVC_logo.png'; // Path to logo
+
+                // Constants for layout
+                const marginTop = 20;
+                const marginLeft = 15;
+                const marginRight = 15;
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const lineHeight = 10;
+                const cellPadding = 6;
+                const headerFontSize = 14;
+                const tableFontSize = 10;
+                const currentDate = new Date();
+                const formattedDate = currentDate.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                });
+
+                // Set title font and add logo
+                doc.setFontSize(headerFontSize);
+                doc.addImage(logoImage, 'PNG', marginLeft, 10, 50, 25);
+                doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 5, { align: 'center' });
+                doc.setFontSize(12);
+                doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', pageWidth / 2, marginTop + 15, { align: 'center' });
+                doc.text('Product Report', pageWidth / 2, marginTop + 25, { align: 'center' });
+
+                // Add Report Generation Date
+                doc.setFontSize(10);
+                doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 35, { align: 'center' });
+
+                // Prepare table
+                const headers = ['Product Name', 'Supplier', 'Type', 'Color', 'Stock', 'Sold', 'Restock Qty', 'Status'];
+                const columnWidths = [40, 40, 30, 30, 30, 30, 30, 30];
+                let currentY = marginTop + 45;
+
+                // Table Header with bold font and background color
+                doc.setFont('helvetica', 'bold');
+                let headerX = marginLeft;
+                headers.forEach((header, i) => {
+                    doc.setFontSize(tableFontSize);
+                    doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
+                    doc.text(header, headerX + cellPadding, currentY + 7);
+                    headerX += columnWidths[i];
+                });
+                currentY += lineHeight;
+
+                // Table Content
+                this.products.forEach((product) => {
+                    let colorStockArray = product.color_stock;
+
+                    // Check if color_stock is a string and parse if necessary
+                    if (typeof colorStockArray === 'string') {
+                        colorStockArray = JSON.parse(colorStockArray);
+                    }
+
+                    const soldPerColor = product.sold_per_color || {}; // Handle sold_per_color safely
+
+                    colorStockArray.forEach((colorStock, index) => {
+                        if (currentY + lineHeight > pageHeight - marginTop - 30) { // Reserve space for footer
+                            // Add a new page if not enough space
+                            doc.addPage();
+                            currentY = marginTop;
+
+                            // Reprint headers
+                            headerX = marginLeft;
+                            headers.forEach((header, i) => {
+                                doc.setFontSize(tableFontSize);
+                                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
+                                doc.text(header, headerX + cellPadding, currentY + 7);
+                                headerX += columnWidths[i];
+                            });
+                            currentY += lineHeight;
+                        }
+
+                        // Fill product details only on the first row for the product
+                        const row = [
+                            index === 0 ? product.product_name : '',
+                            index === 0 ? product.supplier : '',
+                            index === 0 ? product.type : '',
+                            colorStock.color,
+                            colorStock.stock,
+                            soldPerColor[colorStock.color] || 0,
+                            colorStock.restockQuantity,
+                            colorStock.stock <= 10 ? 'Low Stock' : 'High Stock',
+                        ];
+
+                        let cellX = marginLeft;
+                        row.forEach((cell, i) => {
+                            doc.setFontSize(8);
+                            doc.text(String(cell), cellX + cellPadding, currentY + 7);
+                            cellX += columnWidths[i];
+                        });
+
+                        // Draw the borders around each cell
+                        headerX = marginLeft;
+                        row.forEach((_, i) => {
+                            doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
+                            headerX += columnWidths[i];
+                        });
+
+                        currentY += lineHeight;
+                    });
+                });
+
+                // Add footer for Date Issued
+                if (currentY + 20 > pageHeight - marginTop) {
+                    doc.addPage();
+                    currentY = marginTop;
+                }
+                doc.setFontSize(10);
+                doc.text(`Date Issued: ${formattedDate}`, pageWidth - marginRight, currentY + 10, { align: 'right' });
+
+                // Add page number
+                const pageCount = doc.internal.pages.length;
+                doc.text(`Page ${doc.internal.pages.indexOf(doc.internal.pageSize) + 1} of ${pageCount}`, pageWidth - marginRight, pageHeight - 10, { align: 'right' });
+
+                // Save the PDF
+                doc.save('Product_Report.pdf');
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+            }
+        },
+
+
+
+
+
+
+        async exportProductExcel() {
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Product Report');
+                const imagePath = '../src/assets/MVC_logo.png'; // Your image path
+                const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
+
+                const imageId = workbook.addImage({
+                    buffer: imageBuffer,
+                    extension: 'png',
+                });
+
+                // Add the image to the worksheet
+                worksheet.addImage(imageId, {
+                    tl: { col: 2, row: 0 },
+                    ext: { width: 650, height: 100 },
+                });
+
+                // Merge cells and set their values
+                const mergeCells = [
+                    { range: 'C6:E6', value: 'MVC Optical Clinic' },
+                    { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
+                    { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' })}` },
+                    { range: 'C9:E9', value: 'Product Inventory Report' }
+                ];
+
+                // Add report generated date/time
+                const currentDate = new Date();
+                const formattedDate = currentDate.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                });
+
+                worksheet.mergeCells('C10:E10');
+                worksheet.getCell('C10').value = `Report Generated: ${formattedDate}`;
+                worksheet.getCell('C10').font = { size: 12, italic: true };
+                worksheet.getCell('C10').alignment = { horizontal: 'center', vertical: 'middle' };
+
+                // Merge cells and set their values
+                mergeCells.forEach(cell => {
+                    if (!worksheet.getCell(cell.range).isMerged) {
+                        worksheet.mergeCells(cell.range);
+                        worksheet.getCell(cell.range).value = cell.value;
+                        worksheet.getCell(cell.range).font = { size: 14, bold: true };
+                        worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
+                    }
+                });
+
+                worksheet.getCell('C6').font.size = 16; // Make the title bigger
+                worksheet.getCell('C9').font.size = 16;
+
+                // Add column headers
+                const headers = ['Product Name', 'Supplier', 'Type', 'Quantity', 'Sold', 'New Stocks', 'Color Stock', 'Status'];
+                worksheet.addRow(headers);
+
+                // Set specific column widths
+                worksheet.getColumn('A').width = 30;
+                worksheet.getColumn('B').width = 20;
+                worksheet.getColumn('C').width = 20;
+                worksheet.getColumn('D').width = 10;
+                worksheet.getColumn('E').width = 10;
+                worksheet.getColumn('F').width = 10;
+                worksheet.getColumn('G').width = 20; // Adjusted width for Color Stock
+                worksheet.getColumn('H').width = 15;
+
+                // Add data rows for each product
+                this.products.forEach(product => {
+                    // Ensure color_stock is a valid JSON string before parsing
+                    let colorStockText = '';
+                    try {
+                        // Check if color_stock is a string, if so, parse it; otherwise, use it as is
+                        const colorStock = (typeof product.color_stock === 'string')
+                            ? JSON.parse(product.color_stock)
+                            : product.color_stock;
+
+                        // Format the color_stock information
+                        colorStockText = Array.isArray(colorStock)
+                            ? colorStock.map(item => `${item.color}: ${item.stock}`).join(", ")
+                            : '';
+                    } catch (error) {
+                        console.error('Error parsing color_stock:', error);
+                        colorStockText = 'Invalid color_stock data';
+                    }
+
+                    // For each product, if it has multiple color stock items, we need to add them vertically
+                    const colorStockEntries = colorStockText.split(", "); // Split into individual color-stock pairs
+
+                    colorStockEntries.forEach((colorStockEntry, index) => {
+                        // Prepare the row data
+                        const row = [
+                            index === 0 ? product.product_name : '', // Only show product name on the first entry
+                            index === 0 ? product.supplier : '',     // Only show supplier on the first entry
+                            index === 0 ? product.type : '',         // Only show type on the first entry
+                            index === 0 ? product.quantity : '',     // Only show quantity on the first entry
+                            index === 0 ? product.total_sold : '',   // Only show sold on the first entry
+                            index === 0 ? product.new_stock_added : '', // Only show new stock on the first entry
+                            colorStockEntry,  // This will be the individual color-stock entry
+                            product.quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock',  // Status
+                        ];
+
+                        // Add the row to the worksheet
+                        const addedRow = worksheet.addRow(row);
+
+                        // If the quantity is less than 10, make the font color red, else green
+                        const quantityCell = addedRow.getCell(4); // Assuming quantity is in the 4th column (D)
+                        if (quantityCell.value < 10) {
+                            quantityCell.font = { color: { argb: 'FF0000' } }; // Red color
+                        } else if (quantityCell.value > 10) {
+                            quantityCell.font = { color: { argb: '00FF00' } }; // Green color
+                        }
+                    });
+                });
+
+                // Save the workbook as a buffer and trigger the download
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/octet-stream' });
+                saveAs(blob, 'Product_Inventory_Report.xlsx');
+                console.log('Excel file created successfully!');
+            } catch (error) {
+                console.error('Error exporting Excel:', error);
+            }
+        },
+
+
+
+
         getQuantityClass(quantity) {
             return quantity <= this.lowStockThreshold ? 'low-stock' : 'high-stock';
         },
@@ -215,8 +502,8 @@ export default {
                 });
         },
         openInfoItem(item) {
-            this.editedItem = { ...item }; 
-            this.stockDialog = true; 
+            this.editedItem = { ...item };
+            this.stockDialog = true;
         },
         closeDialog() {
             this.stockDialog = false; // Close the dialog
@@ -282,18 +569,18 @@ export default {
 </script>
 
 <style scoped>
-.headers{
+.headers {
     text-align: center;
 }
 
-.sold-quantity{
+.sold-quantity {
     background-color: #ffcccc;
     color: #c0392b;
     padding: 5px 10px;
     border-radius: 4px;
 }
 
-.new-stock{
+.new-stock {
     background-color: #d4edda;
     color: #155724;
     padding: 5px 10px;
@@ -362,21 +649,22 @@ td {
 }
 
 .dialogTable {
-    border-collapse: collapse; 
-    width: 100%; 
+    border-collapse: collapse;
+    width: 100%;
 }
 
-.dialogTable th, .dialogTable td {
-    border: 1px solid #ddd; 
+.dialogTable th,
+.dialogTable td {
+    border: 1px solid #ddd;
     padding: 10px;
-    text-align: center; 
+    text-align: center;
 }
 
 .dialogTable th {
-    background-color: #f2f2f2; 
+    background-color: #f2f2f2;
 }
 
-.headline{
+.headline {
     background-color: #B3D9E6;
     text-align: center;
 }

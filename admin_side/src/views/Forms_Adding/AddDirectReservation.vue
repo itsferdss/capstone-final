@@ -35,7 +35,7 @@
                 <input type="date" v-model="editedItem.created_at" id="date" class="form-input" required />
               </div>
             </div>
-            <div class="form-column">
+            <div class="form-column" v-if="selectedProduct && selectedProduct.type === 'Frames'">
               <div class="form-group">
                 <label for="color">Color</label>
                 <select v-model="editedItem.color" id="color" class="form-input" required>
@@ -85,6 +85,11 @@ export default {
         color: '',
       },
     };
+  },
+  computed: {
+    isFrameProduct() {
+      return this.selectedProduct && this.selectedProduct.type.toLowerCase().includes("Frames");
+    }
   },
   mounted() {
     this.fetchPatients();

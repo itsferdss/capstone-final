@@ -6,7 +6,7 @@
         <!-- Title with icon -->
         <v-toolbar-title class="text-uppercase grey--text productTitle">
           <v-icon left>mdi-package-variant</v-icon> <!-- Icon added here -->
-          Contact Lenses
+          List of Products
         </v-toolbar-title>
         <v-spacer></v-spacer>
 
@@ -32,6 +32,11 @@
         <td>{{ item.type }}</td>
         <td>{{ item.quantity }}</td>
         <td>₱{{ item.price }}</td>
+        <td>
+          <span :class="getStockStatusClass(item.quantity)">
+            {{ getStockStatus(item.quantity) }}
+          </span>
+        </td>
         <td>
           <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
@@ -91,7 +96,8 @@
                     label="Type" prepend-icon="mdi-glasses" disabled></v-select>
                 </v-col>
 
-                <v-col cols="12">
+                <v-col cols="12" v-if="parsedColorStock && parsedColorStock.length > 1">
+                  <!-- Only show if parsedColorStock is valid and has items -->
                   <h4>Color Stock</h4>
                   <v-row>
                     <v-col v-for="(colorStock, index) in parsedColorStock" :key="index" cols="12" sm="4">
@@ -103,6 +109,7 @@
                           <v-text-field :label="'Stock for ' + colorStock.color"
                             v-model="colorStock.stock"></v-text-field>
                         </v-card-subtitle>
+
                       </v-card>
                     </v-col>
                   </v-row>
@@ -117,6 +124,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
 
 
     </template>
@@ -154,6 +162,7 @@ export default {
         { title: 'Type', align: 'center', key: 'type' },
         { title: 'Stock', align: 'center', key: 'quantity' },
         { title: 'Price', align: 'center', key: 'price' },
+        { title: 'Status', align: 'center', },
         { title: 'Actions', align: 'center', sortable: false },
       ],
       currentImageIndex: 0,
@@ -162,8 +171,8 @@ export default {
       color_stock: [],
       dialogDelete: false,
       deleteRecordIndex: -1,
+      lowStockThreshold: 5, // Define your low stock threshold here
     };
-
   },
   computed: {
     displayedProducts() {
@@ -177,7 +186,9 @@ export default {
     },
     parsedColorStock() {
       try {
-        return JSON.parse(this.editedItem.color_stock);
+        const parsed = JSON.parse(this.editedItem.color_stock || "[]");
+        console.log('Parsed color stock:', parsed); // Check the parsed data
+        return parsed;
       } catch (error) {
         console.error('Invalid color_stock format', error);
         return [];
@@ -188,6 +199,12 @@ export default {
     this.fetchProducts();
   },
   methods: {
+    getStockStatus(quantity) {
+      return quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock'; // Determine stock status
+    },
+    getStockStatusClass(quantity) {
+      return quantity <= this.lowStockThreshold ? 'low-stock' : 'high-stock'; // Return class based on stock status
+    },
     updateQuantity() {
       const totalStock = this.editedItem.color_stock.reduce((sum, item) => sum + item.stock, 0);
       this.editedItem.quantity = totalStock;
@@ -203,77 +220,118 @@ export default {
       }
     },
     fetchProducts() {
-      axios.get('/products')
+      axios.get('/allProducts')
         .then(response => {
-          if (Array.isArray(response.data)) {
-            // Filter products where type is 'Frames'
-            this.products = response.data.filter(product => product.type === 'Accessories');
-          } else {
-            this.error = 'Unexpected response format';
-          }
+          console.log('Response data:', response.data); // Inspect the structure here
+
+          // Filter products where type is 'Frames' and map the necessary properties
+          this.products = response.data
+            .filter(product => product.type === 'Accessories') // Filter by product type
+            .map(product => {
+              // Parse color_stock to get an array of images
+              const colorStock = JSON.parse(product.color_stock || "[]");
+
+              // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
+              const colorStockImages = colorStock.map(color =>
+                color.image && !color.image.startsWith('http://127.0.0.1:8000/') ? `http://127.0.0.1:8000/${color.image}` : color.image
+              );
+
+              // Concatenate images from both product.images and colorStockImages, filter out null values
+              const allImages = [...product.images, ...colorStockImages].filter(Boolean);
+
+              return {
+                ...product,
+                currentImage: allImages.length > 0 ? allImages[0] : '', // Set default image if none exists
+                images: allImages // Store combined images array
+              };
+            });
         })
         .catch(error => {
-          this.error = 'Error fetching products: ' + error.message;
+          console.error('Error fetching products:', error);
         });
     },
     openDialog() {
-      this.$router.push('/add/product')
+      this.$router.push('/add/product');
     },
     closeDialog() {
       this.dialog = false;
     },
-    openEditItem() {
-      this.$router.push('/view/product')
+    openEditItem(item) {
+      this.$router.push({ path: '/view/product', query: { id: item.id } });
     },
     openInfoItem(item) {
       this.editedItem = { ...item, images: item.images || [] };
+      console.log('Images:', this.editedItem.images); // Check if the image URLs are correct
       this.currentImageIndex = 0;
       this.infoDialog = true;
     },
-
     closeEditItemDialog() {
       this.editItemDialog = false;
     },
-
     closeInfoItemDialog() {
       this.infoDialog = false;
     },
     deleteProduct(item) {
+      // Trigger SweetAlert2 confirmation dialog
       Swal.fire({
         title: 'Are you sure?',
-        text: 'You will not be able to recover this product!',
+        text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel'
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.delete(`/products/${item.id}`)
-            .then(response => {
-              Swal.fire('Deleted!', 'Product has been deleted.', 'success');
-              this.fetchProducts(); // Fetch updated product list
+          // Proceed with deletion if confirmed
+          const productToDelete = item;
+          axios.delete('/products/' + productToDelete.id)
+            .then(() => {
+              // Remove product from the array
+              const index = this.products.indexOf(productToDelete);
+              this.products.splice(index, 1);
+
+              // Show success message
+              Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'Product has been deleted.',
+                confirmButtonText: 'Ok',
+              });
             })
             .catch(error => {
-              console.error('Error deleting product:', error);
-              Swal.fire('Oops...', 'Something went wrong!', 'error');
+              // Handle error
+              console.error('Delete failed:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Error deleting product!',
+                confirmButtonText: 'Ok',
+              });
             });
-        } else {
-          Swal.fire('Cancelled', 'Your product is safe :)', 'info');
         }
       });
     },
-
-
-
   },
-
-
 };
 </script>
 
 <style>
+.low-stock {
+  background-color: #ffcccc;
+  color: #c0392b;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.high-stock {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
 .v-card:hover {
   background-color: #f0f0f0;
 }

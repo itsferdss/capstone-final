@@ -32,7 +32,7 @@
                 }" />
             </div>
             <div class="col-lg-3 col-md-6 col-12 mb-4">
-              <mini-statistics-card title="Accepted Reservations" :value="acceptedReservations"
+              <mini-statistics-card title="Month's Revevue" :value="acceptedReservations"
                 description="See Reservations" link="/schedule" class="dashCards" :icon="{
                   component: 'mdi-cart-arrow-down',
                   background: '#FFF9C4',

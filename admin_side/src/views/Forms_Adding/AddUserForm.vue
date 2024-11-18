@@ -71,8 +71,8 @@ export default {
         address: '',
         contact: '',
         birthdate: '',
-        password: '',
-        confirm_password: '',
+        password: 'password123', 
+        confirm_password: 'password123',  
       },
       age: '', // New field for storing the calculated age
     };

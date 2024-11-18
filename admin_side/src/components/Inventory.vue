@@ -124,6 +124,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      
 
 
     </template>
@@ -228,7 +229,7 @@ export default {
 
             // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
             const colorStockImages = colorStock.map(color =>
-              color.image && !color.image.startsWith('http://127.0.0.1:8000') ? `http://127.0.0.1:8000/${color.image}` : color.image
+              color.image && !color.image.startsWith('http://127.0.0.1:8000/') ? `http://127.0.0.1:8000/${color.image}` : color.image
             );
 
             // Concatenate images from both product.images and colorStockImages, filter out null values
@@ -267,32 +268,46 @@ export default {
       this.infoDialog = false;
     },
     deleteProduct(item) {
-      this.deleteRecordIndex = this.products.indexOf(item);
-      this.dialogDelete = true;
-    },
-    confirmDelete() {
-      const productToDelete = this.products[this.deleteRecordIndex];
-      axios.delete('/product/' + productToDelete.id)
-        .then(() => {
-          this.products.splice(this.deleteRecordIndex, 1);
-          this.dialogDelete = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Deleted!',
-            text: 'Product has been deleted.',
-            confirmButtonText: 'Ok',
-          });
-        })
-        .catch(error => {
-          console.error('Delete failed:', error);
-          this.dialogDelete = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Error deleting product!',
-            confirmButtonText: 'Ok',
-          });
-        });
+      // Trigger SweetAlert2 confirmation dialog
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Proceed with deletion if confirmed
+          const productToDelete = item;
+          axios.delete('/products/' + productToDelete.id)
+            .then(() => {
+              // Remove product from the array
+              const index = this.products.indexOf(productToDelete);
+              this.products.splice(index, 1);
+
+              // Show success message
+              Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'Product has been deleted.',
+                confirmButtonText: 'Ok',
+              });
+            })
+            .catch(error => {
+              // Handle error
+              console.error('Delete failed:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Error deleting product!',
+                confirmButtonText: 'Ok',
+              });
+            });
+        }
+      });
     },
   },
 };
