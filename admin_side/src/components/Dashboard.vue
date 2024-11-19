@@ -32,14 +32,15 @@
                 }" />
             </div>
             <div class="col-lg-3 col-md-6 col-12 mb-4">
-              <mini-statistics-card title="Month's Revevue" :value="acceptedReservations"
-                description="See Reservations" link="/schedule" class="dashCards" :icon="{
+              <mini-statistics-card title="This Month's Revenue" :value="formattedRevenue"
+                description="See Revenue Details" link="/viewusers" class="dashCards" :icon="{
                   component: 'mdi-cart-arrow-down',
                   background: '#FFF9C4',
                   shape: 'rounded-circle',
                   color: '#F57F17',
                 }" />
             </div>
+
           </div>
           <div class="row">
             <div class="col-lg-7 mb-lg">
@@ -104,7 +105,7 @@ import MiniStatisticsCard from "../examples/MiniStatisticsCard.vue";
 import GradientLineChart from "../examples/GradientLineChart.vue";
 import GradientPieChart from "../examples/GradientPieChart.vue";
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 const pieTitle = 'Reservations Breakdown';
 const pieDescription = '<span class="font-weight-bold">Reservations </span> Overview ';
@@ -113,7 +114,12 @@ const totalPatients = ref(0);
 const totalProducts = ref(0);
 const totalReservations = ref(0);
 const acceptedReservations = ref(0);
+const totalRevenue = ref(0);
 const statusCounts = ref([0, 0, 0, 0]);
+
+const formattedRevenue = computed(() => {
+  return `₱${totalRevenue.value.toLocaleString()}`;
+});
 
 const currentYear = ref(2024); // Initialize the current year
 const minYear = 2020; // Set a minimum year to limit navigation
@@ -139,6 +145,7 @@ onMounted(() => {
   fetchReservationStatusCounts();
   fetchAccountsCreatedPerMonth();
   fetchYearlyData(); // Fetch initial data for the current year
+  fetchGlasses();
 });
 
 // Method to fetch data for the current year
@@ -215,6 +222,32 @@ async function fetchAppointments() {
       console.error('Error fetching appointments:', error);
     });
 }
+
+async function fetchGlasses() {
+  try {
+    const response = await axios.get('/glasses');
+
+    // Filter glasses sold this month
+    const glassesThisMonth = response.data.filter(glass => {
+      const glassDate = new Date(glass.date);
+      const now = new Date();
+
+      // Check if the glass date is in the current month and year
+      return (
+        glassDate.getFullYear() === now.getFullYear() &&
+        glassDate.getMonth() === now.getMonth()
+      );
+    });
+
+    // Calculate total revenue
+    totalRevenue.value = glassesThisMonth.reduce((sum, glass) => {
+      return sum + parseFloat(glass.price); // Ensure price is a number
+    }, 0);
+  } catch (error) {
+    console.error('Error fetching glasses:', error);
+  }
+}
+
 
 async function fetchReservationStatusCounts() {
   try {
