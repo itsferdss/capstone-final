@@ -1,42 +1,14 @@
 <template>
     <v-container>
         <div>
-            <v-row class="mt-4">
-                <v-col class="d-flex justify-end">
-                    <v-menu v-model="menu" offset-y>
-                        <template v-slot:activator="{ props }">
-                            <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
-                                Generate Report
-                                <v-icon right>mdi-menu-down</v-icon>
-                            </v-btn>
-                        </template>
-
-                        <v-card>
-                            <v-card-text>
-                                <!-- Date Range Pickers -->
-                                <p>Start Date:</p>
-                                <v-date-picker v-model="startDate" :max="endDate" @input="updateDateRange" />
-
-                                <p>End Date:</p>
-                                <v-date-picker v-model="endDate" :min="startDate" @input="updateDateRange" />
-                            </v-card-text>
-
-                            <v-card-actions>
-                                <v-btn text @click="exportProductPDF">Generate PDF</v-btn>
-                                <v-btn text @click="exportProductExcel">Generate Excel</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-menu>
-                </v-col>
-            </v-row>
         </div>
-        <v-data-table :search="search" :headers="headers" :items="displayedProducts"
+        <v-data-table :search="search" :headers="headers" :items="glasses"
             :sort-by="[{ key: 'product_id', order: 'asc' }]">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title class="text-uppercase grey--text productTitle">
                         <v-icon left>mdi-package-variant</v-icon>
-                        Inventory
+                            {{ title }}
                     </v-toolbar-title>
                     <v-spacer></v-spacer>
 
@@ -45,87 +17,67 @@
                         style="max-width: 300px;"></v-text-field>
 
 
-                    <v-select v-model="selectedType" :items="productTypes" label="Filter Products" clearable
-                        class="mr-4" density="compact" solo></v-select>
+                    <v-btn @click="dialog = true" class="calendarIcon">
+                        <v-icon>mdi-calendar</v-icon>
+                    </v-btn>
 
 
                 </v-toolbar>
             </template>
 
-            <template v-slot:item="{ item }">
-                <tr>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.supplier }}</td>
-                    <td>{{ item.type }}</td>
+            <template v-slot:body="{ items }">
+                <tr v-for="item in items" :key="item.id">
+                    <td>{{ item.patient_id}}</td>
                     <td>
-                        <span :class="getQuantityClass(item.quantity)">
-                            {{ item.quantity }}
-                        </span>
+                        <span v-if="item.product_id">{{ item.product.product_name }}</span>
+                        <span v-else>{{ item.custom_frame }}</span>
                     </td>
                     <td>
-                        <span class="sold-quantity">{{ item.total_sold }}</span>
+                        <span v-if="item.lens_id">{{ item.lens.product_name }}</span>
+                        <span v-else>{{ item.custom_lens }}</span>
                     </td>
+                    <td>{{ item.date }}</td>
                     <td>
-                        <span class="new-stock">+{{ item.new_stock_added }}</span>
-                    </td>
-                    <td>
-                        <span :class="getStockStatusClass(item.quantity)">
-                            {{ getStockStatus(item.quantity) }}
-                        </span>
-                    </td>
-                    <td>
-                        <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
-                        <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
-                        <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
+                        <span class="price">{{ item.price | currency }}</span>
                     </td>
                 </tr>
             </template>
         </v-data-table>
 
-        <v-dialog v-model="stockDialog" max-width="800px">
+        <v-dialog v-model="dialog" max-width="600px">
             <v-card>
-                <v-card-title class="headline">{{ editedItem.product_name }} Stocks</v-card-title>
-                <v-card-text>
-                    <v-table class="dialogTable">
-                        <thead>
-                            <tr>
-                                <th style="text-align: center; padding: 10px;">Color</th>
-                                <th style="text-align: center; padding: 10px;">Stock</th>
-                                <th style="text-align: center; padding: 10px;">New Stock Added</th>
-                                <th style="text-align: center; padding: 10px;">Sold</th>
-                                <th style="text-align: center; padding: 10px;">Last Updated</th>
-                                <th style="text-align: center; padding: 10px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(stock, index) in parsedColorStock" :key="index">
-                                <td>{{ stock.color }}</td>
-                                <td>{{ stock.stock }}</td>
-                                <td>
-                                    <span class="new-stock">+{{ stock.restockQuantity }}</span>
-                                </td>
-                                <td>
-                                    <span class="sold-quantity">
-                                        {{ getSoldQuantity(stock.color, editedItem.sold_per_color) }}
-                                    </span>
-                                </td>
-                                <td>{{ formatDate(editedItem.updated_at) }}</td>
-                                <td>
-                                    <span :class="getStockStatusClass(stock.stock)">
-                                        {{ getStockStatus(stock.stock) }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
+                <v-card-title>Select a Date Range</v-card-title>
 
-                    </v-table>
+                <v-card-text>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-menu v-model="startMenu" :close-on-content-click="false" offset-y>
+                                <template v-slot:activator="{ props }">
+                                    <v-text-field v-model="startDate" label="Start Date" readonly v-bind="props" />
+                                </template>
+                                <v-date-picker v-model="startDate" :max="today" @input="startMenu = false" />
+                            </v-menu>
+                        </v-col>
+
+                        <v-col cols="6">
+                            <v-menu v-model="endMenu" :close-on-content-click="false" offset-y>
+                                <template v-slot:activator="{ props }">
+                                    <v-text-field v-model="endDate" label="End Date" readonly v-bind="props" />
+                                </template>
+                                <v-date-picker v-model="endDate" :max="today" @input="endMenu = false" />
+                            </v-menu>
+                        </v-col>
+                    </v-row>
                 </v-card-text>
+
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDialog">Close</v-btn>
+                    <v-btn @click="updateTitle" color="green">Confirm</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+
     </v-container>
 </template>
 
@@ -136,6 +88,7 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { ref, onMounted } from 'vue';
 
 export default {
     data() {
@@ -145,11 +98,13 @@ export default {
             infoDialog: false,
             stockDialog: false,
             selectedType: '',
-            menu: false,
+            dialog: false,
             startDate: null,
             endDate: null,
-            products: [],  // Your product data
-            selectedType: 'All',  // Filter type (optional)
+            startMenu: false,
+            endMenu: false,
+            today: new Date().toISOString().substr(0, 10),
+            title: ("Overall Sales"),
             editedItem: {
                 product_image: '',
                 product_id: '',
@@ -162,17 +117,15 @@ export default {
                 images: [],
                 color_stock: [],
             },
+            glasses: [],
             productTypes: ['Low Stock', 'High Stock', 'Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
-                { title: 'Product Name', align: 'center', key: 'product_name' },
-                { title: 'Supplier', align: 'center', key: 'supplier' },
-                { title: 'Type', align: 'center', key: 'type' },
-                { title: 'Quantity', align: 'center' },
-                { title: 'Sold', align: 'center', key: 'quantity' },
-                { title: 'New Stocks', align: 'center', key: 'quantity' },
-                { title: 'Status', align: 'center' },
-                { title: 'Actions', align: 'center', sortable: false },
+                { title: 'Patient', align: 'center', key: 'supplier' },
+                { title: 'Frame', align: 'center', key: 'product_name' },
+                { title: 'Lens', align: 'center', key: 'supplier' },
+                { title: 'Date Sold', align: 'center' },
+                { title: 'Price', align: 'center' },
             ],
             currentImageIndex: 0,
             products: [],
@@ -208,28 +161,26 @@ export default {
                 )
             );
         },
-        parsedColorStock() {
-            return this.editedItem.color_stock;  // Directly use the array
-        },
     },
     mounted() {
         this.fetchProducts();
+        this.fetchGlasses();
     },
     methods: {
-        updateDateRange() {
-            console.log(`Start Date: ${this.startDate}, End Date: ${this.endDate}`);
+
+        getQuantityClass(quantity) {
+            return quantity <= 5 ? 'low-stock' : 'high-stock';
         },
 
-        updateDateRange() {
-            console.log('Date range updated:', this.startDate, this.endDate);
-        },
-
-        async exportProductPDF() {
+        exportProductPDF() {
             try {
-                const doc = new jsPDF('landscape');
-                const logoImage = '../src/assets/MVC_logo.png';
+                const doc = new jsPDF('landscape');  // Set to landscape orientation
+                const logoImage = '../assets/MVC_logo.png'; // Path to logo
+
+                // Constants for layout
                 const marginTop = 20;
                 const marginLeft = 15;
+                const marginRight = 15;
                 const pageHeight = doc.internal.pageSize.height;
                 const pageWidth = doc.internal.pageSize.width;
                 const lineHeight = 10;
@@ -237,55 +188,116 @@ export default {
                 const headerFontSize = 14;
                 const tableFontSize = 10;
                 const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US');
-
-                const filteredProducts = this.products.filter(product => {
-                    const productDate = new Date(product.date);
-                    return (!this.startDate || productDate >= new Date(this.startDate)) &&
-                        (!this.endDate || productDate <= new Date(this.endDate));
+                const formattedDate = currentDate.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
                 });
 
+                // Filter products based on selectedType
+                const filteredProducts = this.products.filter(product =>
+                    this.selectedType ? product.type === this.selectedType : true
+                );
+
+                // Set title font and add logo
                 doc.setFontSize(headerFontSize);
                 doc.addImage(logoImage, 'PNG', marginLeft + 35, 20, 200, 25);
                 doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
                 doc.setFontSize(12);
+                doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', pageWidth / 2, marginTop + 40, { align: 'center' });
                 doc.text('Product Report', pageWidth / 2, marginTop + 50, { align: 'center' });
+
+                // Add Report Generation Date
                 doc.setFontSize(10);
                 doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
 
-                const headers = ['Product Name', 'Supplier', 'Type', 'Date', 'Quantity', 'Status'];
+                // Prepare table
+                const headers = ['Product Name', 'Supplier', 'Type', 'Color', 'Stock', 'Sold', 'Restock Qty', 'Status'];
+                const columnWidths = [40, 40, 30, 30, 30, 30, 30, 30];
                 let currentY = marginTop + 70;
 
+                // Table Header with bold font and background color
                 doc.setFont('helvetica', 'bold');
                 let headerX = marginLeft;
                 headers.forEach((header, i) => {
                     doc.setFontSize(tableFontSize);
-                    doc.rect(headerX, currentY, 40, lineHeight, 'S');
+                    doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
                     doc.text(header, headerX + cellPadding, currentY + 7);
-                    headerX += 40;
+                    headerX += columnWidths[i];
                 });
                 currentY += lineHeight;
 
-                filteredProducts.forEach(product => {
-                    const row = [
-                        product.product_name,
-                        product.supplier,
-                        product.type,
-                        product.date,
-                        product.quantity,
-                        product.quantity <= 5 ? 'Low Stock' : 'High Stock',
-                    ];
+                // Table Content
+                filteredProducts.forEach((product) => {
+                    let colorStockArray = product.color_stock;
 
-                    let cellX = marginLeft;
-                    row.forEach((cell, i) => {
-                        doc.setFontSize(8);
-                        doc.text(String(cell), cellX + cellPadding, currentY + 7);
-                        cellX += 40;
+                    // Check if color_stock is a string and parse if necessary
+                    if (typeof colorStockArray === 'string') {
+                        colorStockArray = JSON.parse(colorStockArray);
+                    }
+
+                    const soldPerColor = product.sold_per_color || {};
+
+                    colorStockArray.forEach((colorStock, index) => {
+                        if (currentY + lineHeight > pageHeight - marginTop - 30) { // Reserve space for footer
+                            doc.addPage();
+                            currentY = marginTop;
+
+                            // Reprint headers
+                            headerX = marginLeft;
+                            headers.forEach((header, i) => {
+                                doc.setFontSize(tableFontSize);
+                                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
+                                doc.text(header, headerX + cellPadding, currentY + 7);
+                                headerX += columnWidths[i];
+                            });
+                            currentY += lineHeight;
+                        }
+
+                        const row = [
+                            index === 0 ? product.product_name : '',
+                            index === 0 ? product.supplier : '',
+                            index === 0 ? product.type : '',
+                            colorStock.color,
+                            colorStock.stock,
+                            soldPerColor[colorStock.color] || 0,
+                            colorStock.restockQuantity,
+                            colorStock.stock <= 5 ? 'Low Stock' : 'High Stock',
+                        ];
+
+                        let cellX = marginLeft;
+                        row.forEach((cell, i) => {
+                            doc.setFontSize(8);
+                            doc.text(String(cell), cellX + cellPadding, currentY + 7);
+                            cellX += columnWidths[i];
+                        });
+
+                        headerX = marginLeft;
+                        row.forEach((_, i) => {
+                            doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
+                            headerX += columnWidths[i];
+                        });
+
+                        currentY += lineHeight;
                     });
-
-                    currentY += lineHeight;
                 });
 
+                // Add footer for Date Issued
+                if (currentY + 20 > pageHeight - marginTop) {
+                    doc.addPage();
+                    currentY = marginTop;
+                }
+                doc.setFontSize(10);
+                doc.text(`Date Issued: ${formattedDate}`, pageWidth - marginRight, currentY + 10, { align: 'right' });
+
+                // Add page number
+                const pageCount = doc.internal.pages.length;
+                doc.text(`Page ${doc.internal.pages.indexOf(doc.internal.pageSize) + 1} of ${pageCount}`, pageWidth - marginRight, pageHeight - 10, { align: 'right' });
+
+                // Save the PDF
                 doc.save('Product_Report.pdf');
             } catch (error) {
                 console.error('Error exporting PDF:', error);
@@ -296,29 +308,61 @@ export default {
             try {
                 const workbook = new ExcelJS.Workbook();
                 const worksheet = workbook.addWorksheet('Product Report');
-                const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US');
+                const imagePath = '../assets/MVC_logo.png';
+                const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
 
-                const filteredProducts = this.products.filter(product => {
-                    const productDate = new Date(product.date);
-                    return (!this.startDate || productDate >= new Date(this.startDate)) &&
-                        (!this.endDate || productDate <= new Date(this.endDate));
+                const imageId = workbook.addImage({
+                    buffer: imageBuffer,
+                    extension: 'png',
                 });
 
-                worksheet.mergeCells('A1:F1');
-                worksheet.getCell('A1').value = `MVC Optical Clinic Product Report`;
-                worksheet.getCell('A1').font = { size: 16, bold: true };
+                worksheet.addImage(imageId, {
+                    tl: { col: 2, row: 0 },
+                    ext: { width: 650, height: 100 },
+                });
 
-                worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Date', 'Quantity', 'Status']);
+                const currentDate = new Date();
+                const formattedDate = currentDate.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                });
 
-                filteredProducts.forEach(product => {
+                const selectedProducts = this.products.filter(product => product.type === this.selectedType);
+
+                worksheet.mergeCells('C6:E6');
+                worksheet.getCell('C6').value = 'MVC Optical Clinic';
+                worksheet.getCell('C6').font = { size: 16, bold: true };
+
+                worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Quantity', 'Sold', 'New Stocks', 'Color Stock', 'Status']);
+
+                selectedProducts.forEach(product => {
+                    let colorStockText = '';
+                    try {
+                        const colorStock = (typeof product.color_stock === 'string')
+                            ? JSON.parse(product.color_stock)
+                            : product.color_stock;
+
+                        colorStockText = Array.isArray(colorStock)
+                            ? colorStock.map(item => `${item.color}: ${item.stock}`).join(', ')
+                            : '';
+                    } catch (error) {
+                        console.error('Error parsing color_stock:', error);
+                        colorStockText = 'Invalid color_stock data';
+                    }
+
                     const row = [
                         product.product_name,
                         product.supplier,
                         product.type,
-                        product.date,
                         product.quantity,
-                        product.quantity <= 5 ? 'Low Stock' : 'High Stock',
+                        product.total_sold,
+                        product.new_stock_added,
+                        colorStockText,
+                        product.quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock',
                     ];
 
                     worksheet.addRow(row);
@@ -327,12 +371,77 @@ export default {
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/octet-stream' });
                 saveAs(blob, 'Product_Inventory_Report.xlsx');
+                console.log('Excel file created successfully!');
             } catch (error) {
-                console.error('Excel export error:', error);
+                console.error('Error exporting Excel:', error);
             }
         },
+        async updateTitle() {
+            if (this.startDate && this.endDate) {
+                const formattedStartDate = new Date(this.startDate).toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric',
+                });
+                const formattedEndDate = new Date(this.endDate).toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric',
+                });
+                this.title = `Sales from ${formattedStartDate} to ${formattedEndDate}`;
+            }
+            this.dialog = false;
 
+            // Fetch glasses based on the updated date range
+            await this.fetchGlasses();
+        },
 
+        async fetchGlasses() {
+            try {
+                const response = await axios.get('/glasses'); // Await the API response
+                const glasses = response.data;
+
+                // Parse and filter glasses based on the selected date range
+                const start = this.startDate ? new Date(this.startDate) : null;
+                const end = this.endDate ? new Date(this.endDate) : null;
+
+                if (end) {
+                    // Set end date time to 23:59:59 to include the entire day
+                    end.setHours(23, 59, 59, 999);
+                }
+
+                const filteredGlasses = glasses.filter(glass => {
+                    const glassDate = new Date(glass.date); // Ensure this matches the backend date format (YYYY-MM-DD)
+
+                    if (start && end) {
+                        return glassDate >= start && glassDate <= end;
+                    } else if (start) {
+                        return glassDate >= start;
+                    } else if (end) {
+                        return glassDate <= end;
+                    }
+                    return true; // Include all if no range is selected
+                });
+
+                // Update glasses and calculate total revenue
+                this.glasses = filteredGlasses;
+                this.totalRevenue = filteredGlasses.reduce((sum, glass) => {
+                    return sum + parseFloat(glass.price); // Ensure price is a number
+                }, 0);
+            } catch (error) {
+                console.error('Error fetching glasses:', error);
+            }
+        },
+        // Optional: Add a currency formatter for prices
+        currency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        },
+        parsedColorStock() {
+            return this.editedItem.color_stock; // Directly use the array
+        },
         getQuantityClass(quantity) {
             return quantity <= this.lowStockThreshold ? 'low-stock' : 'high-stock';
         },
@@ -369,6 +478,7 @@ export default {
                     this.error = 'Error fetching products: ' + error.message;
                 });
         },
+
         openInfoItem(item) {
             this.editedItem = { ...item };
             this.stockDialog = true;

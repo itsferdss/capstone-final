@@ -12,7 +12,8 @@
           <a href="#section4" class="nav-link" :class="{ active: activeSection === 'section4' }">Contact Us</a>
         </div>
 
-        <router-link to="/login" class="nav-link-login" :class="{ active: activeSection === 'login' }">Log in</router-link>
+        <router-link to="/login" class="nav-link-login" :class="{ active: activeSection === 'login' }">Log
+          in</router-link>
 
       </div>
     </header>
@@ -31,6 +32,10 @@
           <button class="primary-button" @click="goToLogin"> Shop Now!
           </button>
         </div>
+        <!-- <div class="button-borders">
+          <button class="primary-button" @click="goToLogin"> Shop Now!
+          </button>
+        </div> -->
       </div>
 
     </div>

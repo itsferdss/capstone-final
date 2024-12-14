@@ -33,6 +33,11 @@
         <v-icon class="link-icon">mdi-package-variant-closed</v-icon>
         <span class="link-text">Inventory</span>
       </router-link>
+
+      <router-link :to="{ path: '/sales' }" active-class="active-link" class="sidebar-link">
+        <v-icon class="link-icon">mdi-package-variant-closed</v-icon>
+        <span class="link-text">Sales</span>
+      </router-link>
     </v-list>
 
     <v-list-item class="logout-link" @click="confirmLogout">

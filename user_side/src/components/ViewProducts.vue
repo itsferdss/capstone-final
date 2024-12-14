@@ -166,7 +166,9 @@ export default {
       loginForm: {
         email: '',
         password: '',
-      }
+      },
+      selectedColorQty: 0
+    
     };
   },
   computed: {
@@ -183,6 +185,7 @@ export default {
     }),
     selectedColorStock() {
       const selected = this.product.color_stock.find(item => item.color === this.selectedColor);
+      this.selectedColorQty = selected ? selected.stock : 0;
       return selected ? selected.stock : 0; // Return stock or 0 if no color is selected
     },
     hasColorOptions() {
@@ -367,6 +370,8 @@ export default {
         this.selectedColor = this.product.color_stock[0].color;
       }
 
+     
+
       if (this.product.color_stock.length > 1 && !this.selectedColor) {
         this.colorDialog = false;
         Swal.fire({
@@ -379,14 +384,18 @@ export default {
         return;
       }
 
-      if (!this.reserveQuantity || this.reserveQuantity < 1) {
+      
+      
+      if (this.reserveQuantity > this.selectedColorQty) {
+        this.colorDialog = false;
         Swal.fire({
           icon: 'warning',
           title: 'Invalid Quantity!',
-          text: 'Please enter a valid quantity to reserve.',
+          text: 'Please enter a quantity to less than the stock. test',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'OK'
         });
+      
         return;
       }
 
@@ -403,6 +412,7 @@ export default {
         }
       })
         .then(response => {
+
           this.colorDialog = false;
           Swal.fire({
             icon: 'success',
@@ -412,6 +422,7 @@ export default {
             confirmButtonText: 'OK'
           });
           console.log('Reservation created:', response.data);
+
         })
         .catch(error => {
           console.error('Error reserving product:', error);
