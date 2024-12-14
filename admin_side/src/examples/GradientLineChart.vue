@@ -64,7 +64,7 @@ function initializeChart() {
             },
           },
           y: {
-            max: 50,
+            max: 100,
             ticks: {
               font: {
                 size: 12,

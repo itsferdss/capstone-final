@@ -52,7 +52,7 @@
                             <div class="icon-circle">
                                 <span class="material-icons">attach_money</span>
                             </div>
-                            Total Reservation Revenue
+                            Total Overall Sales
                         </v-card-title>
                         <v-card-text class="rev">₱{{ totalRevenue }}</v-card-text>
                     </v-card>

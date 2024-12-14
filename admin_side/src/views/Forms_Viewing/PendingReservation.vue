@@ -196,7 +196,7 @@ export default {
         seeItem(id) {
             const item = this.pendingAppointments.find(appointment => appointment.id === id);
             if (item) {
-                const baseUrl = 'http://127.0.0.1:8000/'; // Define the backend base URL
+                const baseUrl = 'https://opticare.fun/'; // Define the backend base URL
 
                 // Safely parse color_stock
                 const colorStockArray = item.product.color_stock ? JSON.parse(item.product.color_stock) : [];

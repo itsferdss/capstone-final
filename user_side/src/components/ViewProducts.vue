@@ -142,7 +142,7 @@ export default {
   name: 'ProductPage',
   data() {
     return {
-      baseURL: 'http://127.0.0.1:8000', 
+      baseURL: 'https://opticare.fun/', 
       photos: [],
       isLoggedIn: false,
       currentIndex: 0,
@@ -314,11 +314,10 @@ export default {
       this.zoomed = false;
     },
     reserve(product) {
-      const token = sessionStorage.getItem('token'); // Check if token exists
+      const token = sessionStorage.getItem('token');
 
       if (!token) {
-        // Show login dialog if not logged in
-        this.loginDialog = true;
+        this.loginDialog = true; // Show login dialog if not logged in
         return;
       }
 
@@ -327,19 +326,47 @@ export default {
         return;
       }
 
-      this.colorDialog = true; // Open the color selection dialog if logged in
+      // Check if user already has a reservation for this product
+      axios.get(`/check-reservation/${product.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+        .then(response => {
+          if (response.data.hasPendingReservation) {
+            Swal.fire({
+              title: 'Existing Reservation Found',
+              text: 'You already have a pending reservation for this product. Do you want to reserve it again?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Yes, reserve again',
+              cancelButtonText: 'No, cancel'
+            }).then(result => {
+              if (result.isConfirmed) {
+                this.colorDialog = true; // Open the dialog to proceed with reserving the product
+              }
+            });
+          } else {
+            this.colorDialog = true; // Open the dialog if there's no existing reservation
+          }
+        })
+        .catch(error => {
+          console.error('Error checking reservations:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'System Error',
+            text: 'Unable to verify reservation status. Please try again later.'
+          });
+        });
     },
+
     confirmColor() {
-      // Check if color selection is required
       if (!this.product.color_stock || this.product.color_stock.length === 0) {
-        // If no color stock is available, skip color selection
         this.selectedColor = null;
       } else if (this.product.color_stock.length === 1) {
-        // If only one color is available, set it as the selected color
         this.selectedColor = this.product.color_stock[0].color;
       }
 
-      // If selectedColor is still empty and color stock is available, prompt the user to select a color
       if (this.product.color_stock.length > 1 && !this.selectedColor) {
         this.colorDialog = false;
         Swal.fire({
@@ -352,7 +379,6 @@ export default {
         return;
       }
 
-      // Validate the quantity
       if (!this.reserveQuantity || this.reserveQuantity < 1) {
         Swal.fire({
           icon: 'warning',
@@ -370,14 +396,14 @@ export default {
         product_name: this.product.product_name,
         user_id: this.patientId,
         color: this.selectedColor,
-        quantity: this.reserveQuantity // Sending quantity
+        quantity: this.reserveQuantity
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`
         }
       })
         .then(response => {
-          this.colorDialog = false; // Close the dialog
+          this.colorDialog = false;
           Swal.fire({
             icon: 'success',
             title: 'Reservation Successful',

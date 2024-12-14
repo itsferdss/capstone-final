@@ -38,9 +38,12 @@
                     <template v-slot:item.status="{ item }">
                         <span :style="getStatusStyle(item.status)">{{ getStatusText(item.status) }}</span>
                     </template>
+                    <template v-slot:item.updated_at="{ item }">
+                        {{ formatDateTime(item.updated_at) }}
+                    </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-btn v-if="item.status === 'pending' || item.status === 'accepted' " @click="updateStatus(item, 'canceled')" color="red"
-                            text>
+                        <v-btn v-if="item.status === 'pending' || item.status === 'accepted' "
+                            @click="updateStatus(item, 'canceled')" color="red" text>
                             Cancel
                         </v-btn>
                     </template>
@@ -68,6 +71,7 @@ export default {
                 { title: 'Color', align: 'center', value: 'color' },
                 { title: 'Status', align: 'center', value: 'status' },
                 { title: 'Quantity', align: 'center', value: 'quantity' },
+                { title: 'Date Updated', align: 'center', value: 'updated_at'},
                 { title: 'Actions', align: 'center', value: 'actions' }
             ]
         };
@@ -158,6 +162,21 @@ export default {
                     'error'
                 );
             }
+        },
+        formatDateTime(datetimeString) {
+            if (!datetimeString) return 'N/A';
+
+            // Create a JavaScript Date object
+            const date = new Date(datetimeString);
+
+            // Format the date only
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            };
+
+            return date.toLocaleDateString('en-US', options); // Adjust locale as needed
         },
         goBack() {
             this.$router.go(-1);

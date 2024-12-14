@@ -27,7 +27,7 @@
 
     <v-list-item class="logout-link" @click="confirmLogout">
       <v-icon class="link-icon">mdi-logout</v-icon>
-      <span class="link-text" :class="{ 'hide-text': miniVariant }">Logout</span>
+      <span class="link-text" :class="{ 'hide-text': miniVariant }">{{ isAuthenticated ? 'Logout' : 'Exit' }}</span>
     </v-list-item>
   </v-navigation-drawer>
 </template>
@@ -105,22 +105,27 @@ export default {
       }
     },
     confirmLogout() {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, log out!',
-        cancelButtonText: 'No, cancel'
-      }).then((result) => {
-        sessionStorage.removeItem('token');
-        if (result.isConfirmed) {
-          // Handle the logout process here
-          this.$router.push('/'); // Redirect to home or login page
-        }
-      });
+      if (this.isAuthenticated) {
+        // Show the alert if the user is logged in
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, log out!',
+          cancelButtonText: 'No, cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            sessionStorage.removeItem('token'); // Remove token
+            this.$router.push('/'); // Redirect to home or login page
+          }
+        });
+      } else {
+        // Directly navigate or take other action if not logged in
+        this.$router.push('/');
+      }
     }
   }
 };

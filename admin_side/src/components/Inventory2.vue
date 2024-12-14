@@ -40,7 +40,7 @@
                         style="max-width: 300px;"></v-text-field>
 
 
-                    <v-select v-model="selectedType" :items="productTypes" label="Filter by Type" clearable class="mr-4"
+                    <v-select v-model="selectedType" :items="productTypes" label="Filter Products" clearable class="mr-4"
                         density="compact" solo></v-select>
 
 
@@ -152,7 +152,7 @@ export default {
                 images: [],
                 color_stock: [],
             },
-            productTypes: ['Frames', 'Lens', 'Contact Lenses', 'Accessories'],
+            productTypes: ['Low Stock', 'High Stock', 'Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
                 { title: 'Product Name', align: 'center', key: 'product_name' },
@@ -178,11 +178,17 @@ export default {
             // Filter by type if selectedType is chosen
             let filteredProducts = this.products;
 
-            if (this.selectedType) {
+            if (this.selectedType === 'Low Stock') {
+                filteredProducts = filteredProducts.filter(product => product.quantity <= 5);
+            } else if (this.selectedType === 'High Stock') {
+                filteredProducts = filteredProducts.filter(product => product.quantity > 5);
+            } else if (this.selectedType && this.selectedType !== 'Low Stock' && this.selectedType !== 'High Stock') {
+                // Filter by type if selectedType is a product type
                 filteredProducts = filteredProducts.filter(
                     product => product.type === this.selectedType
                 );
             }
+
 
             // Apply search filter on the filtered products
             return filteredProducts.filter((product) =>
@@ -200,10 +206,15 @@ export default {
         this.fetchProducts();
     },
     methods: {
+
+        getQuantityClass(quantity) {
+            return quantity <= 5 ? 'low-stock' : 'high-stock';
+        },
+
         exportProductPDF() {
             try {
                 const doc = new jsPDF('landscape');  // Set to landscape orientation
-                const logoImage = '../src/assets/MVC_logo.png'; // Path to logo
+                const logoImage = '../assets/MVC_logo.png'; // Path to logo
 
                 // Constants for layout
                 const marginTop = 20;
@@ -225,22 +236,27 @@ export default {
                     second: 'numeric',
                 });
 
+                // Filter products based on selectedType
+                const filteredProducts = this.products.filter(product =>
+                    this.selectedType ? product.type === this.selectedType : true
+                );
+
                 // Set title font and add logo
                 doc.setFontSize(headerFontSize);
-                doc.addImage(logoImage, 'PNG', marginLeft, 10, 50, 25);
-                doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 5, { align: 'center' });
+                doc.addImage(logoImage, 'PNG', marginLeft + 35, 20, 200, 25);
+                doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
                 doc.setFontSize(12);
-                doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', pageWidth / 2, marginTop + 15, { align: 'center' });
-                doc.text('Product Report', pageWidth / 2, marginTop + 25, { align: 'center' });
+                doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', pageWidth / 2, marginTop + 40, { align: 'center' });
+                doc.text('Product Report', pageWidth / 2, marginTop + 50, { align: 'center' });
 
                 // Add Report Generation Date
                 doc.setFontSize(10);
-                doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 35, { align: 'center' });
+                doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
 
                 // Prepare table
                 const headers = ['Product Name', 'Supplier', 'Type', 'Color', 'Stock', 'Sold', 'Restock Qty', 'Status'];
                 const columnWidths = [40, 40, 30, 30, 30, 30, 30, 30];
-                let currentY = marginTop + 45;
+                let currentY = marginTop + 70;
 
                 // Table Header with bold font and background color
                 doc.setFont('helvetica', 'bold');
@@ -254,7 +270,7 @@ export default {
                 currentY += lineHeight;
 
                 // Table Content
-                this.products.forEach((product) => {
+                filteredProducts.forEach((product) => {
                     let colorStockArray = product.color_stock;
 
                     // Check if color_stock is a string and parse if necessary
@@ -262,11 +278,10 @@ export default {
                         colorStockArray = JSON.parse(colorStockArray);
                     }
 
-                    const soldPerColor = product.sold_per_color || {}; // Handle sold_per_color safely
+                    const soldPerColor = product.sold_per_color || {};
 
                     colorStockArray.forEach((colorStock, index) => {
                         if (currentY + lineHeight > pageHeight - marginTop - 30) { // Reserve space for footer
-                            // Add a new page if not enough space
                             doc.addPage();
                             currentY = marginTop;
 
@@ -274,14 +289,13 @@ export default {
                             headerX = marginLeft;
                             headers.forEach((header, i) => {
                                 doc.setFontSize(tableFontSize);
-                                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
+                                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
                                 doc.text(header, headerX + cellPadding, currentY + 7);
                                 headerX += columnWidths[i];
                             });
                             currentY += lineHeight;
                         }
 
-                        // Fill product details only on the first row for the product
                         const row = [
                             index === 0 ? product.product_name : '',
                             index === 0 ? product.supplier : '',
@@ -290,7 +304,7 @@ export default {
                             colorStock.stock,
                             soldPerColor[colorStock.color] || 0,
                             colorStock.restockQuantity,
-                            colorStock.stock <= 10 ? 'Low Stock' : 'High Stock',
+                            colorStock.stock <= 5 ? 'Low Stock' : 'High Stock',
                         ];
 
                         let cellX = marginLeft;
@@ -300,10 +314,9 @@ export default {
                             cellX += columnWidths[i];
                         });
 
-                        // Draw the borders around each cell
                         headerX = marginLeft;
                         row.forEach((_, i) => {
-                            doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
+                            doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
                             headerX += columnWidths[i];
                         });
 
@@ -330,16 +343,11 @@ export default {
             }
         },
 
-
-
-
-
-
         async exportProductExcel() {
             try {
                 const workbook = new ExcelJS.Workbook();
                 const worksheet = workbook.addWorksheet('Product Report');
-                const imagePath = '../src/assets/MVC_logo.png'; // Your image path
+                const imagePath = '../assets/MVC_logo.png';
                 const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
 
                 const imageId = workbook.addImage({
@@ -347,21 +355,11 @@ export default {
                     extension: 'png',
                 });
 
-                // Add the image to the worksheet
                 worksheet.addImage(imageId, {
                     tl: { col: 2, row: 0 },
                     ext: { width: 650, height: 100 },
                 });
 
-                // Merge cells and set their values
-                const mergeCells = [
-                    { range: 'C6:E6', value: 'MVC Optical Clinic' },
-                    { range: 'C7:E7', value: 'Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales' },
-                    { range: 'C8:E8', value: `As of: ${new Date().toLocaleDateString('en-US', { timeZone: 'Asia/Manila', year: 'numeric', month: 'long', day: 'numeric' })}` },
-                    { range: 'C9:E9', value: 'Product Inventory Report' }
-                ];
-
-                // Add report generated date/time
                 const currentDate = new Date();
                 const formattedDate = currentDate.toLocaleString('en-US', {
                     year: 'numeric',
@@ -372,87 +370,43 @@ export default {
                     second: 'numeric',
                 });
 
-                worksheet.mergeCells('C10:E10');
-                worksheet.getCell('C10').value = `Report Generated: ${formattedDate}`;
-                worksheet.getCell('C10').font = { size: 12, italic: true };
-                worksheet.getCell('C10').alignment = { horizontal: 'center', vertical: 'middle' };
+                const selectedProducts = this.products.filter(product => product.type === this.selectedType);
 
-                // Merge cells and set their values
-                mergeCells.forEach(cell => {
-                    if (!worksheet.getCell(cell.range).isMerged) {
-                        worksheet.mergeCells(cell.range);
-                        worksheet.getCell(cell.range).value = cell.value;
-                        worksheet.getCell(cell.range).font = { size: 14, bold: true };
-                        worksheet.getCell(cell.range).alignment = { horizontal: 'center', vertical: 'middle' };
-                    }
-                });
+                worksheet.mergeCells('C6:E6');
+                worksheet.getCell('C6').value = 'MVC Optical Clinic';
+                worksheet.getCell('C6').font = { size: 16, bold: true };
 
-                worksheet.getCell('C6').font.size = 16; // Make the title bigger
-                worksheet.getCell('C9').font.size = 16;
+                worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Quantity', 'Sold', 'New Stocks', 'Color Stock', 'Status']);
 
-                // Add column headers
-                const headers = ['Product Name', 'Supplier', 'Type', 'Quantity', 'Sold', 'New Stocks', 'Color Stock', 'Status'];
-                worksheet.addRow(headers);
-
-                // Set specific column widths
-                worksheet.getColumn('A').width = 30;
-                worksheet.getColumn('B').width = 20;
-                worksheet.getColumn('C').width = 20;
-                worksheet.getColumn('D').width = 10;
-                worksheet.getColumn('E').width = 10;
-                worksheet.getColumn('F').width = 10;
-                worksheet.getColumn('G').width = 20; // Adjusted width for Color Stock
-                worksheet.getColumn('H').width = 15;
-
-                // Add data rows for each product
-                this.products.forEach(product => {
-                    // Ensure color_stock is a valid JSON string before parsing
+                selectedProducts.forEach(product => {
                     let colorStockText = '';
                     try {
-                        // Check if color_stock is a string, if so, parse it; otherwise, use it as is
                         const colorStock = (typeof product.color_stock === 'string')
                             ? JSON.parse(product.color_stock)
                             : product.color_stock;
 
-                        // Format the color_stock information
                         colorStockText = Array.isArray(colorStock)
-                            ? colorStock.map(item => `${item.color}: ${item.stock}`).join(", ")
+                            ? colorStock.map(item => `${item.color}: ${item.stock}`).join(', ')
                             : '';
                     } catch (error) {
                         console.error('Error parsing color_stock:', error);
                         colorStockText = 'Invalid color_stock data';
                     }
 
-                    // For each product, if it has multiple color stock items, we need to add them vertically
-                    const colorStockEntries = colorStockText.split(", "); // Split into individual color-stock pairs
+                    const row = [
+                        product.product_name,
+                        product.supplier,
+                        product.type,
+                        product.quantity,
+                        product.total_sold,
+                        product.new_stock_added,
+                        colorStockText,
+                        product.quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock',
+                    ];
 
-                    colorStockEntries.forEach((colorStockEntry, index) => {
-                        // Prepare the row data
-                        const row = [
-                            index === 0 ? product.product_name : '', // Only show product name on the first entry
-                            index === 0 ? product.supplier : '',     // Only show supplier on the first entry
-                            index === 0 ? product.type : '',         // Only show type on the first entry
-                            index === 0 ? product.quantity : '',     // Only show quantity on the first entry
-                            index === 0 ? product.total_sold : '',   // Only show sold on the first entry
-                            index === 0 ? product.new_stock_added : '', // Only show new stock on the first entry
-                            colorStockEntry,  // This will be the individual color-stock entry
-                            product.quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock',  // Status
-                        ];
-
-                        // Add the row to the worksheet
-                        const addedRow = worksheet.addRow(row);
-
-                        // If the quantity is less than 10, make the font color red, else green
-                        const quantityCell = addedRow.getCell(4); // Assuming quantity is in the 4th column (D)
-                        if (quantityCell.value < 10) {
-                            quantityCell.font = { color: { argb: 'FF0000' } }; // Red color
-                        } else if (quantityCell.value > 10) {
-                            quantityCell.font = { color: { argb: '00FF00' } }; // Green color
-                        }
-                    });
+                    worksheet.addRow(row);
                 });
 
-                // Save the workbook as a buffer and trigger the download
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/octet-stream' });
                 saveAs(blob, 'Product_Inventory_Report.xlsx');
@@ -461,7 +415,6 @@ export default {
                 console.error('Error exporting Excel:', error);
             }
         },
-
 
 
 
@@ -509,8 +462,45 @@ export default {
             this.stockDialog = false; // Close the dialog
         },
         deleteProduct(item) {
-            this.deleteRecordIndex = this.products.indexOf(item);
-            this.dialogDelete = true;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with deletion if confirmed
+                    const productToDelete = item;
+                    axios.delete('/products/' + productToDelete.id)
+                        .then(() => {
+                            // Remove product from the array
+                            const index = this.products.indexOf(productToDelete);
+                            this.products.splice(index, 1);
+
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Product has been deleted.',
+                                confirmButtonText: 'Ok',
+                            });
+                        })
+                        .catch(error => {
+                            // Handle error
+                            console.error('Delete failed:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Error deleting product!',
+                                confirmButtonText: 'Ok',
+                            });
+                        });
+                }
+            });
         },
         confirmDelete() {
             const productToDelete = this.products[this.deleteRecordIndex];

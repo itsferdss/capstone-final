@@ -96,6 +96,11 @@
                     label="Type" prepend-icon="mdi-glasses" disabled></v-select>
                 </v-col>
 
+                <v-col cols="12" sm="12" md="6">
+                  <v-text-field v-model="editedItem.gender" label="Gender" prepend-icon="mdi-gender-male-female"
+                    disabled></v-text-field>
+                </v-col>
+
                 <v-col cols="12" v-if="parsedColorStock && parsedColorStock.length > 1">
                   <!-- Only show if parsedColorStock is valid and has items -->
                   <h4>Color Stock</h4>
@@ -124,7 +129,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      
+
 
 
     </template>
@@ -229,7 +234,7 @@ export default {
 
             // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
             const colorStockImages = colorStock.map(color =>
-              color.image && !color.image.startsWith('http://127.0.0.1:8000/') ? `http://127.0.0.1:8000/${color.image}` : color.image
+              color.image && !color.image.startsWith('https://opticare.fun/') ? `https://opticare.fun/${color.image}` : color.image
             );
 
             // Concatenate images from both product.images and colorStockImages, filter out null values

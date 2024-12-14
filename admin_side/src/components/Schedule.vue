@@ -325,14 +325,14 @@ export default {
 
         // Prepend the base URL (127.0.0.1) to each color stock image only if needed
         const colorStockImages = colorStockArray.map(color =>
-          color.image && !color.image.startsWith('http') ? `http://127.0.0.1:8000/${color.image}` : color.image
+          color.image && !color.image.startsWith('http') ? `https://opticare.fun/${color.image}` : color.image
         );
 
         // Safely parse item.product.images and prepend the base URL
         const productImages = item.product.image ? JSON.parse(item.product.image) : []; // Parse JSON string
         const allImages = [
           ...productImages.map(image =>
-            image.startsWith('http') ? image : `http://127.0.0.1:8000/${image}`
+            image.startsWith('http') ? image : `https://opticare.fun/${image}`
           ),
           ...colorStockImages
         ].filter(Boolean);
@@ -342,7 +342,7 @@ export default {
 
         if (colorData && colorData.image) {
           // Use color stock image if available
-          imageUrl = colorData.image.startsWith('http') ? colorData.image : `http://127.0.0.1:8000/${colorData.image}`;
+          imageUrl = colorData.image.startsWith('http') ? colorData.image : `https://opticare.fun/${colorData.image}`;
         } else if (allImages.length > 0) {
           // Use the first image from all images if no color stock image is available
           imageUrl = allImages[0];

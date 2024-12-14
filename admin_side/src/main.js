@@ -10,7 +10,7 @@ import fontAwesomeApp from './fontAwesome.js';
 window.axios = axios;
 axios.defaults.withCredentials = false;
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';  // Adjust if needed
+axios.defaults.baseURL = 'https://opticare.fun/api';  // Adjust if needed
 
 const app = createApp(App);
 

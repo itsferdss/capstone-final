@@ -32,13 +32,7 @@
                 }" />
             </div>
             <div class="col-lg-3 col-md-6 col-12 mb-4">
-              <mini-statistics-card title="This Month's Revenue" :value="formattedRevenue"
-                description="See Revenue Details" link="/viewusers" class="dashCards" :icon="{
-                  component: 'mdi-cart-arrow-down',
-                  background: '#FFF9C4',
-                  shape: 'rounded-circle',
-                  color: '#F57F17',
-                }" />
+              <new-mini-static-card  />
             </div>
 
           </div>
@@ -104,6 +98,7 @@
 import MiniStatisticsCard from "../examples/MiniStatisticsCard.vue";
 import GradientLineChart from "../examples/GradientLineChart.vue";
 import GradientPieChart from "../examples/GradientPieChart.vue";
+import NewMiniStaticCard from "../examples/NewMiniStaticCard.vue";
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 
@@ -117,9 +112,6 @@ const acceptedReservations = ref(0);
 const totalRevenue = ref(0);
 const statusCounts = ref([0, 0, 0, 0]);
 
-const formattedRevenue = computed(() => {
-  return `₱${totalRevenue.value.toLocaleString()}`;
-});
 
 const currentYear = ref(2024); // Initialize the current year
 const minYear = 2020; // Set a minimum year to limit navigation

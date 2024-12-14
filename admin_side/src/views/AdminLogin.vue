@@ -2,7 +2,7 @@
   <div class="container">
     <div class="login-form-container">
       <div id="login">
-        <v-img src="../src/assets/MVC_logo.png" class="mvcLogo"></v-img>
+        <v-img src="../assets/MVC_logo.png" class="mvcLogo"></v-img>
         <p class="subtitle">Sign in as Admin</p>
         <div class="input-group">
           <label class="inputTitle" for="email">Email</label>

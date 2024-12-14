@@ -23,9 +23,9 @@
     </template>
 
     <template v-slot:item="{ item }">
-      <tr>
+      <tr :class="{ 'highlight-card': item.glasses.some(glass => glass.due_date) }">
         <td>{{ item.id }}</td>
-        <td>{{ item.full_name }} </td>
+        <td>{{ item.full_name }}</td>
         <td>{{ item.contact }}</td>
         <td>{{ item.email }}</td>
         <td>{{ item.address }}</td>
@@ -43,7 +43,11 @@
               <v-btn @click="openDialogPatientHistory(item)" block class="operationTxt">Prescriptions</v-btn>
             </v-col>
             <v-col cols="4">
-              <v-btn @click="openDialogPatientGlassesInformation(item)" block class="operationTxt">Spectacles</v-btn>
+              <v-btn @click="openDialogPatientGlassesInformation(item)" block :class="{ 'highlight': item.balance > 0 }"
+                class="operationTxt">
+                Spectacles
+              </v-btn>
+
             </v-col>
             <v-col cols="4">
               <v-btn @click="openMoreHistoryDialog(item)" block class="operationTxt">Medical History</v-btn>
@@ -189,13 +193,12 @@
                 </v-col>
               </v-row>
 
-              <div v-if="sortedPrescriptions.length === 0" class="no-data-message">
+              <div v-if="sortedGlasses.length === 0" class="no-data-message">
                 No Data Available
               </div>
 
               <v-card v-for="(glasses, index) in sortedGlasses" :key="index" class="mb-4 presCard"
-                :class="{ 'highlight-card': glasses.due_date }"
-                >
+                :class="{ 'highlight-card': glasses.due_date }">
                 <v-card-title class="glassDate">Updated At: {{ formatPrescriptionDate(glasses.date) }}</v-card-title>
                 <v-card-title v-if="glasses.due_date" class="glassDate due-date">
                   Due Date: {{ formatPrescriptionDate(glasses.due_date) }}
@@ -284,7 +287,7 @@
               </v-col>
             </v-row>
 
-            <div v-if="sortedPrescriptions.length === 0" class="no-data-message">
+            <div v-if="sortedHistory.length === 0" class="no-data-message">
               No Data Available
             </div>
 
@@ -805,7 +808,7 @@ export default {
     exportPrescriptionPDF(patients, title) {
       try {
         const doc = new jsPDF();
-        const logoImage = '../src/assets/MVC_logo.png';
+        const logoImage = '../assets/MVC_logo.png';
  // Constants for layout
         const marginTop = 10;
         const pageHeight = doc.internal.pageSize.height; // Get the height of the page
@@ -1345,6 +1348,11 @@ td{
 .due-date {
   color: #d9534f; 
   font-weight: bold; 
+}
+
+.highlight {
+  background-color: #ffeb3b; /* Highlight color (yellow) */
+  color: #000; /* Text color for better contrast */
 }
 
 @media (max-width: 960px) {

@@ -125,10 +125,27 @@ export default {
     fetchProducts() {
       axios.get('/products/latest')
         .then(response => {
-          this.products = response.data.map(product => ({
-            ...product,
-            currentImage: product.image // Set the default image
-          }));
+          console.log('Response data:', response.data); // Inspect the structure here
+          this.products = response.data.map(product => {
+            // Parse color_stock to get an array of images
+            const colorStock = JSON.parse(product.color_stock || "[]");
+
+            // Prepend 'https://opticare.fun/' to each color stock image URL if it doesn't already have it
+            const colorStockImages = colorStock.map(color =>
+              color.image && !color.image.startsWith('https://opticare.fun/')
+                ? `https://opticare.fun/${color.image}`
+                : color.image
+            );
+
+            // Concatenate images from both product.image and colorStockImages, filter out null values
+            const allImages = [product.image, ...colorStockImages].filter(Boolean);
+
+            return {
+              ...product,
+              currentImage: allImages.length > 0 ? allImages[0] : this.defaultImage // Use the first image as currentImage
+            };
+          });
+          console.log('Products after mapping:', this.products); // Check final product structure
         })
         .catch(error => {
           console.error('Error fetching products:', error);

@@ -65,7 +65,7 @@ import axios from 'axios';
 export default {
     data() {
         return {
-            baseURL: 'http://127.0.0.1:8000',
+            baseURL: 'https://opticare.fun/',
             editedItem: {
                 product_id: '',
                 product_name: '',

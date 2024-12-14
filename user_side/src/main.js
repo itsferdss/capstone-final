@@ -12,9 +12,9 @@ window.axios = axios
 axios.defaults.withCredentials = false
 
 // Set base URL dynamically based on environment
-// axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+// axios.defaults.baseURL = 'https://opticare.fun/api';
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api';
+axios.defaults.baseURL = 'https://opticare.fun/api';
 
 createApp(App).use(router).use(store).use(vuetify).mount('#app')
 

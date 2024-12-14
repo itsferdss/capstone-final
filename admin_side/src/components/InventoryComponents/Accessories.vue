@@ -233,7 +233,7 @@ export default {
 
               // Prepend 'http://127.0.0.1' to each color stock image URL if it doesn't already have it
               const colorStockImages = colorStock.map(color =>
-                color.image && !color.image.startsWith('http://127.0.0.1:8000/') ? `http://127.0.0.1:8000/${color.image}` : color.image
+                color.image && !color.image.startsWith('https://opticare.fun/') ? `https://opticare.fun/${color.image}` : color.image
               );
 
               // Concatenate images from both product.images and colorStockImages, filter out null values
