@@ -38,6 +38,7 @@
                         <td>{{ getColorStock(item) }}</td>
                         <td>₱{{ item.product.price }}</td>
                         <td>{{ item.quantity }}</td>
+                        <td>{{ formatPrescriptionDate(item.deadline) }}</td>
                         <td>
                             <v-icon size="small" style="color: teal" @click="seeItem(item.id)">mdi-eye</v-icon>
                             <v-icon size="small" style="color: green"
@@ -52,68 +53,69 @@
     </v-container>
 
     <v-dialog v-model="dialog" max-width="600px">
-  <v-card elevation="8" class="pa-4">
-    <!-- Title Section -->
-    <v-card-title class="headline font-weight-bold">
-      {{ selectedItem?.patient.full_name }}'s Reservation
-    </v-card-title>
+        <v-card elevation="8" class="pa-4">
+            <!-- Title Section -->
+            <v-card-title class="headline font-weight-bold">
+                {{ selectedItem?.patient.full_name }}'s Reservation
+            </v-card-title>
 
-    <!-- Divider for a cleaner separation -->
-    <v-divider></v-divider>
+            <!-- Divider for a cleaner separation -->
+            <v-divider></v-divider>
 
-    <!-- Content Section -->
-    <v-card-text>
-      <v-container>
-        <v-row>
-          <!-- Image Section -->
-          <v-col cols="12" sm="6">
-            <v-img :src="selectedItem?.image" aspect-ratio="1.5" class="rounded-lg mb-4" max-width="100%"></v-img>
-          </v-col>
+            <!-- Content Section -->
+            <v-card-text>
+                <v-container>
+                    <v-row>
+                        <!-- Image Section -->
+                        <v-col cols="12" sm="6">
+                            <v-img :src="selectedItem?.image" aspect-ratio="1.5" class="rounded-lg mb-4"
+                                max-width="100%"></v-img>
+                        </v-col>
 
-          <!-- Details Section -->
-          <v-col cols="12" sm="6">
-            <v-row class="mb-2">
-              <v-col>
-                <strong>Product Name:</strong>
-                <span>{{ selectedItem?.product.product_name }}</span>
-              </v-col>
-            </v-row>
-            <v-row class="mb-2">
-              <v-col>
-                <strong>Color:</strong>
-                <span>{{ selectedItem?.color }}</span>
-              </v-col>
-            </v-row>
-            <v-row class="mb-2">
-              <v-col>
-                <strong>Stock Quantity:</strong>
-                <span>{{ selectedItem?.stockQuantity }}</span>
-              </v-col>
-            </v-row>
-            <v-row class="mb-2">
-              <v-col>
-                <strong>Price:</strong>
-                <span>₱{{ selectedItem?.product.price }}</span>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <strong>Reservation Date:</strong>
-                <span>{{ formatPrescriptionDate(selectedItem?.created_at) }}</span>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-text>
+                        <!-- Details Section -->
+                        <v-col cols="12" sm="6">
+                            <v-row class="mb-2">
+                                <v-col>
+                                    <strong>Product Name:</strong>
+                                    <span>{{ selectedItem?.product.product_name }}</span>
+                                </v-col>
+                            </v-row>
+                            <v-row class="mb-2">
+                                <v-col>
+                                    <strong>Color:</strong>
+                                    <span>{{ selectedItem?.color }}</span>
+                                </v-col>
+                            </v-row>
+                            <v-row class="mb-2">
+                                <v-col>
+                                    <strong>Stock Quantity:</strong>
+                                    <span>{{ selectedItem?.stockQuantity }}</span>
+                                </v-col>
+                            </v-row>
+                            <v-row class="mb-2">
+                                <v-col>
+                                    <strong>Price:</strong>
+                                    <span>₱{{ selectedItem?.product.price }}</span>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <strong>Reservation Date:</strong>
+                                    <span>{{ formatPrescriptionDate(selectedItem?.created_at) }}</span>
+                                </v-col>
+                            </v-row>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-card-text>
 
-    <!-- Actions Section -->
-    <v-divider></v-divider>
-    <v-card-actions class="d-flex justify-end">
-      <v-btn color="primary" dark @click="dialog = false">Close</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+            <!-- Actions Section -->
+            <v-divider></v-divider>
+            <v-card-actions class="d-flex justify-end">
+                <v-btn color="primary" dark @click="dialog = false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 
 </template>
 
@@ -136,6 +138,7 @@ export default {
                 { title: 'Stock', align: 'center' },
                 { title: 'Price', align: 'center' },
                 { title: 'Quantity', align: 'center' },
+                { title: 'Deadline Date', align: 'center' },
                 { title: 'Actions', align: 'center', sortable: false },
             ],
             dialog: false, 

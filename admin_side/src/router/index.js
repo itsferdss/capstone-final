@@ -143,6 +143,13 @@ const router = createRouter({
             //     requiresAuthentication: false, // Landing page doesn't require authentication
             // },
         },
+        {
+            path: '/view/declined',
+            component: () => import('../views/Forms_Viewing/DeclinedReservation.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
        
         { path: '/', redirect: '/adminlogin' }
     ]

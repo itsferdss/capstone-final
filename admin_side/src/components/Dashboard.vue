@@ -32,12 +32,68 @@
                 }" />
             </div>
             <div class="col-lg-3 col-md-6 col-12 mb-4">
-              <new-mini-static-card  />
+              <new-mini-static-card />
+            </div>
+          </div>
+
+          <!-- Put Low Stock Products, Patients Overview, and Reservation Breakdown beside each other -->
+          <div class="row">
+            <!-- Low Stock Products Column -->
+            <div class="col-lg-3 col-md-8 col-12 mb-4">
+              <!-- Total Low Stock Products -->
+              <router-link to="/inventory2" class="clickable-card">
+                <div class="card z-index-2" id="low-stock-container">
+                  <v-card-title class="grey lighten-2">
+                    <div>
+                      <div v-html="'<span class=\'font-weight-bold\'>Products with low stock</span>'"
+                        class="lineCaption"></div>
+                    </div>
+                  </v-card-title>
+                  <h5 class="lineTitle">
+                    &nbsp&nbsp&nbspTotal Low Stock Products:
+                    <span class="red-count">{{ lowStockCount }}</span> <!-- Applying the red-count class -->
+                  </h5>
+
+                  <!-- Move the Print button to the right side -->
+                  <div class="d-flex justify-end">
+                    <v-btn @click="exportLowStockPDF" color="primary" class="ml-2 d-flex justify-center align-center">
+                      <v-icon class="ml-1">mdi-file-pdf</v-icon>
+                      Print
+                    </v-btn>
+                  </div>
+
+                  <v-divider></v-divider>
+
+                  <!-- Scrollable List of Low Stock Products -->
+                  <div class="scrollable-list">
+                    <div v-if="lowStockProducts.length > 0">
+                      <v-list>
+                        <v-list-item-group v-for="product in lowStockProducts" :key="product.id">
+                          <v-list-item>
+                            <v-list-item-content>
+                              <v-list-item-title>
+                                {{ product.product_name }}
+                                <span class="red-quantity">
+                                  ({{ product.quantity }})
+                                </span>
+                              </v-list-item-title>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+                    </div>
+                    <div v-else>
+                      <p>No low stock products available.</p>
+                    </div>
+                  </div>
+                </div>
+              </router-link>
             </div>
 
-          </div>
-          <div class="row">
-            <div class="col-lg-7 mb-lg">
+
+
+            <div class="col-lg-5 col-md-6 col-12 mb-4">
+              <!-- Patients Overview -->
               <div class="card z-index-2">
                 <v-card-title class="grey lighten-2">
                   <div>
@@ -47,9 +103,7 @@
                   </div>
                   <div class="year-navigation">
                     <v-icon @click="prevYear" :disabled="currentYear <= minYear">mdi-chevron-left</v-icon>
-                    <!-- Use left chevron icon -->
-                    <v-icon class="nextYr" @click="nextYear">mdi-chevron-right</v-icon> <!-- Use right chevron icon -->
-
+                    <v-icon class="nextYr" @click="nextYear">mdi-chevron-right</v-icon>
                   </div>
                 </v-card-title>
 
@@ -60,8 +114,9 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-5">
-              <!-- pie chart -->
+
+            <div class="col-lg-4 col-md-6 col-12 mb-4">
+              <!-- Reservation Breakdown -->
               <div class="card z-index-2">
                 <v-card-title class="grey lighten-2">
                   <div>
@@ -101,6 +156,7 @@ import GradientPieChart from "../examples/GradientPieChart.vue";
 import NewMiniStaticCard from "../examples/NewMiniStaticCard.vue";
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
+import { jsPDF } from 'jspdf';
 
 const pieTitle = 'Reservations Breakdown';
 const pieDescription = '<span class="font-weight-bold">Reservations </span> Overview ';
@@ -111,6 +167,7 @@ const totalReservations = ref(0);
 const acceptedReservations = ref(0);
 const totalRevenue = ref(0);
 const statusCounts = ref([0, 0, 0, 0]);
+const lowStockProducts = ref([]);
 
 
 const currentYear = ref(2024); // Initialize the current year
@@ -138,7 +195,93 @@ onMounted(() => {
   fetchAccountsCreatedPerMonth();
   fetchYearlyData(); // Fetch initial data for the current year
   fetchGlasses();
+  fetchLowStockProducts();
 });
+
+async function exportLowStockPDF() {
+  try {
+    const doc = new jsPDF('landscape');
+    const logoImage = '../src/assets/MVC_logo.png'; // Adjust logo path if needed
+    const marginTop = 20;
+    const marginLeft = 15;
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const lineHeight = 10;
+    const cellPadding = 6;
+    const headerFontSize = 14;
+    const tableFontSize = 10;
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleString();
+
+    // Add logo and title to the PDF
+    doc.setFontSize(headerFontSize);
+    doc.addImage(logoImage, 'PNG', marginLeft + 35, marginTop + 10, 200, 25); // Adjust logo size and position
+    doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('Low Stock Products Report', pageWidth / 2, marginTop + 50, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
+
+    // Table headers
+    const headers = ['Product Name', 'Supplier', 'Quantity', 'Updated At', 'Status'];
+
+    let currentY = marginTop + 70;
+
+    // Draw table header
+    let headerX = marginLeft;
+    doc.setFont('helvetica', 'bold');
+    headers.forEach((header, i) => {
+      doc.setFontSize(tableFontSize);
+      doc.rect(headerX, currentY, 40, lineHeight, 'S');
+      doc.text(header, headerX + cellPadding, currentY + 7);
+      headerX += 40;
+    });
+    currentY += lineHeight;
+
+    // Draw product rows
+    lowStockProducts.value.forEach((product) => {
+      const row = [
+        product.product_name,
+        product.supplier || 'N/A', // Default to 'N/A' if supplier is missing
+        product.quantity,
+        new Date(product.updated_at).toLocaleString(),
+        product.quantity <= 5 ? 'Low Stock' : 'Sufficient Stock',
+      ];
+
+      let cellX = marginLeft;
+      row.forEach((cell) => {
+        doc.setFontSize(8);
+        doc.text(String(cell), cellX + cellPadding, currentY + 7);
+        cellX += 40;
+      });
+
+      currentY += lineHeight + 2; // Adjust the row height
+      if (currentY > pageHeight - 30) {
+        doc.addPage();
+        currentY = 20; // Reset for next page
+      }
+    });
+
+    doc.save('Low_Stock_Products_Report.pdf');
+  } catch (error) {
+    console.error('Error exporting PDF:', error);
+    alert('An error occurred while exporting the PDF report.');
+  }
+}
+
+async function fetchLowStockProducts() {
+  try {
+    const response = await axios.get('/products/lowstock'); // Ensure the API returns data with 'product_name' and 'stock'
+    if (Array.isArray(response.data)) {
+      lowStockProducts.value = response.data;
+      console.log('Low stock products fetched:', lowStockProducts.value); // For debugging purposes
+    } else {
+      console.error('Unexpected response format');
+    }
+  } catch (error) {
+    console.error('Error fetching low stock products:', error.message);
+  }
+}
 
 // Method to fetch data for the current year
 async function fetchYearlyData() {
@@ -258,6 +401,59 @@ async function fetchAccountsCreatedPerMonth() {
 </script>
 
 <style scoped>
+.red-quantity {
+  color: red;
+}
+
+#low-stock-container {
+  max-height: 500px;
+  /* Set max-height for vertical scrolling */
+  overflow-y: auto;
+  /* Vertical scroll for overflowing content */
+  overflow-x: auto;
+  /* Horizontal scroll when content overflows */
+  display: block;
+  /* Ensure it's treated as a block container */
+}
+
+.scrollable-list {
+  display: flex;
+  /* Use flexbox to arrange items horizontally */
+  flex-wrap: nowrap;
+  /* Prevent wrapping to next line */
+  gap: 15px;
+  /* Space between items */
+  width: max-content;
+  /* Allow width to expand based on content */
+}
+
+.v-list-item {
+  min-width: 150px;
+  /* Set a minimum width for each product item */
+}
+.clickable-card {
+  text-decoration: none;
+  /* Remove underline */
+  cursor: pointer;
+  /* Change the cursor to a pointer when hovering */
+}
+
+/* Add hover effect for better UX */
+.clickable-card:hover .card {
+  background-color: #f1f1f1;
+  /* Lighten the background on hover */
+  box-shadow: 0 12px 16px rgba(0, 0, 0, 0.1);
+  /* Add subtle shadow on hover */
+}
+
+.clickable-card:hover {
+  text-decoration: none;
+  /* Ensure no underline on hover */
+}
+.v-card__title {
+  font-size: 1px;
+  /* Smaller font size for titles */
+}
 .caption {
   font-size: 15px;
 }

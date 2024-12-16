@@ -1,94 +1,102 @@
 <template>
-        <div>
-            <v-row class="mt-4">
-                <v-col class="d-flex justify-end">
-                    <v-menu v-model="menu" offset-y>
-                        <template v-slot:activator="{ props }">
-                            <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
-                                Generate Report
-                                <v-icon right>mdi-menu-down</v-icon>
-                            </v-btn>
-                        </template>
+    <div>
+        <v-row class="mt-4">
+            <v-col class="d-flex justify-end">
+                <v-menu v-model="menu" offset-y>
+                    <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+                            Generate Report
+                            <v-icon right>mdi-menu-down</v-icon>
+                        </v-btn>
+                    </template>
 
-                        <v-card>
-                            <v-card-text>
-                                <!-- Date Range Pickers -->
-                                <p>Start Date:</p>
-                                <v-date-picker v-model="startDate" :max="endDate" @input="updateDateRange" />
+                    <v-card>
 
-                                <p>End Date:</p>
-                                <v-date-picker v-model="endDate" :min="startDate" @input="updateDateRange" />
-                            </v-card-text>
+                        <v-card-actions>
+                            <v-btn text @click="exportProductPDF">Generate PDF</v-btn>
+                            <v-btn text @click="exportProductExcel">Generate Excel</v-btn>
+                        </v-card-actions>
 
-                            <v-card-actions>
-                                <v-btn text @click="exportProductPDF">Generate PDF</v-btn>
-                                <v-btn text @click="exportProductExcel">Generate Excel</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-menu>
-                </v-col>
-            </v-row>
-        </div>
-        <v-data-table :search="search" :headers="headers" :items="displayedProducts"
-            :sort-by="[{ key: 'product_id', order: 'asc' }]">
-            <template v-slot:top>
-                <v-toolbar flat>
-                    <v-toolbar-title class="text-uppercase grey--text productTitle">
-                        <v-icon left>mdi-package-variant</v-icon>
-                        Inventory
-                    </v-toolbar-title>
-                    <v-spacer></v-spacer>
+                        <v-card-text>
+                            <!-- Date Range Pickers -->
+                            <p>Start Date:</p>
+                            <v-date-picker v-model="startDate" :max="endDate" @input="updateDateRange" />
 
-                    <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search Product"
-                        prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
-                        style="max-width: 300px;"></v-text-field>
+                            <p>End Date:</p>
+                            <v-date-picker v-model="endDate" :min="startDate" @input="updateDateRange" />
+                        </v-card-text>
 
 
-                    <v-select v-model="selectedType" :items="productTypes" label="Filter Products" clearable
-                        class="mr-4" density="compact" solo></v-select>
+                    </v-card>
+                </v-menu>
+            </v-col>
+        </v-row>
+    </div>
+    <v-data-table :search="search" :headers="headers" :items="displayedProducts"
+        :sort-by="[{ key: 'product_id', order: 'asc' }]">
+        <template v-slot:top>
+            <v-toolbar flat>
+                <v-toolbar-title class="text-uppercase grey--text productTitle">
+                    <v-icon left>mdi-package-variant</v-icon>
+                    Inventory
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+
+                <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search Product"
+                    prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
+                    style="max-width: 300px;"></v-text-field>
 
 
-                </v-toolbar>
-            </template>
+                <v-select v-model="selectedType" :items="productTypes" label="Filter Products" clearable class="mr-4"
+                    density="compact" solo></v-select>
 
-            <template v-slot:item="{ item }">
-                <tr>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.supplier }}</td>
-                    <td>{{ item.type }}</td>
-                    <td>
-                        <span :class="getQuantityClass(item.quantity)">
-                            {{ item.quantity }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sold-quantity">{{ item.total_sold }}</span>
-                    </td>
-                    <td>
-                        <span class="new-stock">+{{ item.new_stock_added }}</span>
-                    </td>
-                    <td>
-                        <span :class="getStockStatusClass(item.quantity)">
-                            {{ getStockStatus(item.quantity) }}
-                        </span>
-                    </td>
-                    <td>
-                        <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
-                        <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
-                        <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
-                    </td>
-                </tr>
-            </template>
-        </v-data-table>
 
-        <v-dialog v-model="stockDialog" max-width="800px">
-            <v-card>
-                <v-card-title class="headline">{{ editedItem.product_name }} Stocks</v-card-title>
-                <v-card-text>
+            </v-toolbar>
+        </template>
+
+        <template v-slot:item="{ item }">
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.supplier }}</td>
+                <td>{{ item.type }}</td>
+                <td>
+                    <span :class="getQuantityClass(item.quantity)">
+                        {{ item.quantity }}
+                    </span>
+                </td>
+                <td>
+                    <span class="sold-quantity">{{ item.total_sold }}</span>
+                </td>
+                <td>
+                    <span class="new-stock">+{{ item.new_stock_added }}</span>
+                </td>
+                <td>
+                    <span :class="getStockStatusClass(item.quantity)">
+                        {{ getStockStatus(item.quantity) }}
+                    </span>
+                </td>
+                <td>
+                    <v-icon size="small" style="color: #2F3F64" @click="openInfoItem(item)">mdi-eye</v-icon>
+                    <v-icon size="small" style="color: #2F3F64" @click="openEditItem(item)">mdi-pencil</v-icon>
+                    <v-icon size="small" style="color: #2F3F64" @click="deleteProduct(item)">mdi-delete</v-icon>
+                </td>
+            </tr>
+        </template>
+    </v-data-table>
+
+    <v-dialog v-model="stockDialog" max-width="800px">
+        <v-card>
+            <v-card-title class="headline">{{ editedItem.product_name }} Stocks</v-card-title>
+            <v-card-text>
+                <!-- Loop through each color and display its own table -->
+                <div v-for="(colorStock, index) in parsedColorStock" :key="index" class="color-section">
+                    <!-- Display the color outside the table -->
+                    <h3 class="color-header" style="text-align: center; margin: 20px 0;">
+                        {{ colorStock.color }}
+                    </h3>
                     <v-table class="dialogTable">
                         <thead>
                             <tr>
-                                <th style="text-align: center; padding: 10px;">Color</th>
                                 <th style="text-align: center; padding: 10px;">Stock</th>
                                 <th style="text-align: center; padding: 10px;">New Stock Added</th>
                                 <th style="text-align: center; padding: 10px;">Sold</th>
@@ -97,34 +105,34 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(stock, index) in parsedColorStock" :key="index">
-                                <td>{{ stock.color }}</td>
-                                <td>{{ stock.stock }}</td>
+                            <tr>
+                                <td>{{ colorStock.stock }}</td>
                                 <td>
-                                    <span class="new-stock">+{{ stock.restockQuantity }}</span>
+                                    <span class="new-stock">+{{ colorStock.restockQuantity }}</span>
                                 </td>
                                 <td>
                                     <span class="sold-quantity">
-                                        {{ getSoldQuantity(stock.color, editedItem.sold_per_color) }}
+                                        {{ getSoldQuantity(colorStock.color, editedItem.sold_per_color) }}
                                     </span>
                                 </td>
                                 <td>{{ formatDate(editedItem.updated_at) }}</td>
                                 <td>
-                                    <span :class="getStockStatusClass(stock.stock)">
-                                        {{ getStockStatus(stock.stock) }}
+                                    <span :class="getStockStatusClass(colorStock.stock)">
+                                        {{ getStockStatus(colorStock.stock) }}
                                     </span>
                                 </td>
                             </tr>
                         </tbody>
-
                     </v-table>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDialog">Close</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+                </div>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDialog">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
 </template>
 
 <script>
@@ -146,8 +154,8 @@ export default {
             menu: false,
             startDate: null,
             endDate: null,
-            products: [],  // Your product data
-            selectedType: 'All',  // Filter type (optional)
+            products: [],
+            selectedType: '',  // Filter type (optional)
             editedItem: {
                 product_image: '',
                 product_id: '',
@@ -212,20 +220,17 @@ export default {
     },
     mounted() {
         this.fetchProducts();
+        this.fetchHistories();
     },
     methods: {
         updateDateRange() {
             console.log(`Start Date: ${this.startDate}, End Date: ${this.endDate}`);
         },
 
-        updateDateRange() {
-            console.log('Date range updated:', this.startDate, this.endDate);
-        },
-
         async exportProductPDF() {
             try {
                 const doc = new jsPDF('landscape');
-                const logoImage = '../src/assets/MVC_logo.png';
+                const logoImage = '../src/assets/MVC_logo.png'; // Ensure this is the correct path
                 const marginTop = 20;
                 const marginLeft = 15;
                 const pageHeight = doc.internal.pageSize.height;
@@ -234,15 +239,31 @@ export default {
                 const cellPadding = 6;
                 const headerFontSize = 14;
                 const tableFontSize = 10;
+                const typeTitleFontSize = 16;  // Increase font size for product type title
                 const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US');
+                const formattedDate = currentDate.toLocaleString();
 
-                const filteredProducts = this.products.filter(product => {
-                    const productDate = new Date(product.date);
-                    return (!this.startDate || productDate >= new Date(this.startDate)) &&
-                        (!this.endDate || productDate <= new Date(this.endDate));
-                });
+                // Filter the products based on the selected type and stock level (Low Stock or High Stock)
+                let filteredProducts = this.products;
 
+                if (this.selectedType === 'Low Stock') {
+                    filteredProducts = filteredProducts.filter(product => product.quantity <= 5);
+                } else if (this.selectedType === 'High Stock') {
+                    filteredProducts = filteredProducts.filter(product => product.quantity > 5);
+                } else if (this.selectedType && this.selectedType !== 'Low Stock' && this.selectedType !== 'High Stock') {
+                    filteredProducts = filteredProducts.filter(
+                        product => product.type === this.selectedType
+                    );
+                }
+
+                // Group products by type
+                const productsByType = filteredProducts.reduce((acc, product) => {
+                    if (!acc[product.type]) acc[product.type] = [];
+                    acc[product.type].push(product);
+                    return acc;
+                }, {});
+
+                // Add logo and title to the PDF
                 doc.setFontSize(headerFontSize);
                 doc.addImage(logoImage, 'PNG', marginLeft + 35, 20, 200, 25);
                 doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
@@ -251,84 +272,178 @@ export default {
                 doc.setFontSize(10);
                 doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
 
-                const headers = ['Product Name', 'Supplier', 'Type', 'Date', 'Quantity', 'Status'];
+                // Iterate through each product type and generate a table
                 let currentY = marginTop + 70;
+                const headers = ['Product Name', 'Supplier', 'Type', 'Updated At', 'Quantity', 'Status'];
 
-                doc.setFont('helvetica', 'bold');
-                let headerX = marginLeft;
-                headers.forEach((header, i) => {
-                    doc.setFontSize(tableFontSize);
-                    doc.rect(headerX, currentY, 40, lineHeight, 'S');
-                    doc.text(header, headerX + cellPadding, currentY + 7);
-                    headerX += 40;
-                });
-                currentY += lineHeight;
+                Object.keys(productsByType).forEach((type) => {
+                    // Add title for product type with larger font size
+                    doc.setFontSize(typeTitleFontSize); // Set larger font size for the type title
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(type, marginLeft, currentY);
+                    currentY += lineHeight + 5;
 
-                filteredProducts.forEach(product => {
-                    const row = [
-                        product.product_name,
-                        product.supplier,
-                        product.type,
-                        product.date,
-                        product.quantity,
-                        product.quantity <= 5 ? 'Low Stock' : 'High Stock',
-                    ];
+                    // Draw table header
+                    let headerX = marginLeft;
+                    doc.setFont('helvetica', 'bold');
+                    headers.forEach((header, i) => {
+                        doc.setFontSize(tableFontSize);
+                        doc.rect(headerX, currentY, 40, lineHeight, 'S');
+                        doc.text(header, headerX + cellPadding, currentY + 7);
+                        headerX += 40;
+                    });
+                    currentY += lineHeight;
 
-                    let cellX = marginLeft;
-                    row.forEach((cell, i) => {
-                        doc.setFontSize(8);
-                        doc.text(String(cell), cellX + cellPadding, currentY + 7);
-                        cellX += 40;
+                    // Draw product rows
+                    productsByType[type].forEach((product) => {
+                        const row = [
+                            product.product_name,
+                            product.supplier,
+                            product.type,
+                            new Date(product.updated_at).toLocaleString(),
+                            product.quantity,
+                            product.quantity <= 5 ? 'Low Stock' : 'High Stock',
+                        ];
+
+                        let cellX = marginLeft;
+                        row.forEach((cell) => {
+                            doc.setFontSize(8);
+                            doc.text(String(cell), cellX + cellPadding, currentY + 7);
+                            cellX += 40;
+                        });
+
+                        currentY += lineHeight + 2; // Adjust the row height
+                        if (currentY > pageHeight - 30) {
+                            doc.addPage();
+                            currentY = 20; // Reset for next page
+                        }
                     });
 
-                    currentY += lineHeight;
+                    currentY += 10; // Add space after each table
                 });
 
                 doc.save('Product_Report.pdf');
             } catch (error) {
                 console.error('Error exporting PDF:', error);
+                Swal.fire('Error', 'An error occurred while exporting the PDF report.', 'error');
             }
         },
+
 
         async exportProductExcel() {
             try {
                 const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Product Report');
                 const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US');
+                const formattedDate = currentDate.toLocaleString();
 
-                const filteredProducts = this.products.filter(product => {
-                    const productDate = new Date(product.date);
-                    return (!this.startDate || productDate >= new Date(this.startDate)) &&
-                        (!this.endDate || productDate <= new Date(this.endDate));
+                // Ensure valid startDate and endDate
+                const startDate = this.startDate ? new Date(this.startDate) : null;
+                const endDate = this.endDate ? new Date(this.endDate) : null;
+
+                // Filter the products based on the selected type and stock level (Low Stock or High Stock)
+                let filteredProducts = this.products;
+
+                if (this.selectedType === 'Low Stock') {
+                    filteredProducts = filteredProducts.filter(product => product.quantity <= 5);
+                } else if (this.selectedType === 'High Stock') {
+                    filteredProducts = filteredProducts.filter(product => product.quantity > 5);
+                } else if (this.selectedType && this.selectedType !== 'Low Stock' && this.selectedType !== 'High Stock') {
+                    filteredProducts = filteredProducts.filter(
+                        product => product.type === this.selectedType
+                    );
+                }
+
+                // Apply date range filter
+                filteredProducts = filteredProducts.filter(product => {
+                    const productUpdatedAt = new Date(product.updated_at);
+                    const isAfterStart = !startDate || productUpdatedAt >= startDate;
+                    const isBeforeEnd = !endDate || productUpdatedAt <= endDate;
+                    return isAfterStart && isBeforeEnd;
                 });
 
-                worksheet.mergeCells('A1:F1');
-                worksheet.getCell('A1').value = `MVC Optical Clinic Product Report`;
-                worksheet.getCell('A1').font = { size: 16, bold: true };
+                if (filteredProducts.length === 0) {
+                    Swal.fire('No products found', 'No products match the selected filters and date range.', 'warning');
+                    return;
+                }
 
-                worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Date', 'Quantity', 'Status']);
+                // Group products by type
+                const productsByType = filteredProducts.reduce((acc, product) => {
+                    if (!acc[product.type]) acc[product.type] = [];
+                    acc[product.type].push(product);
+                    return acc;
+                }, {});
 
-                filteredProducts.forEach(product => {
-                    const row = [
-                        product.product_name,
-                        product.supplier,
-                        product.type,
-                        product.date,
-                        product.quantity,
-                        product.quantity <= 5 ? 'Low Stock' : 'High Stock',
-                    ];
-
-                    worksheet.addRow(row);
+                // Add the logo to the top of the sheet (row 1 to row 4)
+                const logoImagePath = '../src/assets/MVC_logo.png'; // Ensure this is the correct path
+                const imageBuffer = await fetch(logoImagePath).then(res => res.arrayBuffer());
+                const imageId = workbook.addImage({
+                    buffer: imageBuffer,
+                    extension: 'png',
                 });
 
+                // Loop through the grouped products and create a sheet for each product type
+                Object.keys(productsByType).forEach((type) => {
+                    const worksheet = workbook.addWorksheet(type);  // Add a new sheet for each product type
+
+                    // Merge cells for the logo (position at top, centered)
+                    worksheet.mergeCells('A1:F4');
+                    worksheet.getCell('A1').value = '';
+                    worksheet.addImage(imageId, {
+                        tl: { col: 0, row: 0 },
+                        ext: { width: 808, height: 118 },
+                    });
+
+                    // Add the title starting from row 7
+                    worksheet.mergeCells('A7:F7');
+                    worksheet.getCell('A7').value = `MVC Optical Clinic Product Report`;
+                    worksheet.getCell('A7').font = { size: 16, bold: true };
+                    worksheet.getCell('A7').alignment = { horizontal: 'center' };
+
+                    // Add the date generated text below the title
+                    worksheet.mergeCells('A8:F8');
+                    worksheet.getCell('A8').value = `Report Generated: ${formattedDate}`;
+                    worksheet.getCell('A8').font = { size: 12, italic: true };
+                    worksheet.getCell('A8').alignment = { horizontal: 'center' };
+
+                    // Add headers for product data (start from row 9)
+                    worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Updated At', 'Quantity', 'Status']);
+                    worksheet.getRow(9).font = { size: 12, bold: true };
+
+                    // Set the columns width to fit content
+                    worksheet.getColumn(1).width = 25;
+                    worksheet.getColumn(2).width = 20;
+                    worksheet.getColumn(3).width = 15;
+                    worksheet.getColumn(4).width = 25;
+                    worksheet.getColumn(5).width = 12;
+                    worksheet.getColumn(6).width = 15;
+
+                    // Add product rows starting from row 10
+                    productsByType[type].forEach(product => {
+                        const row = [
+                            product.product_name,
+                            product.supplier,
+                            product.type,
+                            new Date(product.updated_at).toLocaleString(), // Format updated_at as a string
+                            product.quantity,
+                            product.quantity <= 5 ? 'Low Stock' : 'High Stock',
+                        ];
+
+                        worksheet.addRow(row);
+                    });
+                });
+
+                // Save the Excel file
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/octet-stream' });
-                saveAs(blob, 'Product_Inventory_Report.xlsx');
+                saveAs(blob, 'Product_Report.xlsx');
             } catch (error) {
-                console.error('Excel export error:', error);
+                console.error('Error exporting Excel:', error);
+                Swal.fire('Error', 'An error occurred while exporting the Excel report.', 'error');
             }
         },
+
+
+
 
 
         getQuantityClass(quantity) {
@@ -341,7 +456,7 @@ export default {
             return quantity <= this.lowStockThreshold ? 'low-stock' : 'high-stock';
         },
         fetchProducts() {
-            axios.get('/allProducts')
+            axios.get('allProducts')
                 .then(response => {
                     if (Array.isArray(response.data)) {
                         this.products = response.data.map(product => {
@@ -365,6 +480,18 @@ export default {
                 })
                 .catch(error => {
                     this.error = 'Error fetching products: ' + error.message;
+                });
+        },
+        fetchHistories() {
+            axios.get('/productHistory')
+                .then(response => {
+                    // Handle successful response
+                    console.log('Product histories fetched:', response.data);
+                    this.histories = response.data.data; // Assuming you have a data property `histories` in your component
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error fetching product histories:', error);
                 });
         },
         openInfoItem(item) {
@@ -417,7 +544,7 @@ export default {
         },
         confirmDelete() {
             const productToDelete = this.products[this.deleteRecordIndex];
-            axios.delete('/product/' + productToDelete.id)
+            axios.delete('api/product/' + productToDelete.id)
                 .then(() => {
                     this.products.splice(this.deleteRecordIndex, 1);
                     this.dialogDelete = false;

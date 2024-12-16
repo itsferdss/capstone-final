@@ -78,7 +78,7 @@
                 </select>
                 <span v-if="editedItem.type_of_lens && selectedLensPrice !== null" class="price-display">
                   Price:
-                  <span v-if="editedItem.type_of_lens === 'other' && editedItem.customLensPrice !== null">
+                  <span v-if="editedItem.type_of_lens === 'other'">
                     ₱{{ editedItem.customLensPrice }}
                   </span>
                   <span v-else-if="selectedLensPrice !== null">
@@ -225,13 +225,25 @@ export default {
   },
   computed: {
     initialPrice() {
-      // Calculate the sum of selected frames and lenses
-      return (
-        parseFloat(this.selectedFramePrice) +
-        parseFloat(this.selectedLensPrice) +
-        parseFloat(this.editedItem.customFramePrice) +
-        parseFloat(this.editedItem.customLensPrice)
-      ).toFixed(2);
+      let framePrice = 0;
+      let lensPrice = 0;
+
+      // Use custom frame price if provided, otherwise use the selected frame price
+      if (this.editedItem.customFramePrice) {
+        framePrice = parseFloat(this.editedItem.customFramePrice);
+      } else if (this.selectedFramePrice) {
+        framePrice = parseFloat(this.selectedFramePrice);
+      }
+
+      // Use custom lens price if provided, otherwise use the selected lens price
+      if (this.editedItem.customLensPrice) {
+        lensPrice = parseFloat(this.editedItem.customLensPrice);
+      } else if (this.selectedLensPrice) {
+        lensPrice = parseFloat(this.selectedLensPrice);
+      }
+
+      // Calculate and return the total price
+      return (framePrice + lensPrice).toFixed(2);
     },
     finalAmount() {
       // Deduct the discount from the initial price
@@ -263,38 +275,34 @@ export default {
         return;
       }
 
-      const patientId = this.$route.query.patient_id;
+      // Find the selected frame to check its stock
+      const selectedFrame = this.frames.find(frame => frame.id === this.editedItem.frame);
 
-      // Check if the frame stock or lens stock is zero or less
-      if (this.selectedFrameStock <= 0) {
+      
+
+      // Check if the stock is available
+      if (selectedFrame && selectedFrame.quantity <= 0) {
         Swal.fire({
-          title: 'Out of Stock',
-          text: 'The selected frame has no stock. Please restock or change the product.',
+          title: 'No Stock Available',
+          text: 'The selected frame is out of stock. Please choose another frame.',
           icon: 'warning',
           confirmButtonText: 'OK',
         });
-        return; // Prevent saving
+        return; // Stop execution if no stock is available
       }
 
-      if (this.selectedLensStock <= 0) {
+      const selectedLens = this.lenses.find(lens => lens.id === this.editedItem.type_of_lens);
+      if (selectedLens && selectedLens.quantity <= 0) {
         Swal.fire({
-          title: 'Out of Stock',
-          text: 'The selected lens has no stock. Please restock or change the product.',
+          title: 'No Stock Available',
+          text: 'The selected lens is out of stock. Please choose another frame.',
           icon: 'warning',
           confirmButtonText: 'OK',
         });
-        return; // Prevent saving
+        return; // Stop execution if no stock is available
       }
 
-      // Parse initial price and discount as numbers
-      const initialPrice = parseFloat(this.initialPrice?._value || this.initialPrice) || 0;
-      const discount = parseFloat(this.editedItem.discount) || 0;
-      const finalAmount = initialPrice - discount;
-
-      const partialPayment = parseFloat(this.partialPayment) || 0;
-      const balance = finalAmount - partialPayment;
-
-      if (balance > 0 && !this.dueDate) {
+      if (this.calculatedBalance > 0 && !this.dueDate) {
         Swal.fire({
           title: 'Missing Due Date',
           text: 'There is an outstanding balance. Please assign a due date.',
@@ -304,52 +312,51 @@ export default {
         return;
       }
 
-      const glassesData = {
+      const patientId = this.$route.query.patient_id;
+
+      // Prepare the data to save
+      const dataToSave = {
         patient_id: patientId,
-        frame: this.editedItem.frame,
-        product_id: this.editedItem.frame,
-        type_of_lens: this.editedItem.type_of_lens,
-        lens_id: this.editedItem.type_of_lens,
-        remarks: this.editedItem.remarks,
-        price: finalAmount,
-        balance: balance,
-        customLens: this.editedItem.customLens,
-        customLensPrice: this.editedItem.customLensPrice,
         customFrame: this.editedItem.customFrame,
-        customFramePrice: this.editedItem.customFramePrice,
+        frame: this.editedItem.frame,
+        type_of_lens: this.editedItem.type_of_lens,
+        customLens: this.editedItem.customLens,
         date: this.prescriptionDate,
         due_date: this.dueDate,
-        discount: discount,
-        initial_price: initialPrice,
-        partial_payment: partialPayment,
+        discount: this.editedItem.discount,
+        partial_payment: this.partialPayment,
+        remarks: this.editedItem.remarks,
+        balance: this.calculatedBalance,
+        initial_price: this.initialPrice,
+        price: this.finalAmount,
+        custom_lens_price: this.editedItem.customLensPrice,
+        custom_frame_price: this.editedItem.customFramePrice,
+        product_id: this.editedItem.frame,
+        lens_id: this.editedItem.type_of_lens,
       };
 
-      console.log(glassesData);
-
-      axios.post(`/patients/${patientId}/glasses`, glassesData)
-        .then((response) => {
-          console.log('Glasses information saved successfully:', response.data);
-
+      axios.post(`/patients/${patientId}/glasses`, dataToSave)
+        .then(response => {
           Swal.fire({
             title: 'Success',
-            text: 'Glasses information saved successfully! Also reduced stocks.',
+            text: 'Glass information saved successfully!',
             icon: 'success',
             confirmButtonText: 'OK',
           });
-
-          this.childGlassesDialog = false;
+          this.goBack();
         })
-        .catch((error) => {
-          console.error('Error saving glasses information:', error);
-
+        
+        .catch(error => {
+          console.error('Error saving glasses:', error);
           Swal.fire({
             title: 'Error',
-            text: 'Failed to save glasses information. Please try again later.',
+            text: 'There was an issue saving the glasses information.',
             icon: 'error',
             confirmButtonText: 'OK',
           });
         });
     },
+
 
     fetchProducts() {
       axios.get('/products')
@@ -379,28 +386,27 @@ export default {
           this.error = 'Error fetching products: ' + error.message;
         });
     },
-    async updateFramePrice() {
-      const selectedFrameId = this.editedItem.frame;
-
-      if (selectedFrameId && this.frames.length > 0) {
-        const selectedFrame = this.frames.find(frame => frame.id === selectedFrameId);
-
-        if (selectedFrame) {
-          this.selectedFramePrice = selectedFrame.price;
-          this.selectedFrameStock = selectedFrame.quantity;  // Display the stock quantity
-        }
+    updateFramePrice() {
+      const selectedFrame = this.frames.find(frame => frame.id === this.editedItem.frame);
+      if (selectedFrame) {
+        this.selectedFramePrice = selectedFrame.price;
+        this.selectedFrameStock = selectedFrame.quantity;
+        console.log('Frame Stock:', this.selectedFrameStock);
       } else {
         this.selectedFramePrice = null;
         this.selectedFrameStock = null;
       }
     },
-    async updateLensPrice() {
-      const selectedLensId = this.editedItem.type_of_lens;
-      const selectedLens = this.lenses.find(lens => lens.id === selectedLensId);
 
+    updateLensPrice() {
+      const selectedLens = this.lenses.find(lens => lens.id === this.editedItem.type_of_lens);
       if (selectedLens) {
         this.selectedLensPrice = selectedLens.price;
-        this.selectedLensStock = selectedLens.quantity;  // Update stock info
+        this.selectedLensStock = selectedLens.quantity;
+        console.log('Lens Stock:', this.selectedLensStock);
+      } else {
+        this.selectedLensPrice = null;
+        this.selectedLensStock = null;
       }
     },
     updateTotal() {

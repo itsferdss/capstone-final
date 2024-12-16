@@ -20,7 +20,7 @@
         <div class="badge-container">
           <v-btn @click="openDialogPr('pending')" class="mb-2 mr-4 rounded-l pending-btn" elevation="2">
             <v-icon left>mdi-clock-outline</v-icon>
-            <span class="pending-text">Pending Reservations</span>
+            <span class="pending-text">Pending</span>
           </v-btn>
 
           <v-badge :content="pendingAppointments.length" color="green" overlap class="notif"></v-badge>
@@ -30,7 +30,13 @@
         <!-- Picked Up Reservations Dialog -->
         <v-btn @click="openDialogPu('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props">
           <v-icon left>mdi-check-outline</v-icon>
-          <span class="picked-up-text">Picked Up Reservations</span>
+          <span class="picked-up-text">Picked Up</span>
+        </v-btn>
+
+        <v-btn @click="openDialogDeclined('pickedUp')" class="mb-2 rounded-l picked-up-btn" elevation="2" v-bind="props"
+          style="margin-left: 16px;">
+          <v-icon left>mdi-cancel</v-icon>
+          <span class="picked-up-text">Declined</span>
         </v-btn>
       </v-toolbar>
     </template>
@@ -50,6 +56,7 @@
           </span>
         </td>
         <td>{{ appointments.quantity }}</td>
+        <td>{{ formatPrescriptionDate(appointments.deadline) }}</td>
         <td>
           <v-icon size="small" style="color: teal" @click="seeItem(appointments.id)">mdi-eye</v-icon>
           <v-icon size="small" style="color: #d33" @click="declineAppointment(appointments.id)">mdi-cancel</v-icon>
@@ -145,6 +152,7 @@ export default {
         { title: 'Product Name', align: 'center', key: 'product_name' },
         { title: 'Color', align: 'center', key: 'color' },
         { title: 'Quantity', align: 'center', key: 'quantity' },
+        { title: 'Deadline Date', align: 'center', key: 'quantity' },
         { title: 'Actions', align: 'center', sortable: false },
       ],
       appointments: [],
@@ -202,6 +210,9 @@ export default {
 
     openDialogPu() {
       this.$router.push('/view/pickedup')
+    },
+    openDialogDeclined() {
+      this.$router.push('/view/declined')
     },
   formatPrescriptionDate(dateString) {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };

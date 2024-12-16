@@ -1,15 +1,17 @@
 <template>
-    <v-data-table :search="search" :headers="headers" :items="combinedData" :sort-by="[{ key: 'date', order: 'asc' }]">
+    <v-data-table :headers="headers" :items="filteredData" :sort-by="[{ key: 'date', order: 'asc' }]">
         <template v-slot:top>
             <v-toolbar flat>
-                <v-toolbar-title class="text-uppercase grey--text productTitle">
+                <v-toolbar-title class="text-uppercase grey--text">
                     <v-icon left>mdi-package-variant</v-icon>
                     {{ title }}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-text-field v-model="search" class="w-auto mr-4" density="compact"
-                    label="Search Product or Appointment" prepend-inner-icon="mdi-magnify" variant="solo-filled" flat
-                    hide-details single-line style="max-width: 300px;"></v-text-field>
+
+                <!-- Search Bar -->
+                <v-text-field v-model="search" label="Search Product or Appointment" prepend-inner-icon="mdi-magnify"
+                    dense hide-details single-line style="max-width: 300px"></v-text-field>
+
                 <v-btn @click="dialog = true" class="calendarIcon">
                     <v-icon>mdi-calendar</v-icon>
                 </v-btn>
@@ -25,15 +27,49 @@
                 </td>
                 <td v-if="item.type === 'Reservation'">{{ item.product.product_name }}</td>
                 <td v-if="item.type === 'Glass'">
+                    <span v-if="item.product_id">{{ item.lens.product_name }}</span>
+                    <span v-else>{{ item.custom_lens }}</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">N/A</td>
+                <td v-if="item.type === 'Glass'">
                     <span v-if="item.date">{{ item.date }}</span>
                     <span v-else>N/A</span>
                 </td>
                 <td v-if="item.type === 'Reservation'">{{ formatDate(item.created_at) }}</td>
+                <td v-if="item.type === 'Reservation'">
+                    <span v-if="item.quantity">{{ item.quantity }}</span>
+                </td>
+                <td v-if="item.type === 'Glass'">
+                    <span v-if="item.date">1</span>
+                </td>
+                <td v-if="item.type === 'Glass'">
+                    <span class="price" v-if="item.initial_price">₱ {{ item.initial_price | currency }}</span>
+                    <span v-else>N/A</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">
+                    ₱ {{ (item.product.price * (item.quantity || 1)).toFixed(2) }}
+                </td>
+                <td v-if="item.type === 'Glass'">
+                    <span class="price" v-if="item.discount">₱ {{ item.discount | currency }}</span>
+                    <span v-else>N/A</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">
+                    N/A
+                </td>
                 <td v-if="item.type === 'Glass'">
                     <span class="price" v-if="item.price">₱ {{ item.price | currency }}</span>
                     <span v-else>N/A</span>
                 </td>
-                <td v-if="item.type === 'Reservation'"> ₱ {{ item.product.price }}</td>
+                <td v-if="item.type === 'Reservation'">
+                    N/A
+                </td>
+                <td v-if="item.type === 'Glass'">
+                    <span class="price" v-if="item.balance">₱ {{ item.price | currency }}</span>
+                    <span v-else>N/A</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">
+                    N/A
+                </td>
             </tr>
         </template>
     </v-data-table>
@@ -86,6 +122,7 @@ export default {
             endDate: null,
             startMenu: false,
             endMenu: false,
+            search: '',
             today: new Date().toISOString().substr(0, 10),
             title: ("Overall Sales"),
             editedItem: {
@@ -107,10 +144,15 @@ export default {
             productTypes: ['Low Stock', 'High Stock', 'Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
-                { title: 'Type', align: 'center', value: 'type' },
-                { title: 'Details', align: 'center', value: 'details' },
-                { title: 'Date', align: 'center', value: 'date' },
-                { title: 'Price', align: 'center', value: 'price' },
+                { title: 'Type', align: 'center' },
+                { title: 'Frame', align: 'center'},
+                { title: 'Lens', align: 'center' },
+                { title: 'Date', align: 'center'},
+                { title: 'Quantity', align: 'center' },
+                { title: 'Price', align: 'center'},
+                { title: 'Discount', align: 'center' },
+                { title: 'Amount', align: 'center' },
+                { title: 'Balance', align: 'center' },
             ],
             currentImageIndex: 0,
             products: [],
@@ -144,6 +186,23 @@ export default {
                 )
             );
         },
+        filteredData() {
+            if (this.search) {
+                return this.combinedData.filter(item => {
+                const searchTerm = this.search.toLowerCase();
+
+                // Check if any of these properties contain the search term
+                return (
+                    item.type.toLowerCase().includes(searchTerm) ||
+                    (item.product?.product_name?.toLowerCase()?.includes(searchTerm)) ||
+                    (item.custom_frame?.toLowerCase()?.includes(searchTerm)) ||
+                    (item.date?.toLowerCase()?.includes(searchTerm)) ||
+                    (item.quantity?.toString()?.includes(searchTerm))
+                );
+                });
+            }
+            return this.combinedData;
+            }
     },
     mounted() {
         this.fetchProducts();
