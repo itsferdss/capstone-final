@@ -51,7 +51,7 @@
                   </v-card-title>
                   <h5 class="lineTitle">
                     &nbsp&nbsp&nbspTotal Low Stock Products:
-                    <span class="red-count">{{ lowStockCount }}</span> <!-- Applying the red-count class -->
+                    <span class="low-stock">{{ lowStockCount }}</span> <!-- Applying the red-count class -->
                   </h5>
 
                   <!-- Move the Print button to the right side -->
@@ -184,6 +184,10 @@ const chartData = ref({
       borderWidth: 1,
     },
   ],
+});
+
+const lowStockCount = computed(() => {
+  return lowStockProducts.value.length; // Automatically updates when lowStockProducts changes
 });
 
 onMounted(() => {
@@ -401,6 +405,10 @@ async function fetchAccountsCreatedPerMonth() {
 </script>
 
 <style scoped>
+.low-stock {
+  color: red;
+  font-weight: bold;
+}
 .red-quantity {
   color: red;
 }
