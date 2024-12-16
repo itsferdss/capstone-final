@@ -1,4 +1,28 @@
 <template>
+    <div>
+    <v-row class="mt-4">
+      <v-col class="d-flex justify-end">
+        <v-menu v-model="menu" offset-y>
+          <!-- Activator slot for dropdown button -->
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" class="mb-2 rounded-l generateBtn" dark color="primary">
+              Generate Report
+              <v-icon right>mdi-menu-down</v-icon>
+            </v-btn>
+                    </template>
+
+                    <v-card>
+            <v-card-actions>
+              <!-- Generate PDF button -->
+              <v-btn text @click="exportProductPDF">Generate PDF</v-btn>
+              <!-- Generate Excel button -->
+              <v-btn text @click="exportProductExcel">Generate Excel</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
+      </v-col>
+    </v-row>
+  </div>
     <v-data-table :headers="headers" :items="filteredData" :sort-by="[{ key: 'date', order: 'asc' }]">
         <template v-slot:top>
             <v-toolbar flat>
@@ -15,6 +39,7 @@
                 <v-btn @click="dialog = true" class="calendarIcon">
                     <v-icon>mdi-calendar</v-icon>
                 </v-btn>
+                
             </v-toolbar>
         </template>
 
@@ -108,12 +133,17 @@
 <script>
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 export default {
     data() {
         return {
             editItemDialog: false,
             dialog: false,
+            menu: false, 
             infoDialog: false,
             stockDialog: false,
             selectedType: '',
@@ -209,6 +239,234 @@ export default {
         this.fetchGlasses();
     },
     methods: {
+        
+        async exportProductPDF() {
+    try {
+        const doc = new jsPDF('landscape');
+        const logoImage = '../src/assets/MVC_logo.png'; // Ensure this path is correct
+        const marginTop = 20;
+        const marginLeft = 15;
+        const pageHeight = doc.internal.pageSize.height;
+        const pageWidth = doc.internal.pageSize.width;
+        const lineHeight = 10;
+        const cellPadding = 6;
+        const headerFontSize = 14;
+        const tableFontSize = 10;
+        const typeTitleFontSize = 16;  // Larger font size for product type title
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleString();
+
+        // Get the filtered data (this.filteredData should already contain the filtered results)
+        let filteredItems = this.filteredData;
+
+        // Group items by product type
+        const itemsByType = filteredItems.reduce((acc, item) => {
+            if (!acc[item.type]) acc[item.type] = [];
+            acc[item.type].push(item);
+            return acc;
+        }, {});
+
+        // Add logo and title to the PDF
+        doc.setFontSize(headerFontSize);
+        doc.addImage(logoImage, 'PNG', marginLeft + 35, 20, 200, 25);
+        doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
+        doc.setFontSize(12);
+        doc.text('Product Report', pageWidth / 2, marginTop + 50, { align: 'center' });
+        doc.setFontSize(10);
+        doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
+
+        // Iterate through each product type and generate a table
+        let currentY = marginTop + 70;
+        const headers = ['Product Name', 'Lens', 'Date', 'Quantity', 'Price', 'Discount', 'Amount', 'Balance'];
+
+        // Define custom column widths: Increase the width of 'Product Name' and 'Lens' columns
+        const columnWidths = [60, 60, 30, 20, 20, 20, 20, 20];  // Width for each column: Adjust as needed
+
+        Object.keys(itemsByType).forEach((type) => {
+            // Add product type title with larger font size
+            doc.setFontSize(typeTitleFontSize); // Larger font size for the type title
+            doc.setFont('helvetica', 'bold');
+            doc.text(type, marginLeft, currentY);
+            currentY += lineHeight + 5;
+
+            // Draw table header
+            let headerX = marginLeft;
+            doc.setFont('helvetica', 'bold');
+            headers.forEach((header, i) => {
+                doc.setFontSize(tableFontSize);
+                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
+                doc.text(header, headerX + cellPadding, currentY + 7);
+                headerX += columnWidths[i]; // Move the X coordinate based on column width
+            });
+            currentY += lineHeight;
+
+            // Draw product rows for the current type
+            itemsByType[type].forEach((item) => {
+                const productName = item.custom_frame || item.product_name || 'N/A';  // Logic for checking custom_frame and product_name
+
+                const row = [
+                    productName,  // Use custom_frame or product_name, fallback to 'N/A'
+                    item.custom_lens || item.lens?.product_name || 'N/A',  // Use custom_lens or lens product name, fallback to 'N/A'
+                    new Date(item.updated_at).toLocaleString() || '',  // Date formatting
+                    item.quantity != null ? item.quantity : '1',         // Don't show 'N/A' if the value is 0 or null
+                    parseFloat(item.product?.price || item.price || 0).toFixed(2),  // Price with 2 decimal places
+                    item.discount || 'N/A',  // Optional discount field
+                    item.amount || 'N/A',     // Amount (calculated for 'reservation' type, 'N/A' for others)
+                    item.balance || '0',      // Optional balance field
+                ];
+
+                let cellX = marginLeft;
+                row.forEach((cell, i) => {
+                    doc.setFontSize(8);
+                    doc.text(String(cell), cellX + cellPadding, currentY + 7);
+                    cellX += columnWidths[i]; // Move the X coordinate based on column width
+                });
+
+                currentY += lineHeight + 2; // Adjust row height
+                if (currentY > pageHeight - 30) {
+                    doc.addPage();
+                    currentY = 20; // Reset for next page
+                }
+            });
+
+            currentY += 10; // Add space after each product type section
+        });
+
+        // Save PDF
+        doc.save('Product_Report.pdf');
+    } catch (error) {
+        console.error('Error exporting PDF:', error);
+        Swal.fire('Error', 'An error occurred while exporting the PDF report.', 'error');
+    }
+},
+
+
+
+
+
+
+
+async exportProductExcel() {
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleString();
+
+        // Get the filtered data (this.filteredData should already contain the filtered results)
+        const filteredItems = this.filteredData;
+
+        // Group data by product type
+        const dataByType = filteredItems.reduce((acc, item) => {
+            if (!acc[item.type]) acc[item.type] = [];
+            acc[item.type].push(item);
+            return acc;
+        }, {});
+
+        if (filteredItems.length === 0) {
+            Swal.fire('No data found', 'No records match the current filters.', 'warning');
+            return;
+        }
+
+        // Add the logo to the top of the Excel sheet
+        const logoImagePath = '../src/assets/MVC_logo.png'; // Ensure this path is correct
+        const imageBuffer = await fetch(logoImagePath).then(res => res.arrayBuffer());
+        const imageId = workbook.addImage({
+            buffer: imageBuffer,
+            extension: 'png',
+        });
+
+        // Loop through the grouped data and create a sheet for each product type
+        Object.keys(dataByType).forEach((type) => {
+            const worksheet = workbook.addWorksheet(type);  // Add a new sheet for each product type
+
+            // Merge cells for the logo (position at top, centered)
+            worksheet.mergeCells('A1:I4');
+            worksheet.getCell('A1').value = '';
+            worksheet.addImage(imageId, {
+                tl: { col: 0, row: 0 },
+                ext: { width: 808, height: 118 },
+            });
+
+            // Add title starting from row 7
+            worksheet.mergeCells('A7:I7');
+            worksheet.getCell('A7').value = `MVC Optical Clinic Sales Report`;
+            worksheet.getCell('A7').font = { size: 16, bold: true };
+            worksheet.getCell('A7').alignment = { horizontal: 'center' };
+
+            // Add the date generated text below the title
+            worksheet.mergeCells('A8:I8');
+            worksheet.getCell('A8').value = `Report Generated: ${formattedDate}`;
+            worksheet.getCell('A8').font = { size: 12, italic: true };
+            worksheet.getCell('A8').alignment = { horizontal: 'center' };
+
+            // Add headers for the table
+            worksheet.addRow(['Frame/Product Name', 'Lens', 'Date', 'Quantity', 'Price', 'Discount', 'Amount', 'Balance']);
+            worksheet.getRow(9).font = { size: 12, bold: true };
+
+            // Set the columns width to fit content
+            worksheet.getColumn(1).width = 12;
+            worksheet.getColumn(2).width = 25;
+            worksheet.getColumn(3).width = 25;
+            worksheet.getColumn(4).width = 15;
+            worksheet.getColumn(5).width = 10;
+            worksheet.getColumn(6).width = 12;
+            worksheet.getColumn(7).width = 12;
+            worksheet.getColumn(8).width = 12;
+
+            // Add rows for each item
+            dataByType[type].forEach(item => {
+                const productName = item.custom_frame || item.product?.product_name || 'N/A';
+
+                // Calculate Amount (Quantity * Price)
+                const quantity = item.quantity || 1;  // Default to 1 if quantity is missing
+                const price = parseFloat(item.product?.price || item.price || 0);  // Convert price to number, default to 0 if missing
+                const amount = quantity * price;  // Calculate Amount
+
+                const row = [
+                    productName,  // Use custom_frame or product_name, fallback to 'N/A'
+                    item.custom_lens || item.lens?.product_name || 'N/A', // Use custom_lens or lens product name, fallback to 'N/A'
+                    new Date(item.updated_at).toLocaleString() || '', // Date formatting
+                    quantity,         // Quantity
+                    price.toFixed(2),  // Price with 2 decimal places
+                    item.discount || 'N/A', // Optional discount field
+                    amount.toFixed(2),  // Amount (Quantity * Price)
+                    item.balance || '0', // Optional balance field
+                ];
+                worksheet.addRow(row);
+            });
+
+            // Format the rows
+            worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                    if (rowNumber > 8) {
+                        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    }
+                });
+            });
+        });
+
+        // Create a Blob from the workbook
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        // Create a download link for the Blob and trigger the download
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Product_Report.xlsx'; // The name of the file to be downloaded
+        link.click();
+
+        Swal.fire('Success', 'Excel report has been generated successfully!', 'success');
+    } catch (error) {
+        console.error('Error exporting Excel:', error);
+        Swal.fire('Error', 'An error occurred while exporting the Excel report.', 'error');
+    }
+},
+
+
+
+
+
+
         getQuantityClass(quantity) {
             return quantity <= 5 ? 'low-stock' : 'high-stock';
         },
