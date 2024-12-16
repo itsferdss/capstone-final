@@ -1,94 +1,77 @@
 <template>
-    <v-container>
-        <div>
-        </div>
-        <v-data-table :search="search" :headers="headers" :items="glasses"
-            :sort-by="[{ key: 'product_id', order: 'asc' }]">
-            <template v-slot:top>
-                <v-toolbar flat>
-                    <v-toolbar-title class="text-uppercase grey--text productTitle">
-                        <v-icon left>mdi-package-variant</v-icon>
-                            {{ title }}
-                    </v-toolbar-title>
-                    <v-spacer></v-spacer>
+    <v-data-table :search="search" :headers="headers" :items="combinedData" :sort-by="[{ key: 'date', order: 'asc' }]">
+        <template v-slot:top>
+            <v-toolbar flat>
+                <v-toolbar-title class="text-uppercase grey--text productTitle">
+                    <v-icon left>mdi-package-variant</v-icon>
+                    {{ title }}
+                </v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-text-field v-model="search" class="w-auto mr-4" density="compact"
+                    label="Search Product or Appointment" prepend-inner-icon="mdi-magnify" variant="solo-filled" flat
+                    hide-details single-line style="max-width: 300px;"></v-text-field>
+                <v-btn @click="dialog = true" class="calendarIcon">
+                    <v-icon>mdi-calendar</v-icon>
+                </v-btn>
+            </v-toolbar>
+        </template>
 
-                    <v-text-field v-model="search" class="w-auto mr-4" density="compact" label="Search Product"
-                        prepend-inner-icon="mdi-magnify" variant="solo-filled" flat hide-details single-line
-                        style="max-width: 300px;"></v-text-field>
+        <template v-slot:body="{ items }">
+            <tr v-for="item in items" :key="item.id">
+                <td>{{ item.type }}</td>
+                <td v-if="item.type === 'Glass'">
+                    <span v-if="item.product_id">{{ item.product.product_name }}</span>
+                    <span v-else>{{ item.custom_frame }}</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">{{ item.product.product_name }}</td>
+                <td v-if="item.type === 'Glass'">
+                    <span v-if="item.date">{{ item.date }}</span>
+                    <span v-else>N/A</span>
+                </td>
+                <td v-if="item.type === 'Reservation'">{{ formatDate(item.created_at) }}</td>
+                <td v-if="item.type === 'Glass'">
+                    <span class="price" v-if="item.price">₱ {{ item.price | currency }}</span>
+                    <span v-else>N/A</span>
+                </td>
+                <td v-if="item.type === 'Reservation'"> ₱ {{ item.product.price }}</td>
+            </tr>
+        </template>
+    </v-data-table>
 
-
-                    <v-btn @click="dialog = true" class="calendarIcon">
-                        <v-icon>mdi-calendar</v-icon>
-                    </v-btn>
-
-
-                </v-toolbar>
-            </template>
-
-            <template v-slot:body="{ items }">
-                <tr v-for="item in items" :key="item.id">
-                    <td>{{ item.patient_id}}</td>
-                    <td>
-                        <span v-if="item.product_id">{{ item.product.product_name }}</span>
-                        <span v-else>{{ item.custom_frame }}</span>
-                    </td>
-                    <td>
-                        <span v-if="item.lens_id">{{ item.lens.product_name }}</span>
-                        <span v-else>{{ item.custom_lens }}</span>
-                    </td>
-                    <td>{{ item.date }}</td>
-                    <td>
-                        <span class="price">{{ item.price | currency }}</span>
-                    </td>
-                </tr>
-            </template>
-        </v-data-table>
-
-        <v-dialog v-model="dialog" max-width="600px">
-            <v-card>
-                <v-card-title>Select a Date Range</v-card-title>
-
-                <v-card-text>
-                    <v-row>
-                        <v-col cols="6">
-                            <v-menu v-model="startMenu" :close-on-content-click="false" offset-y>
-                                <template v-slot:activator="{ props }">
-                                    <v-text-field v-model="startDate" label="Start Date" readonly v-bind="props" />
-                                </template>
-                                <v-date-picker v-model="startDate" :max="today" @input="startMenu = false" />
-                            </v-menu>
-                        </v-col>
-
-                        <v-col cols="6">
-                            <v-menu v-model="endMenu" :close-on-content-click="false" offset-y>
-                                <template v-slot:activator="{ props }">
-                                    <v-text-field v-model="endDate" label="End Date" readonly v-bind="props" />
-                                </template>
-                                <v-date-picker v-model="endDate" :max="today" @input="endMenu = false" />
-                            </v-menu>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn @click="updateTitle" color="green">Confirm</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-
-    </v-container>
+    <v-dialog v-model="dialog" max-width="600px">
+        <v-card>
+            <v-card-title>Select a Date Range</v-card-title>
+            <v-card-text>
+                <v-row>
+                    <v-col cols="6">
+                        <v-menu v-model="startMenu" :close-on-content-click="false" offset-y>
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-model="startDate" label="Start Date" readonly v-bind="props" />
+                            </template>
+                            <v-date-picker v-model="startDate" :max="today" @input="startMenu = false" />
+                        </v-menu>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-menu v-model="endMenu" :close-on-content-click="false" offset-y>
+                            <template v-slot:activator="{ props }">
+                                <v-text-field v-model="endDate" label="End Date" readonly v-bind="props" />
+                            </template>
+                            <v-date-picker v-model="endDate" :max="today" @input="endMenu = false" />
+                        </v-menu>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="updateTitle" color="green">Confirm</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script>
 import Swal from 'sweetalert2';
 import axios from 'axios';
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
-import { ref, onMounted } from 'vue';
 
 export default {
     data() {
@@ -118,14 +101,16 @@ export default {
                 color_stock: [],
             },
             glasses: [],
+            pickedUpAppointments: [],
+            combinedData: [],
+
             productTypes: ['Low Stock', 'High Stock', 'Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
-                { title: 'Patient', align: 'center', key: 'supplier' },
-                { title: 'Frame', align: 'center', key: 'product_name' },
-                { title: 'Lens', align: 'center', key: 'supplier' },
-                { title: 'Date Sold', align: 'center' },
-                { title: 'Price', align: 'center' },
+                { title: 'Type', align: 'center', value: 'type' },
+                { title: 'Details', align: 'center', value: 'details' },
+                { title: 'Date', align: 'center', value: 'date' },
+                { title: 'Price', align: 'center', value: 'price' },
             ],
             currentImageIndex: 0,
             products: [],
@@ -151,8 +136,6 @@ export default {
                     product => product.type === this.selectedType
                 );
             }
-
-
             // Apply search filter on the filtered products
             return filteredProducts.filter((product) =>
                 Object.values(product).some(
@@ -167,214 +150,8 @@ export default {
         this.fetchGlasses();
     },
     methods: {
-
         getQuantityClass(quantity) {
             return quantity <= 5 ? 'low-stock' : 'high-stock';
-        },
-
-        exportProductPDF() {
-            try {
-                const doc = new jsPDF('landscape');  // Set to landscape orientation
-                const logoImage = '../assets/MVC_logo.png'; // Path to logo
-
-                // Constants for layout
-                const marginTop = 20;
-                const marginLeft = 15;
-                const marginRight = 15;
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
-                const lineHeight = 10;
-                const cellPadding = 6;
-                const headerFontSize = 14;
-                const tableFontSize = 10;
-                const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
-                });
-
-                // Filter products based on selectedType
-                const filteredProducts = this.products.filter(product =>
-                    this.selectedType ? product.type === this.selectedType : true
-                );
-
-                // Set title font and add logo
-                doc.setFontSize(headerFontSize);
-                doc.addImage(logoImage, 'PNG', marginLeft + 35, 20, 200, 25);
-                doc.text('MVC Optical Clinic', pageWidth / 2, marginTop + 30, { align: 'center' });
-                doc.setFontSize(12);
-                doc.text('Mauricio Bldg, Brgy. San Antonio, Cabangan, Zambales', pageWidth / 2, marginTop + 40, { align: 'center' });
-                doc.text('Product Report', pageWidth / 2, marginTop + 50, { align: 'center' });
-
-                // Add Report Generation Date
-                doc.setFontSize(10);
-                doc.text(`Report Generated: ${formattedDate}`, pageWidth / 2, marginTop + 60, { align: 'center' });
-
-                // Prepare table
-                const headers = ['Product Name', 'Supplier', 'Type', 'Color', 'Stock', 'Sold', 'Restock Qty', 'Status'];
-                const columnWidths = [40, 40, 30, 30, 30, 30, 30, 30];
-                let currentY = marginTop + 70;
-
-                // Table Header with bold font and background color
-                doc.setFont('helvetica', 'bold');
-                let headerX = marginLeft;
-                headers.forEach((header, i) => {
-                    doc.setFontSize(tableFontSize);
-                    doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S'); // Draw rectangle with only stroke
-                    doc.text(header, headerX + cellPadding, currentY + 7);
-                    headerX += columnWidths[i];
-                });
-                currentY += lineHeight;
-
-                // Table Content
-                filteredProducts.forEach((product) => {
-                    let colorStockArray = product.color_stock;
-
-                    // Check if color_stock is a string and parse if necessary
-                    if (typeof colorStockArray === 'string') {
-                        colorStockArray = JSON.parse(colorStockArray);
-                    }
-
-                    const soldPerColor = product.sold_per_color || {};
-
-                    colorStockArray.forEach((colorStock, index) => {
-                        if (currentY + lineHeight > pageHeight - marginTop - 30) { // Reserve space for footer
-                            doc.addPage();
-                            currentY = marginTop;
-
-                            // Reprint headers
-                            headerX = marginLeft;
-                            headers.forEach((header, i) => {
-                                doc.setFontSize(tableFontSize);
-                                doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
-                                doc.text(header, headerX + cellPadding, currentY + 7);
-                                headerX += columnWidths[i];
-                            });
-                            currentY += lineHeight;
-                        }
-
-                        const row = [
-                            index === 0 ? product.product_name : '',
-                            index === 0 ? product.supplier : '',
-                            index === 0 ? product.type : '',
-                            colorStock.color,
-                            colorStock.stock,
-                            soldPerColor[colorStock.color] || 0,
-                            colorStock.restockQuantity,
-                            colorStock.stock <= 5 ? 'Low Stock' : 'High Stock',
-                        ];
-
-                        let cellX = marginLeft;
-                        row.forEach((cell, i) => {
-                            doc.setFontSize(8);
-                            doc.text(String(cell), cellX + cellPadding, currentY + 7);
-                            cellX += columnWidths[i];
-                        });
-
-                        headerX = marginLeft;
-                        row.forEach((_, i) => {
-                            doc.rect(headerX, currentY, columnWidths[i], lineHeight, 'S');
-                            headerX += columnWidths[i];
-                        });
-
-                        currentY += lineHeight;
-                    });
-                });
-
-                // Add footer for Date Issued
-                if (currentY + 20 > pageHeight - marginTop) {
-                    doc.addPage();
-                    currentY = marginTop;
-                }
-                doc.setFontSize(10);
-                doc.text(`Date Issued: ${formattedDate}`, pageWidth - marginRight, currentY + 10, { align: 'right' });
-
-                // Add page number
-                const pageCount = doc.internal.pages.length;
-                doc.text(`Page ${doc.internal.pages.indexOf(doc.internal.pageSize) + 1} of ${pageCount}`, pageWidth - marginRight, pageHeight - 10, { align: 'right' });
-
-                // Save the PDF
-                doc.save('Product_Report.pdf');
-            } catch (error) {
-                console.error('Error exporting PDF:', error);
-            }
-        },
-
-        async exportProductExcel() {
-            try {
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Product Report');
-                const imagePath = '../assets/MVC_logo.png';
-                const imageBuffer = await fetch(imagePath).then(res => res.arrayBuffer());
-
-                const imageId = workbook.addImage({
-                    buffer: imageBuffer,
-                    extension: 'png',
-                });
-
-                worksheet.addImage(imageId, {
-                    tl: { col: 2, row: 0 },
-                    ext: { width: 650, height: 100 },
-                });
-
-                const currentDate = new Date();
-                const formattedDate = currentDate.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
-                });
-
-                const selectedProducts = this.products.filter(product => product.type === this.selectedType);
-
-                worksheet.mergeCells('C6:E6');
-                worksheet.getCell('C6').value = 'MVC Optical Clinic';
-                worksheet.getCell('C6').font = { size: 16, bold: true };
-
-                worksheet.addRow(['Product Name', 'Supplier', 'Type', 'Quantity', 'Sold', 'New Stocks', 'Color Stock', 'Status']);
-
-                selectedProducts.forEach(product => {
-                    let colorStockText = '';
-                    try {
-                        const colorStock = (typeof product.color_stock === 'string')
-                            ? JSON.parse(product.color_stock)
-                            : product.color_stock;
-
-                        colorStockText = Array.isArray(colorStock)
-                            ? colorStock.map(item => `${item.color}: ${item.stock}`).join(', ')
-                            : '';
-                    } catch (error) {
-                        console.error('Error parsing color_stock:', error);
-                        colorStockText = 'Invalid color_stock data';
-                    }
-
-                    const row = [
-                        product.product_name,
-                        product.supplier,
-                        product.type,
-                        product.quantity,
-                        product.total_sold,
-                        product.new_stock_added,
-                        colorStockText,
-                        product.quantity <= this.lowStockThreshold ? 'Low Stock' : 'High Stock',
-                    ];
-
-                    worksheet.addRow(row);
-                });
-
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/octet-stream' });
-                saveAs(blob, 'Product_Inventory_Report.xlsx');
-                console.log('Excel file created successfully!');
-            } catch (error) {
-                console.error('Error exporting Excel:', error);
-            }
         },
         async updateTitle() {
             if (this.startDate && this.endDate) {
@@ -390,46 +167,62 @@ export default {
                 });
                 this.title = `Sales from ${formattedStartDate} to ${formattedEndDate}`;
             }
+
             this.dialog = false;
 
-            // Fetch glasses based on the updated date range
+            // Fetch glasses and reservations based on the updated date range
             await this.fetchGlasses();
         },
 
         async fetchGlasses() {
             try {
-                const response = await axios.get('/glasses'); // Await the API response
-                const glasses = response.data;
+                // Fetch glasses
+                const glassesResponse = await axios.get('/glasses');
+                const glasses = glassesResponse.data;
 
-                // Parse and filter glasses based on the selected date range
+                // Fetch reservations
+                const pickedUpResponse = await axios.get('/reservations/picked_up');
+                const pickedUpAppointments = pickedUpResponse.data;
+
+                // Parse start and end dates
                 const start = this.startDate ? new Date(this.startDate) : null;
                 const end = this.endDate ? new Date(this.endDate) : null;
 
                 if (end) {
-                    // Set end date time to 23:59:59 to include the entire day
                     end.setHours(23, 59, 59, 999);
                 }
 
+                // Filter glasses based on the selected date range
                 const filteredGlasses = glasses.filter(glass => {
-                    const glassDate = new Date(glass.date); // Ensure this matches the backend date format (YYYY-MM-DD)
-
-                    if (start && end) {
-                        return glassDate >= start && glassDate <= end;
-                    } else if (start) {
-                        return glassDate >= start;
-                    } else if (end) {
-                        return glassDate <= end;
-                    }
-                    return true; // Include all if no range is selected
+                    const glassDate = new Date(glass.date);
+                    return (!start || glassDate >= start) && (!end || glassDate <= end);
                 });
 
-                // Update glasses and calculate total revenue
-                this.glasses = filteredGlasses;
+                // Filter reservations based on the selected date range
+                const filteredPickedUpAppointments = pickedUpAppointments.filter(appointment => {
+                    const appointmentDate = new Date(appointment.created_at);
+                    return (!start || appointmentDate >= start) && (!end || appointmentDate <= end);
+                });
+
+                // Combine glasses and reservations into a single array with types
+                this.combinedData = [
+                    ...filteredGlasses.map(glass => ({
+                        ...glass,
+                        type: 'Glass',
+                    })),
+                    ...filteredPickedUpAppointments.map(appointment => ({
+                        ...appointment,
+                        type: 'Reservation',
+                    })),
+                ];
+
+                // Calculate total revenue for glasses
                 this.totalRevenue = filteredGlasses.reduce((sum, glass) => {
-                    return sum + parseFloat(glass.price); // Ensure price is a number
+                    return sum + parseFloat(glass.price || 0);
                 }, 0);
+
             } catch (error) {
-                console.error('Error fetching glasses:', error);
+                console.error('Error fetching glasses or reservations:', error);
             }
         },
         // Optional: Add a currency formatter for prices
@@ -568,17 +361,13 @@ export default {
             return soldPerColor && soldPerColor[color] ? soldPerColor[color] : 0;
         },
         formatDate(dateString) {
-            // Create a new Date object and format it as desired (e.g., 'MM/DD/YYYY HH:mm:ss')
+            if (!dateString) return 'N/A';
             const date = new Date(dateString);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
     },
 };
 </script>

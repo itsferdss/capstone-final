@@ -22,24 +22,15 @@
                 <label for="birthdate">Birthdate</label>
                 <input type="date" v-model="editedItem.birthdate" id="birthdate" class="form-input" />
               </div>
-              <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" v-model="editedItem.password" id="password" class="form-input" required />
-              </div>
             </div>
             <div class="form-column">
               <div class="form-group">
                 <label for="contact">Contact Number</label>
-                <input type="tel" v-model="editedItem.contact" id="contact" class="form-input" required />
+                <input type="tel" v-model="editedItem.contact" id="contact" class="form-input" />
               </div>
               <div class="form-group">
                 <label for="age">Age</label>
-                <input type="text" v-model="age" id="age" class="form-input" required />
-              </div>
-              <div class="form-group">
-                <label for="confirm_password">Confirm Password</label>
-                <input type="password" v-model="editedItem.confirm_password" id="confirm_password" class="form-input"
-                  required />
+                <input type="text" v-model="age" id="age" class="form-input" required readonly />
               </div>
             </div>
           </div>
@@ -71,8 +62,7 @@ export default {
         address: '',
         contact: '',
         birthdate: '',
-        password: 'password123', 
-        confirm_password: 'password123',  
+        password: ''
       },
       age: '', // New field for storing the calculated age
     };
@@ -91,9 +81,29 @@ export default {
       } else {
         this.age = '';
       }
+      this.updatePassword();
+    },
+    'editedItem.contact'(newContact) {
+      // Automatically set password to contact number if available
+      if (newContact) {
+        this.editedItem.password = newContact;
+      } else {
+        this.updatePassword();
+      }
     },
   },
   methods: {
+    updatePassword() {
+      if (!this.editedItem.contact) {
+        // Set default password based on birth year or a fallback value
+        if (this.editedItem.birthdate) {
+          const birthYear = new Date(this.editedItem.birthdate).getFullYear();
+          this.editedItem.password = `default${birthYear}`;
+        } else {
+          this.editedItem.password = 'default123';
+        }
+      }
+    },
     saveNewUser() {
       // Validate age
       if (this.age < 5) {
@@ -104,17 +114,6 @@ export default {
         });
         return; // Prevent form submission
       }
-
-      // Validate password match
-      if (this.editedItem.password !== this.editedItem.confirm_password) {
-        Swal.fire({
-          title: 'Error',
-          text: 'Passwords do not match.',
-          icon: 'error',
-        });
-        return;
-      }
-
       // Send data to backend if validation passes
       axios.post('/patients', this.editedItem)
         .then(response => {
@@ -142,7 +141,6 @@ export default {
         contact: '',
         birthdate: '',
         password: '',
-        confirm_password: '',
       };
       this.age = ''; // Reset the age
     },
@@ -152,6 +150,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style scoped>

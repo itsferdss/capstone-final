@@ -14,6 +14,8 @@
 
         <router-link to="/login" class="nav-link-login" :class="{ active: activeSection === 'login' }">Log
           in</router-link>
+        <router-link to="/register" class="nav-link-login" :class="{ active: activeSection === 'login' }">Sign
+          up</router-link>
 
       </div>
     </header>

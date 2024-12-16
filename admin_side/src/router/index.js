@@ -136,6 +136,13 @@ const router = createRouter({
                 requiresAuthentication: true, // Login page doesn't require authentication
             },
         },
+        {
+            path: '/viewAll',
+            component: () => import('../components/ViewAll.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
        
         { path: '/', redirect: '/adminlogin' }
     ]

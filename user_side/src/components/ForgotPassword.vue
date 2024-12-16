@@ -35,6 +35,9 @@
                         </v-form>
                     </v-card-text>
                 </v-card>
+                <p class="text-center mt-4" style="font-size: 0.9em; color: gray;">
+                    Don't have an Account? <router-link to="/register">Sign up here</router-link>
+                </p>
             </v-col>
         </v-row>
     </v-container>

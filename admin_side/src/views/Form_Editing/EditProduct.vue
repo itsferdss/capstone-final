@@ -3,10 +3,22 @@
         <h1 class="edit-title">Edit {{ editedItem.product_name }}</h1>
         <div class="edit-form-container">
             <div class="edit-form-box">
-                <form @submit.prevent="saveEditedProduct">
+                <form>
                     <div class="edit-form-group">
                         <label for="quantity">Total Quantity</label>
-                        <input type="number" v-model="editedItem.quantity" id="quantity" class="edit-input" disabled />
+                        <input type="number" v-model="editedItem.quantity" id="quantity" class="edit-input" />
+                    </div>
+
+                    <div class="edit-form-group" v-if="editedItem.color_stock.length < 1">
+                        <label for="restock-quantity">Restock Quantity</label>
+                        <div class="input-with-btn">
+                            <input type="number" v-model.number="editedItem.restockQuantity" id="restock-quantity"
+                                class="edit-input" />
+                            <button @click="addRestockToQuantity(index)" class="btn-add" :disabled="isRestocking">
+                                <span v-if="isRestocking">Loading...</span>
+                                <span v-else>{{ isRestocked ? 'Restocked' : 'Add' }}</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="edit-form-group">
@@ -21,9 +33,9 @@
                             <div v-for="(colorStock, index) in editedItem.color_stock" :key="index" class="color-row">
                                 <div class="color-preview" :style="{ backgroundColor: colorStock.color }"></div>
                                 <input type="text" v-model="colorStock.color" placeholder="Color (e.g., #ff0000 or red)"
-                                    class="color-input" required />
+                                    class="color-input"/>
                                 <input type="number" v-model.number="colorStock.stock" @input="updateQuantity"
-                                    placeholder="Stock" class="stock-input" required />
+                                    placeholder="Stock" class="stock-input"/>
                                 <input type="number" v-model.number="colorStock.restockQuantity"
                                     :disabled="colorStock.isRestocked" placeholder="Restock" class="restock-input" />
 
@@ -40,7 +52,8 @@
                                         <img :src="colorStock.image" alt="Color Stock Image"
                                             class="color-stock-image" />
                                     </div>
-                                    <input type="file" class="edit-input file-input" @change="handleFileChange($event, index)" />
+                                    <input type="file" class="edit-input file-input"
+                                        @change="handleFileChange($event, index)" />
 
                                 </div>
                             </div>
@@ -49,7 +62,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn save-btn">Save Product</button>
+                        <button type="submit" class="btn save-btn" @click="saveEditedProduct">Save Product</button>
                         <button type="button" class="btn cancel-btn" @click="goBack">Back</button>
                     </div>
                 </form>
@@ -71,6 +84,9 @@ export default {
                 product_name: '',
                 quantity: 0,
                 price: '',
+                restockQuantity: 0,
+                isRestocking: false,
+                isRestocked: false,
                 color_stock: [{
                     color: '',
                     stock: 0,
@@ -180,26 +196,29 @@ export default {
             }
         },
         saveEditedProduct() {
-            // Verify color stock content
             console.log("Color stock before sending:", this.editedItem.color_stock);
 
-            // Prepare payload with color_stock as a direct object
+            // Prepare the payload with color_stock nullable
             const payload = {
                 product_id: this.editedItem.product_id,
+                restockQuantity: this.editedItem.restockQuantity,
                 product_name: this.editedItem.product_name,
                 quantity: this.editedItem.quantity,
                 price: this.editedItem.price,
-                color_stock: this.editedItem.color_stock.map(item => ({
-                    ...item,
-                    // Ensure image is a valid string or leave empty if it's a file
-                    image: typeof item.image === 'string' ? item.image : ''
-                }))
+                // Send color_stock only if it contains valid data
+                ...(this.editedItem.color_stock.length > 0 && {
+                    color_stock: this.editedItem.color_stock.map(item => ({
+                        ...item,
+                        image: typeof item.image === 'string' ? item.image : ''
+                    }))
+                })
             };
 
-            // Use axios to send JSON data (no need for multipart/form-data)
+            console.log("Payload:", payload);
+
             axios.put(`/products/${this.editedItem.product_id}`, payload, {
                 headers: {
-                    'Content-Type': 'application/json', // Default content type for JSON
+                    'Content-Type': 'application/json',
                 },
             })
                 .then(() => {
@@ -220,6 +239,29 @@ export default {
                         confirmButtonText: 'OK'
                     });
                 });
+        },
+
+        addRestockToQuantity(index) {
+            const restockQuantity = parseInt(this.editedItem.restockQuantity) || 0;
+            const currentQuantity = parseInt(this.editedItem.quantity) || 0;
+
+            if (restockQuantity > 0) {
+                this.isRestocking = true;
+
+                setTimeout(() => {
+                    this.editedItem.quantity = currentQuantity + restockQuantity;
+                    this.isRestocking = false;
+                    this.isRestocked = true;
+                }, 1000);
+
+            } else {
+                Swal.fire({
+                    title: 'Invalid Quantity',
+                    text: 'Please enter a valid restock quantity.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK',
+                });
+            }
         },
 
         goBack() {
@@ -383,6 +425,32 @@ label {
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid #ddd;
+}
+
+.input-with-btn {
+    display: flex;
+    align-items: center;
+}
+
+.edit-input {
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.btn-add {
+    padding: 8px 16px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-right: 400px;
+}
+
+.btn-add:hover {
+    background-color: #45a049;
 }
 
 @media (max-width: 768px) {

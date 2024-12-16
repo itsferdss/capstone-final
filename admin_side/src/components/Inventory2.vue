@@ -1,5 +1,4 @@
 <template>
-    <v-container>
         <div>
             <v-row class="mt-4">
                 <v-col class="d-flex justify-end">
@@ -126,7 +125,6 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-container>
 </template>
 
 <script>

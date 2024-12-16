@@ -72,7 +72,21 @@ const router = createRouter({
             // meta: {
             //     requiresAuthentication: false, // Landing page doesn't require authentication
             // },
-        }
+        },
+        {
+            path: '/set-password',
+            component: () => import('../components/SetPassword.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
+        {
+            path: '/register',
+            component: () => import('../components/Register.vue'),
+            // meta: {
+            //     requiresAuthentication: false, // Landing page doesn't require authentication
+            // },
+        },
     ],
 });
 

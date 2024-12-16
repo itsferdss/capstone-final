@@ -16,7 +16,7 @@
           </i>
         </div>
         <button @click="login">Log in</button>
-        <p class="forgot-password" @click="navigateToForgotPassword">Forgot Password?</p> <!-- Forgot Password link -->
+        <p class="forgot-password" @click="navigateToForgotPassword">Forgot Password?</p> 
         <p>{{ errorMessage }}</p>
       </div>
     </div>

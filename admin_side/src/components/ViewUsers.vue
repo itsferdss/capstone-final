@@ -30,6 +30,7 @@
         <td>{{ item.email }}</td>
         <td>{{ item.address }}</td>
         <td>
+          <v-icon size="small" style="color: #2F3F64" @click="openPatientInfo(item)">mdi-eye</v-icon>
           <v-icon class="me-2" size="small" style="color: #2F3F64"
             @click="viewPrescriptions(item)">mdi-information</v-icon>
           <v-icon size="small" style="color: #2F3F64" @click="deleteUser(item)">mdi-delete</v-icon>
@@ -237,6 +238,15 @@
 
                   <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
                     <v-col cols="12">
+                      <v-btn v-if="glasses.balance > 0" color="#f5a623" @click="markPaid(selectedPatient, glasses)">
+                        <v-icon left>mdi-check</v-icon>
+                        <div class="deleteText">Paid</div>
+                      </v-btn>
+
+                      <div
+                        style="width: 1px; height: 24px; background-color: #ccc; display: inline-block; margin: 0 8px;">
+                      </div>
+
                       <v-btn color="#35623D" @click="editSpectacles(selectedPatient, glasses)">
                         <v-icon left>mdi-pencil</v-icon>
                         <div class="deleteText">Edit</div>
@@ -318,6 +328,35 @@
           </v-card-text>
         </v-card>
       </v-dialog>
+
+      <v-dialog v-model="patientDialog" max-width="600px">
+        <v-card v-for="(history, index) in sortedHistory" :key="index" class="mb-4 presCard">
+          <v-card-title class="historyDate">Updated At: {{ formatPrescriptionDate(history.date) }}</v-card-title>
+          <v-card-text>
+            <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+              <v-col cols="12" sm="4" class="label-col"><strong>Medical History:</strong></v-col>
+              <v-col cols="12" sm="8">{{ history.medical_history }}</v-col>
+            </v-row>
+
+            <v-row class="text-center" style="border-bottom: 1px solid lightgray;">
+              <v-col cols="12" sm="4" class="label-col"><strong>Ocular History:</strong></v-col>
+              <v-col cols="12" sm="8">{{ history.ocular_history }}</v-col>
+            </v-row>
+
+            <!-- Delete Button -->
+            <v-row class="text-right" style="border-bottom: 1px solid lightgray;">
+              <v-col cols="12">
+                <v-btn color="#35623D" @click="editHistory(selectedPatient, history)">
+                  <v-icon left>mdi-pencil</v-icon>
+                  <div class="deleteText">Edit</div>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+
     </template>
   </v-data-table>
 </template>
@@ -344,6 +383,7 @@ export default {
       dialogMoreHistory: false,
       childHistoryDialog: false,
       generateAll: false, 
+      patientDialog: false,
       selectedPatient: null,
       startDate: null,
       endDate: null,
@@ -773,6 +813,54 @@ export default {
     closeChildHistoryDialog() {
       this.childHistoryDialog = false;
       this.resetEditedItem();
+    },
+    openPatientInfo(user) {
+      this.selectedUser = user;
+      const patientId = this.selectedUser.id; 
+      this.$router.push({
+        path: '/viewAll',
+        query: { patient_id: patientId } // Add patient_id as a query parameter
+      });
+      
+    },
+    calculateAge(birthdate) {
+      if (!birthdate) return null;
+      const birthDate = new Date(birthdate);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    },
+    async markPaid(selectedPatient, glasses) {
+      try {
+        const response = await axios.patch(`/mark-paid`, {
+          patient_id: selectedPatient.id,
+          glasses_id: glasses.id,
+        });
+
+        // Show success alert
+        Swal.fire({
+          title: 'Success!',
+          text: 'The payment has been marked successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+
+        console.log(response.data);
+      } catch (error) {
+        console.error('PATCH Error:', error);
+
+        // Show error alert
+        Swal.fire({
+          title: 'Error!',
+          text: error.response?.data?.message || 'An error occurred while marking payment.',
+          icon: 'error',
+          confirmButtonText: 'Try Again',
+        });
+      }
     },
      resetEditedItem() {
       this.editedItem = {

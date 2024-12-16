@@ -35,7 +35,7 @@ export default {
   setup() {
     const route = useRoute();
     const showLogin = computed(() => route.path === '/adminlogin');
-    const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/forgot-password' && route.path !== '/reset-password');
+    const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/forgot-password' && route.path !== '/reset-password' && route.path !== '/register');
     const miniVariant = ref(false);
     const drawer = ref(false); // Default to true to ensure visibility
     const isMobile = ref(window.innerWidth <= 960);

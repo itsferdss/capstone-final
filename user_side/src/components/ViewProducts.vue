@@ -383,15 +383,13 @@ export default {
         });
         return;
       }
-
-      
       
       if (this.reserveQuantity > this.selectedColorQty) {
         this.colorDialog = false;
         Swal.fire({
           icon: 'warning',
           title: 'Invalid Quantity!',
-          text: 'Please enter a quantity to less than the stock. test',
+          text: 'Please enter a quantity to less than the stock.',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'OK'
         });

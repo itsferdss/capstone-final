@@ -16,58 +16,160 @@
 
           <div class="form-row">
             <div class="form-column">
+              <!-- Frame Selection -->
               <div class="form-group">
                 <label for="frame">Frame</label>
-                <select v-model="editedItem.frame" id="frame" class="select" required>
+                <select v-model="editedItem.frame" id="frame" class="select" @change="updateFramePrice">
                   <option disabled value="">Select a frame</option>
                   <option v-for="frame in frames" :key="frame.id" :value="frame.id">
                     {{ frame.product_name }}
                   </option>
                   <option value="other">Other</option>
                 </select>
+                <span v-if="editedItem.frame && selectedFramePrice !== null" class="price-display">
+                  Price:
+                  <span v-if="editedItem.frame === 'other' && editedItem.customFramePrice !== null">
+                    ₱{{ editedItem.customFramePrice }}
+                  </span>
+                  <span v-else-if="selectedFramePrice !== null">
+                    ₱{{ selectedFramePrice }}
+                  </span>
+                </span>
+
+                <span v-if="editedItem.frame && selectedFrameStock !== null" class="price-display">
+                  Stock:
+                  <span v-if="editedItem.frame === 'other'">
+                    Custom Frame (No stock available)
+                  </span>
+                  <span v-else>
+                    {{ selectedFrameStock }}
+                  </span>
+                </span>
               </div>
 
+              <!-- Custom Frame -->
               <div v-if="editedItem.frame === 'other'" class="form-group">
-                <label for="customFrame">Enter custom frame</label>
-                <input v-model="editedItem.customFrame" id="customFrame" type="text" placeholder="Type the frame here"
-                  class="form-control" required />
+                <div class="form-row">
+                  <!-- Custom Frame Name -->
+                  <div class="form-column">
+                    <label for="customFrame">Enter Custom Frame</label>
+                    <input v-model="editedItem.customFrame" id="customFrame" type="text"
+                      placeholder="Type the frame name" class="form-control" required />
+                  </div>
+
+                  <!-- Custom Frame Price -->
+                  <div class="form-column">
+                    <label for="customFramePrice">Custom Frame Price</label>
+                    <input v-model.number="editedItem.customFramePrice" id="customFramePrice" type="number"
+                      placeholder="Enter price" class="form-control" step="0.01" />
+                  </div>
+                </div>
               </div>
 
+              <!-- Lens Selection -->
               <div class="form-group">
                 <label for="lens">Lens</label>
-                <select v-model="editedItem.type_of_lens" id="lens" class="select" required>
+                <select v-model="editedItem.type_of_lens" id="lens" class="select" @change="updateLensPrice">
                   <option disabled value="">Select a lens</option>
                   <option v-for="lens in lenses" :key="lens.id" :value="lens.id">
                     {{ lens.product_name }}
                   </option>
                   <option value="other">Other</option>
                 </select>
+                <span v-if="editedItem.type_of_lens && selectedLensPrice !== null" class="price-display">
+                  Price:
+                  <span v-if="editedItem.type_of_lens === 'other' && editedItem.customLensPrice !== null">
+                    ₱{{ editedItem.customLensPrice }}
+                  </span>
+                  <span v-else-if="selectedLensPrice !== null">
+                    ₱{{ selectedLensPrice }}
+                  </span>
+                </span>
+
+                <span v-if="editedItem.type_of_lens && selectedLensStock !== null" class="price-display">
+                  Stock:
+                  <span v-if="editedItem.type_of_lens === 'other'">
+                    Custom Lens (No stock available)
+                  </span>
+                  <span v-else>
+                    {{ selectedLensStock }}
+                  </span>
+                </span>
               </div>
 
+              <!-- Custom Lens -->
               <div v-if="editedItem.type_of_lens === 'other'" class="form-group">
-                <label for="customLens">Enter custom lens</label>
-                <input v-model="editedItem.customLens" id="customLens" type="text" placeholder="Type the lens here"
-                  class="form-control" required />
+                <div class="form-row">
+                  <!-- Custom Lens Name -->
+                  <div class="form-column">
+                    <label for="customLens">Enter Custom Lens</label>
+                    <input v-model="editedItem.customLens" id="customLens" type="text" placeholder="Type the lens name"
+                      class="form-control" required />
+                  </div>
+
+                  <!-- Custom Lens Price -->
+                  <div class="form-column">
+                    <label for="customLensPrice">Custom Lens Price</label>
+                    <input v-model.number="editedItem.customLensPrice" id="customLensPrice" type="number"
+                      placeholder="Enter price" class="form-control" step="0.01" />
+                  </div>
+                </div>
               </div>
 
+              <div class="form-group">
+                <div class="form-row">
+                  <div class="form-column">
+                    <label for="initialPrice">Initial Price</label>
+                    <input type="number" step="0.01" :value="initialPrice" id="initialPrice" class="form-input"
+                      placeholder="Total price" readonly />
+                  </div>
+
+                  <div class="form-column">
+                    <label for="discount">Discount (optional)</label>
+                    <input type="number" step="0.01" v-model.number="editedItem.discount" id="discount"
+                      class="form-input" placeholder="Enter discount" @input="updateTotal" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="finalAmount">Total Amount</label>
+                <input type="number" step="0.01" :value="finalAmount" id="finalAmount" class="form-input"
+                  placeholder="Total amount" readonly />
+              </div>
+
+
+
+              <!-- Remarks -->
               <div class="form-group">
                 <label for="remarks">Remarks</label>
-                <input type="text" v-model="editedItem.remarks" id="remarks" class="form-input" required />
+                <input type="text" v-model="editedItem.remarks" id="remarks" class="form-input" />
               </div>
 
-              <div class="form-group">
-                <label for="price">Price</label>
-                <input type="number" step="0.01" v-model.number="editedItem.price" id="price" class="form-input"
-                  required placeholder="Enter price" />
-              </div>
 
               <div class="form-group">
-                <label for="balance">Balance</label>
-                <input type="number" step="0.01" v-model.number="editedItem.balance" id="balance" class="form-input"
-                  placeholder="Enter balance" />
+                <div class="form-row">
+                  <div class="form-column">
+                    <label for="partialPayment">Partial Payment</label>
+                    <input type="number" step="0.01" v-model.number="partialPayment" id="partialPayment"
+                      class="form-input" placeholder="Enter partial payment" />
+                  </div>
+
+                  <div class="form-column">
+                    <label for="balance">Balance</label>
+                    <input type="number" step="0.01" :value="calculatedBalance" id="balance" class="form-input"
+                      placeholder="Calculated balance" readonly />
+                  </div>
+                </div>
               </div>
+
+              <!-- Price and Balance -->
+
+
             </div>
+
           </div>
+
           <hr />
           <div class="form-buttons">
             <v-btn type="submit" :style="{ backgroundColor: '#3EB489', color: 'white' }">
@@ -96,7 +198,13 @@ export default {
     const today = new Date().toISOString().split('T')[0]; 
 
     return {
+      selectedLensStock: null,
+      selectedFrameStock: null,
+      selectedFramePrice: null,
+      selectedLensPrice: null,
       prescriptionDate: today,
+      dueDate: null,
+      partialPayment: 0,
       editedItem: {
         frame: '', // Dropdown to select frame
         type_of_lens: '',
@@ -106,11 +214,37 @@ export default {
         customLens: '',
         customFrame: '',
         balance: '',
+        customFramePrice: 0,
+        customLensPrice: 0,
+        discount: 0
       },
       frames: [], // Array to store frames fetched from API
       lenses: [],
       patient: {},
     };  
+  },
+  computed: {
+    initialPrice() {
+      // Calculate the sum of selected frames and lenses
+      return (
+        parseFloat(this.selectedFramePrice) +
+        parseFloat(this.selectedLensPrice) +
+        parseFloat(this.editedItem.customFramePrice) +
+        parseFloat(this.editedItem.customLensPrice)
+      ).toFixed(2);
+    },
+    finalAmount() {
+      // Deduct the discount from the initial price
+      const discount = parseFloat(this.editedItem.discount) || 0;
+      return (parseFloat(this.initialPrice) - discount).toFixed(2);
+    },
+    calculatedBalance() {
+      const initialPrice = parseFloat(this.initialPrice?._value || this.initialPrice) || 0;
+      const discount = parseFloat(this.editedItem?.discount) || 0;
+      const finalAmount = initialPrice - discount;
+      const partialPayment = parseFloat(this.partialPayment) || 0;
+      return finalAmount - partialPayment;
+    },
   },
   methods: {
     fetchPatient() {
@@ -131,6 +265,45 @@ export default {
 
       const patientId = this.$route.query.patient_id;
 
+      // Check if the frame stock or lens stock is zero or less
+      if (this.selectedFrameStock <= 0) {
+        Swal.fire({
+          title: 'Out of Stock',
+          text: 'The selected frame has no stock. Please restock or change the product.',
+          icon: 'warning',
+          confirmButtonText: 'OK',
+        });
+        return; // Prevent saving
+      }
+
+      if (this.selectedLensStock <= 0) {
+        Swal.fire({
+          title: 'Out of Stock',
+          text: 'The selected lens has no stock. Please restock or change the product.',
+          icon: 'warning',
+          confirmButtonText: 'OK',
+        });
+        return; // Prevent saving
+      }
+
+      // Parse initial price and discount as numbers
+      const initialPrice = parseFloat(this.initialPrice?._value || this.initialPrice) || 0;
+      const discount = parseFloat(this.editedItem.discount) || 0;
+      const finalAmount = initialPrice - discount;
+
+      const partialPayment = parseFloat(this.partialPayment) || 0;
+      const balance = finalAmount - partialPayment;
+
+      if (balance > 0 && !this.dueDate) {
+        Swal.fire({
+          title: 'Missing Due Date',
+          text: 'There is an outstanding balance. Please assign a due date.',
+          icon: 'warning',
+          confirmButtonText: 'OK',
+        });
+        return;
+      }
+
       const glassesData = {
         patient_id: patientId,
         frame: this.editedItem.frame,
@@ -138,15 +311,20 @@ export default {
         type_of_lens: this.editedItem.type_of_lens,
         lens_id: this.editedItem.type_of_lens,
         remarks: this.editedItem.remarks,
-        price: this.editedItem.price,
-        balance: this.editedItem.balance,
+        price: finalAmount,
+        balance: balance,
         customLens: this.editedItem.customLens,
+        customLensPrice: this.editedItem.customLensPrice,
         customFrame: this.editedItem.customFrame,
+        customFramePrice: this.editedItem.customFramePrice,
         date: this.prescriptionDate,
         due_date: this.dueDate,
-        
-
+        discount: discount,
+        initial_price: initialPrice,
+        partial_payment: partialPayment,
       };
+
+      console.log(glassesData);
 
       axios.post(`/patients/${patientId}/glasses`, glassesData)
         .then((response) => {
@@ -172,6 +350,7 @@ export default {
           });
         });
     },
+
     fetchProducts() {
       axios.get('/products')
         .then((response) => {
@@ -200,6 +379,34 @@ export default {
           this.error = 'Error fetching products: ' + error.message;
         });
     },
+    async updateFramePrice() {
+      const selectedFrameId = this.editedItem.frame;
+
+      if (selectedFrameId && this.frames.length > 0) {
+        const selectedFrame = this.frames.find(frame => frame.id === selectedFrameId);
+
+        if (selectedFrame) {
+          this.selectedFramePrice = selectedFrame.price;
+          this.selectedFrameStock = selectedFrame.quantity;  // Display the stock quantity
+        }
+      } else {
+        this.selectedFramePrice = null;
+        this.selectedFrameStock = null;
+      }
+    },
+    async updateLensPrice() {
+      const selectedLensId = this.editedItem.type_of_lens;
+      const selectedLens = this.lenses.find(lens => lens.id === selectedLensId);
+
+      if (selectedLens) {
+        this.selectedLensPrice = selectedLens.price;
+        this.selectedLensStock = selectedLens.quantity;  // Update stock info
+      }
+    },
+    updateTotal() {
+      // Updates the final amount whenever a discount is applied
+      console.log('Discount applied:', this.editedItem.discount);
+    },
     resetForm() {
       this.editedItem = {
         frame: '',
@@ -210,6 +417,7 @@ export default {
         balance: '',
       };
     },
+    
     goBack() {
       this.$router.go(-1);
     },
@@ -341,5 +549,11 @@ input:focus {
 .presDate{
   margin-top: 10px;
   margin-right: 10px;
+}
+
+.price-display {
+  font-weight: bold;
+  color: #4CAF50;
+  margin-left: 10px;
 }
 </style>
