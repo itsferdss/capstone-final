@@ -301,19 +301,28 @@ export default {
             currentY += lineHeight;
 
             // Draw product rows for the current type
-            itemsByType[type].forEach((item) => {
-                const productName = item.custom_frame || item.product_name || 'N/A';  // Logic for checking custom_frame and product_name
+            itemsByType[type].forEach((item) => { 
+            const productName = item.custom_frame || item.product?.product_name || 'N/A';  // Fallback for product name
 
-                const row = [
-                    productName,  // Use custom_frame or product_name, fallback to 'N/A'
-                    item.custom_lens || item.lens?.product_name || 'N/A',  // Use custom_lens or lens product name, fallback to 'N/A'
-                    new Date(item.updated_at).toLocaleString() || '',  // Date formatting
-                    item.quantity != null ? item.quantity : '1',         // Don't show 'N/A' if the value is 0 or null
-                    parseFloat(item.product?.price || item.price || 0).toFixed(2),  // Price with 2 decimal places
-                    item.discount || 'N/A',  // Optional discount field
-                    item.amount || 'N/A',     // Amount (calculated for 'reservation' type, 'N/A' for others)
-                    item.balance || '0',      // Optional balance field
-                ];
+            // Calculate Amount (Quantity * Price)
+            const quantity = item.quantity != null ? item.quantity : 1;  // Default to 1 if quantity is null
+            const price = parseFloat(item.product?.price || item.price || 0);  // Default to 0 if price is missing
+            const amount = (quantity * price).toFixed(2);  // Calculate and format amount
+
+            // Handle the date format and fallback
+            const date = item.updated_at ? new Date(item.updated_at).toLocaleString() : ''; // Ensure valid date
+
+            // Construct the row
+            const row = [
+                productName,                    // Custom frame or product name
+                item.custom_lens || item.lens?.product_name || 'N/A',  // Custom lens or lens name
+                date,                            // Date formatted
+                quantity,                        // Quantity (fallback 1 if missing)
+                price.toFixed(2),                // Price with 2 decimal places
+                item.discount || 'N/A',          // Discount
+                amount,                          // Amount (calculated Quantity * Price)
+                item.balance || '0',             // Balance
+            ];
 
                 let cellX = marginLeft;
                 row.forEach((cell, i) => {
