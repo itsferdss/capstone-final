@@ -2,9 +2,11 @@
   <v-navigation-drawer v-model="drawer" :permanent="!isMobile" class="navigation-drawer" :mini-variant="miniVariant"
     @update:mini-variant="toggleMiniVariant"
     :style="{ width: miniVariant ? '70px' : '260px', display: isMobile && !drawer ? 'none' : 'block' }" app>
-    <div class="admin-title">
-      <v-icon class="admin-icon">mdi-account-circle-outline</v-icon>
-      <h1 class="admin-text" :class="{ 'hide-text': miniVariant }">User</h1>
+    <div class="user-title">
+      <v-icon class="user-icon">mdi-account-circle-outline</v-icon>
+      <h1 class="user-text" :class="{ 'hide-text': miniVariant }">
+      Welcome, {{ full_name }}
+    </h1>
     </div>
     <v-divider></v-divider>
 
@@ -32,6 +34,7 @@
   </v-navigation-drawer>
 </template>
 
+
 <script>
 import Swal from 'sweetalert2';
 
@@ -58,6 +61,10 @@ export default {
     isAuthenticated() {
       // Check if a token or auth flag exists
       return !!sessionStorage.getItem('token');
+    },
+    full_name() {
+      // Retrieve the first name from sessionStorage or another source
+      return sessionStorage.getItem('full_name') || 'User';
     }
   },
   data() {
@@ -66,12 +73,20 @@ export default {
     };
   },
   mounted() {
+  
+  // Check if sessionStorage data is available, and update loading state
+  if (sessionStorage.getItem('full_name')) {
+    this.isLoading = false;
+  }
     this.checkScreenWidth();
     window.addEventListener('resize', this.checkScreenWidth);
   },
+  
   beforeDestroy() {
     window.removeEventListener('resize', this.checkScreenWidth);
   },
+
+  
   methods: {
     checkScreenWidth() {
       this.isMobile = window.innerWidth <= 960;
@@ -106,7 +121,6 @@ export default {
     },
     confirmLogout() {
       if (this.isAuthenticated) {
-        // Show the alert if the user is logged in
         Swal.fire({
           title: 'Are you sure?',
           text: "You won't be able to revert this!",
@@ -118,13 +132,13 @@ export default {
           cancelButtonText: 'No, cancel'
         }).then((result) => {
           if (result.isConfirmed) {
-            sessionStorage.removeItem('token'); // Remove token
-            this.$router.push('/'); // Redirect to home or login page
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('full_name'); // Optionally remove the user's name too
+            this.$router.push('/'); // Redirect to home or login
           }
         });
       } else {
-        // Directly navigate or take other action if not logged in
-        this.$router.push('/');
+        this.$router.push('/'); // Redirect if not authenticated
       }
     }
   }
@@ -141,26 +155,27 @@ export default {
   box-shadow: 0 10px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.admin-title {
+.user-title {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100px;
   background-color: #B3D9E6;
   color: black;
+  margin-top: 15px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
 
-.admin-icon {
+.user-icon {
   font-size: 40px;
-  margin-right: 5px;
+  margin-left: 15px;
 }
 
-.admin-text {
+.user-text {
   font-weight: bold;
-  font-size: 24px;
-  margin: 0;
+  font-size: 21px; /* Change this value to a smaller size */
+  margin-left: 10px;
 }
 
 .sidebar-link {
@@ -225,11 +240,11 @@ export default {
     margin-right: 10px;
   }
 
-  .admin-icon {
+  .user-icon {
     font-size: 30px;
   }
 
-  .admin-text {
+  .user-text {
     font-size: 18px;
   }
 

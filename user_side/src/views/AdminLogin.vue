@@ -47,35 +47,65 @@ export default {
     passwordType() {
       return this.showPassword ? 'text' : 'password';
     },
+
+    drawer: {
+    get() {
+      return this.modelValue;
+    },
+    set(value) {
+      this.$emit('update:modelValue', value);
+    }
+  },
+  isAuthenticated() {
+    // Check if a token or auth flag exists
+    return !!sessionStorage.getItem('token');
+  },
+  full_name() {
+    // Retrieve the full name from sessionStorage or another source
+    return sessionStorage.getItem('full_name') || 'User';
+  }
   },
   methods: {
     login() {
-      axios.post('/login', {
-        email: this.email,
-        password: this.password
-      })
-      .then(response => {
-        const token = response.data.token; // Assuming the token is returned in the response
-        const id = response.data.id; 
-        localStorage.setItem('patientId', id);
-        sessionStorage.setItem('token', token); // Store the token in sessionStorage
-        this.$store.commit('setPatientId', id); 
-        Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          text: 'Welcome!',
-        });
-        this.$router.push('/home'); // Redirect to home after successful login
-      })
-      .catch(error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: 'Invalid email or password',
-        });
-        console.error('Login failed:', error);
+  axios.post('/login', {
+    email: this.email,
+    password: this.password
+  })
+  .then(response => {
+    console.log(response); // Debug response structure
+    const token = response.data.access_token; // Access the token
+    const id = response.data.id; // Assuming the id is from the root object
+
+    // Check if the patient object and full_name exist in the response
+    if (response.data.patient && response.data.patient.full_name) {
+      const fullName = response.data.patient.full_name; // Access full_name from patient
+      sessionStorage.setItem('full_name', fullName); // Store full name in sessionStorage
+      sessionStorage.setItem('token', token); // Store token
+      localStorage.setItem('patientId', id); // Store patient ID
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'Welcome!',
       });
-    },
+      this.$router.push('/home'); // Redirect after successful login
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'Full name not found in the response.',
+      });
+    }
+  })
+  .catch(error => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: 'Invalid email or password.',
+    });
+    console.error('Login failed:', error);
+  });
+},
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
