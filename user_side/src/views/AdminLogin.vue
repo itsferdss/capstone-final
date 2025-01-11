@@ -16,10 +16,14 @@
           </i>
         </div>
         <button @click="login">Log in</button>
-        <p class="forgot-password" @click="navigateToForgotPassword">Forgot Password?</p> 
+        <p class="forgot-password" @click="navigateToForgotPassword">Forgot Password?</p>
         <p>{{ errorMessage }}</p>
       </div>
+      <p class="text-center mt-4" style="font-size: 0.9em; color: gray;">
+        Don't have an account? <router-link to="/register">Sign up here</router-link>
+      </p>
     </div>
+
     <div class="trapezoid"></div>
     <div class="circle circle-1"></div>
     <div class="circle circle-2">

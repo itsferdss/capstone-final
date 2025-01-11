@@ -56,6 +56,7 @@
 
         <template v-slot:item="{ item }">
             <tr>
+                <td>{{ item.id }}</td>
                 <td>{{ item.product_name }}</td>
                 <td>{{ item.supplier }}</td>
                 <td>{{ item.type }}</td>
@@ -67,9 +68,9 @@
                 <td>
                     <span class="sold-quantity">{{ item.total_sold }}</span>
                 </td>
-                <td>
+                <!-- <td>
                     <span class="new-stock">+{{ item.new_stock_added }}</span>
-                </td>
+                </td> -->
                 <td>
                     <span :class="getStockStatusClass(item.quantity)">
                         {{ getStockStatus(item.quantity) }}
@@ -87,45 +88,35 @@
     <v-dialog v-model="stockDialog" max-width="800px">
         <v-card>
             <v-card-title class="headline">{{ editedItem.product_name }} Stocks</v-card-title>
+
             <v-card-text>
-                <!-- Loop through each color and display its own table -->
-                <div v-for="(colorStock, index) in parsedColorStock" :key="index" class="color-section">
-                    <!-- Display the color outside the table -->
-                    <h3 class="color-header" style="text-align: center; margin: 20px 0;">
-                        {{ colorStock.color }}
-                    </h3>
-                    <v-table class="dialogTable">
+                <div v-for="(historyItems, color) in groupedColorStocks" :key="color">
+                    <h3>{{ color }}</h3>
+
+                    <v-table dense>
                         <thead>
                             <tr>
-                                <th style="text-align: center; padding: 10px;">Stock</th>
-                                <th style="text-align: center; padding: 10px;">New Stock Added</th>
-                                <th style="text-align: center; padding: 10px;">Sold</th>
-                                <th style="text-align: center; padding: 10px;">Last Updated</th>
-                                <th style="text-align: center; padding: 10px;">Status</th>
+                                <th>Stock</th>
+                                <th>New Stock Added</th>
+                                <th>Sold</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <tr>
-                                <td>{{ colorStock.stock }}</td>
-                                <td>
-                                    <span class="new-stock">+{{ colorStock.restockQuantity }}</span>
-                                </td>
-                                <td>
-                                    <span class="sold-quantity">
-                                        {{ getSoldQuantity(colorStock.color, editedItem.sold_per_color) }}
-                                    </span>
-                                </td>
-                                <td>{{ formatDate(editedItem.updated_at) }}</td>
-                                <td>
-                                    <span :class="getStockStatusClass(colorStock.stock)">
-                                        {{ getStockStatus(colorStock.stock) }}
-                                    </span>
-                                </td>
+                            <tr v-for="item in historyItems" :key="item.updated_at">
+                                <td>{{ item.stock }}</td>
+                                <td>{{ item.new_stock_added }}</td>
+                                <td>{{ item.sold || 0 }}</td>
+                                <td>{{ formatDate(item.updated_at) }}</td>
+                                <td>{{ getStockStatus(item.stock) }}</td>
                             </tr>
                         </tbody>
                     </v-table>
                 </div>
             </v-card-text>
+
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDialog">Close</v-btn>
@@ -155,6 +146,8 @@ export default {
             startDate: null,
             endDate: null,
             products: [],
+            groupedColorStocks: {},
+            histories: [],
             selectedType: '',  // Filter type (optional)
             editedItem: {
                 product_image: '',
@@ -171,12 +164,12 @@ export default {
             productTypes: ['Low Stock', 'High Stock', 'Frames', 'Lens', 'Contact Lenses', 'Accessories'],
             search: '',
             headers: [
+                { title: 'Product ID', align: 'center', key: 'id' },
                 { title: 'Product Name', align: 'center', key: 'product_name' },
                 { title: 'Supplier', align: 'center', key: 'supplier' },
                 { title: 'Type', align: 'center', key: 'type' },
                 { title: 'Quantity', align: 'center' },
                 { title: 'Sold', align: 'center', key: 'quantity' },
-                { title: 'New Stocks', align: 'center', key: 'quantity' },
                 { title: 'Status', align: 'center' },
                 { title: 'Actions', align: 'center', sortable: false },
             ],
@@ -214,13 +207,9 @@ export default {
                 )
             );
         },
-        parsedColorStock() {
-            return this.editedItem.color_stock;  // Directly use the array
-        },
     },
     mounted() {
         this.fetchProducts();
-        this.fetchHistories();
     },
     methods: {
         updateDateRange() {
@@ -230,7 +219,7 @@ export default {
         async exportProductPDF() {
             try {
                 const doc = new jsPDF('landscape');
-                const logoImage = '../src/assets/MVC_logo.png'; // Ensure this is the correct path
+                const logoImage = '../assets/MVC_logo.png'; // Ensure this is the correct path
                 const marginTop = 20;
                 const marginLeft = 15;
                 const pageHeight = doc.internal.pageSize.height;
@@ -374,7 +363,7 @@ export default {
                 }, {});
 
                 // Add the logo to the top of the sheet (row 1 to row 4)
-                const logoImagePath = '../src/assets/MVC_logo.png'; // Ensure this is the correct path
+                const logoImagePath = '../assets/MVC_logo.png'; // Ensure this is the correct path
                 const imageBuffer = await fetch(logoImagePath).then(res => res.arrayBuffer());
                 const imageId = workbook.addImage({
                     buffer: imageBuffer,
@@ -482,21 +471,70 @@ export default {
                     this.error = 'Error fetching products: ' + error.message;
                 });
         },
-        fetchHistories() {
+        fetchHistories(productId) {
             axios.get('/productHistory')
                 .then(response => {
-                    // Handle successful response
-                    console.log('Product histories fetched:', response.data);
-                    this.histories = response.data.data; // Assuming you have a data property `histories` in your component
+                    const allHistories = response.data.data;
+
+                    // Filter histories by the selected product ID
+                    this.histories = allHistories.filter(history =>
+                        history.product_id === productId
+                    );
+
+                    // Parse color_stock strings to JSON and group histories by color
+                    this.histories = this.histories.map(history => {
+                        if (history.color_stock) {
+                            try {
+                                history.color_stock = JSON.parse(history.color_stock);
+                            } catch (e) {
+                                console.error('Failed to parse color_stock for history:', history);
+                                history.color_stock = [];
+                            }
+                        }
+                        return history;
+                    });
+
+                    this.groupByColor();
+
+                    console.log('Filtered Histories with Parsed color_stock:', this.histories);
                 })
                 .catch(error => {
-                    // Handle error
                     console.error('Error fetching product histories:', error);
                 });
+        },
+        groupByColor() {
+            const groupedColors = {};
+
+            this.histories.forEach(history => {
+                if (history.color_stock) {
+                    history.color_stock.forEach(colorStock => {
+                        const color = colorStock.color;
+
+                        if (!groupedColors[color]) {
+                            groupedColors[color] = [];
+                        }
+
+                        groupedColors[color].push({
+                            stock: colorStock.stock,
+                            restockQuantity: colorStock.restockQuantity,
+                            updated_at: history.updated_at,
+                            new_stock_added: history.new_stock_added
+                        });
+                    });
+                }
+            });
+
+            console.log('Grouped Color Stocks:', groupedColors);
+            this.groupedColorStocks = groupedColors;
         },
         openInfoItem(item) {
             this.editedItem = { ...item };
             this.stockDialog = true;
+            this.productId = item.id;
+
+            this.fetchHistories(item.id);
+
+            console.log("Product ID:", this.productId);
         },
         closeDialog() {
             this.stockDialog = false; // Close the dialog

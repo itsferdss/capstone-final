@@ -183,6 +183,50 @@
       </div>
     </div>
   </main>
+
+  <v-dialog v-model="showReceiptModal" max-width="600px">
+    <v-card>
+      <v-card-title class="receipt_title">
+        <h2>Receipt Details</h2>
+      </v-card-title>
+
+      <v-card-text>
+        <!-- Receipt Content to be Printed -->
+        <div ref="printableArea">
+          <v-container>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-card outlined class="printable pa-4">
+                  <p><strong>Patient Name:</strong> {{ receiptDetails.patientName }}</p>
+                  <p><strong>Order Date:</strong> {{ receiptDetails.orderDate }}</p>
+                  <p><strong>Frame:</strong>
+                    {{ receiptDetails.productId === 'other' ? receiptDetails.customFrame : receiptDetails.productId }}
+                  </p>
+                  <p><strong>Lens:</strong>
+                    {{ receiptDetails.type_of_lens === 'other' ? receiptDetails.customLens : receiptDetails.type_of_lens
+                    }}
+                  </p>
+                  <p><strong>Original Price:</strong> ₱{{ receiptDetails.originalPrice }}</p>
+                  <p><strong>Discount:</strong> ₱{{ receiptDetails.discount }}</p>
+                  <p><strong>Discounted Price:</strong> ₱{{ receiptDetails.discountedPrice }}</p>
+                  <p><strong>Amount Received:</strong> ₱{{ receiptDetails.amountReceived }}</p>
+                  <p><strong>Balance:</strong> ₱{{ receiptDetails.balance }}</p>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+
+      </v-card-text>
+
+      <v-card-actions>
+        <v-btn color="primary" @click="printReceipt" class="ma-2" large>Print</v-btn>
+        <v-btn color="grey" @click="showReceiptModal = false" class="ma-2" large>Close</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
 </template>
 
 
@@ -198,6 +242,7 @@ export default {
     const today = new Date().toISOString().split('T')[0]; 
 
     return {
+      showReceiptModal: false,
       selectedLensStock: null,
       selectedFrameStock: null,
       selectedFramePrice: null,
@@ -217,6 +262,19 @@ export default {
         customFramePrice: 0,
         customLensPrice: 0,
         discount: 0
+      },
+      receiptDetails: {
+        patientName: '',
+        orderDate: '',
+        productName: '',
+        productId: '',
+        originalPrice: 0,
+        discount: 0,
+        discountedPrice: 0,
+        amountReceived: 0,
+        balance: 0,
+        type_of_lens: '',
+        frame: ''
       },
       frames: [], // Array to store frames fetched from API
       lenses: [],
@@ -342,10 +400,26 @@ export default {
             text: 'Glass information saved successfully!',
             icon: 'success',
             confirmButtonText: 'OK',
+          }).then(() => {
+            // Populate receipt data
+            this.showReceiptModal = true;
+            this.receiptDetails = {
+              patientName: this.patient.full_name,
+              orderDate: this.prescriptionDate,
+              productName: this.editedItem.customFrame,
+              type_of_lens: this.editedItem.type_of_lens,
+              productId: this.editedItem.frame,
+              originalPrice: this.initialPrice,
+              discount: this.editedItem.discount,
+              discountedPrice: this.finalAmount,
+              amountReceived: this.partialPayment,
+              balance: this.calculatedBalance,
+              customLens: this.editedItem.customLens,
+              customFrame: this.editedItem.customFrame,
+            };
+            console.log(this.receiptDetails);
           });
-          this.goBack();
         })
-        
         .catch(error => {
           console.error('Error saving glasses:', error);
           Swal.fire({
@@ -427,6 +501,32 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
+    printReceipt() {
+      const printContent = this.$refs.printableArea;
+      const printWindow = window.open("", "_blank");
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Receipt</title>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+              .logo { max-width: 100px; display: block; margin: 0 auto 10px; }
+              h2 { text-align: center; margin-bottom: 20px; }
+              .receipt-details { max-width: 400px; margin: 0 auto; }
+              p { margin: 5px 0; }
+              strong { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            ${printContent.innerHTML}
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.print();
+    }
   },
   mounted() {
     this.fetchProducts();
@@ -561,5 +661,33 @@ input:focus {
   font-weight: bold;
   color: #4CAF50;
   margin-left: 10px;
+}
+
+
+.receipt_title {
+  text-align: center;
+  font-weight: bold;
+  color: #1976D2;
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
+
+.v-card {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.v-btn {
+  font-weight: bold;
+}
+
+.v-card p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.printable{
+  width: 480px;
 }
 </style>

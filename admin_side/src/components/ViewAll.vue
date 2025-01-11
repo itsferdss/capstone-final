@@ -1,5 +1,6 @@
 <template>
     <div class="form-container">
+        <p class="createdPatient">Created at: {{ formatDate(patient.created_at) }}</p>
         <h1 class="title">Patient Information Form</h1>
         <form @submit.prevent="submitForm">
             <!-- Full Name -->
@@ -312,6 +313,7 @@ export default {
                           contact: patientData.contact,
                           email: patientData.email,
                           birthdate: patientData.birthdate,  // Directly assign the birthdate string
+                          created_at: patientData.created_at
                       };
                   })
                   .catch(error => {
@@ -403,12 +405,10 @@ export default {
                       this.setCurrentMedicalHistory(); // Load the first record
                   } else {
                       this.error = 'No medical history found for this patient';
-                      this.clearForm();
                   }
               })
               .catch(error => {
                   this.error = 'Error fetching medical history: ' + error.message;
-                  this.clearForm();
               });
       },
       setCurrentMedicalHistory() {
@@ -418,7 +418,6 @@ export default {
               this.form.Medical = currentHistory.medical_history || '';
               this.form.historyDate = currentHistory.date || '';
           } else {
-              this.clearForm();
           }
       },
       nextPage() {
@@ -459,6 +458,15 @@ export default {
               this.setCurrentMedicalHistory();
           }
       },
+      formatDate(dateString) {
+          // Create a new Date object and format it as 'MM/DD/YYYY'
+          const date = new Date(dateString);
+          return date.toLocaleString('en-US', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+          });
+      }
       
   },
 };
@@ -674,6 +682,11 @@ input[type="checkbox"] {
 
 .title{
     text-align: center;
+}
+
+.createdPatient {
+    font-style: italic;
+    text-align: right;
 }
 
 

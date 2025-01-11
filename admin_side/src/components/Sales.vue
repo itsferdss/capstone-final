@@ -179,9 +179,9 @@ export default {
                 { title: 'Lens', align: 'center' },
                 { title: 'Date', align: 'center'},
                 { title: 'Quantity', align: 'center' },
-                { title: 'Price', align: 'center'},
+                { title: 'Total Amount', align: 'center'},
                 { title: 'Discount', align: 'center' },
-                { title: 'Amount', align: 'center' },
+                { title: 'Price', align: 'center' },
                 { title: 'Balance', align: 'center' },
             ],
             currentImageIndex: 0,
@@ -243,7 +243,7 @@ export default {
         async exportProductPDF() {
     try {
         const doc = new jsPDF('landscape');
-        const logoImage = '../src/assets/MVC_logo.png'; // Ensure this path is correct
+        const logoImage = '../assets/MVC_logo.png'; // Ensure this path is correct
         const marginTop = 20;
         const marginLeft = 15;
         const pageHeight = doc.internal.pageSize.height;
@@ -377,7 +377,7 @@ async exportProductExcel() {
         }
 
         // Add the logo to the top of the Excel sheet
-        const logoImagePath = '../src/assets/MVC_logo.png'; // Ensure this path is correct
+        const logoImagePath = '../assets/MVC_logo.png'; // Ensure this path is correct
         const imageBuffer = await fetch(logoImagePath).then(res => res.arrayBuffer());
         const imageId = workbook.addImage({
             buffer: imageBuffer,

@@ -127,6 +127,9 @@
           <v-btn @click="login" class="login-button px-8 py-2" elevation="2">Log In</v-btn>
           <v-btn text @click="loginDialog = false" class="rounded-button px-6">Back</v-btn>
         </v-card-actions>
+        <p class="text-center mt-4" style="font-size: 0.9em; color: gray;">
+          Don't have an account? <router-link to="/register">Sign up here</router-link>
+        </p>
       </v-card>
     </v-dialog>
   </div>
@@ -370,8 +373,6 @@ export default {
         this.selectedColor = this.product.color_stock[0].color;
       }
 
-     
-
       if (this.product.color_stock.length > 1 && !this.selectedColor) {
         this.colorDialog = false;
         Swal.fire({
@@ -383,55 +384,68 @@ export default {
         });
         return;
       }
-      
+
       if (this.reserveQuantity > this.selectedColorQty) {
         this.colorDialog = false;
         Swal.fire({
           icon: 'warning',
           title: 'Invalid Quantity!',
-          text: 'Please enter a quantity to less than the stock.',
+          text: 'Please enter a quantity less than the stock.',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'OK'
         });
-      
         return;
       }
 
-      // Send reservation request
-      axios.post('/reserve', {
-        product_id: this.product.id,
-        product_name: this.product.product_name,
-        user_id: this.patientId,
-        color: this.selectedColor,
-        quantity: this.reserveQuantity
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+
+      // Notify the user about the 1-week reservation timeframe
+      this.colorDialog = false;
+      Swal.fire({
+        title: 'Important Notice!',
+        text: 'Our policy only allows reservations to be held for up to 7 days. By clicking "confirm", you agree to this condition and your reservation will be finalized.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Send reservation request
+          axios.post('/reserve', {
+            product_id: this.product.id,
+            product_name: this.product.product_name,
+            user_id: this.patientId,
+            color: this.selectedColor,
+            quantity: this.reserveQuantity
+          }, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+            }
+          })
+            .then(response => {
+              this.colorDialog = false;
+              Swal.fire({
+                icon: 'success',
+                title: 'Reservation Successful',
+                text: `Product ${this.selectedColor ? `(${this.selectedColor})` : ''} with quantity ${this.reserveQuantity} has been reserved successfully.`,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+              });
+              console.log('Reservation created:', response.data);
+            })
+            .catch(error => {
+              console.error('Error reserving product:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Reservation Failed',
+                text: 'Failed to reserve product. Please try again later.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+              });
+            });
         }
-      })
-        .then(response => {
-
-          this.colorDialog = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Reservation Successful',
-            text: `Product ${this.selectedColor ? `(${this.selectedColor})` : ''} with quantity ${this.reserveQuantity} has been reserved successfully.`,
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'OK'
-          });
-          console.log('Reservation created:', response.data);
-
-        })
-        .catch(error => {
-          console.error('Error reserving product:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Reservation Failed',
-            text: 'Failed to reserve product. Please try again later.',
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'OK'
-          });
-        });
+      });
     },
     forgotPassword() {
       this.$router.push('/forgot-password'); // Redirect to the forgot password page

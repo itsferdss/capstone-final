@@ -147,7 +147,7 @@ export default {
         { title: 'User ID', align: 'center', key: 'user_id' },
         { title: 'User Name', align: 'center', key: 'full_name' },
         { title: 'Contact Number', align: 'center', key: 'contact_number' },
-        { title: 'Appointment Date', align: 'center', key: 'formatted_appointment_date' },
+        { title: 'Reservation Date', align: 'center', key: 'formatted_appointment_date' },
         { title: 'Product ID', align: 'center', key: 'product_id' },
         { title: 'Product Name', align: 'center', key: 'product_name' },
         { title: 'Color', align: 'center', key: 'color' },

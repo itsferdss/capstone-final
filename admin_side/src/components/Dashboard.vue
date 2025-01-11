@@ -205,7 +205,7 @@ onMounted(() => {
 async function exportLowStockPDF() {
   try {
     const doc = new jsPDF('landscape');
-    const logoImage = '../src/assets/MVC_logo.png'; // Adjust logo path if needed
+    const logoImage = '../assets/MVC_logo.png'; // Adjust logo path if needed
     const marginTop = 20;
     const marginLeft = 15;
     const pageHeight = doc.internal.pageSize.height;

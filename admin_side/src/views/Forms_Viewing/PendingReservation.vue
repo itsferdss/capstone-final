@@ -132,7 +132,7 @@ export default {
             headers: [
                 { title: 'ID', align: 'center'},
                 { title: 'Name', align: 'center' },
-                { title: 'Date', align: 'center' },
+                { title: 'Reservation Date', align: 'center' },
                 { title: 'Product Name', align: 'center' },
                 { title: 'Color', align: 'center' },
                 { title: 'Stock', align: 'center' },

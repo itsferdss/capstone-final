@@ -21,9 +21,6 @@
             </v-card-title>
             <v-card-text>
                 <v-data-table :headers="headers" :items="reservations" item-key="id" class="elevation-1">
-                    <template v-slot:item.picked_up_date="{ item }">
-                        {{ item.picked_up_date ? new Date(item.picked_up_date).toLocaleDateString() : 'Not picked up' }}
-                    </template>
                     <template v-slot:item.product.product_name="{ item }">
                         {{ item.product.product_name }}
                     </template>
@@ -38,8 +35,11 @@
                     <template v-slot:item.status="{ item }">
                         <span :style="getStatusStyle(item.status)">{{ getStatusText(item.status) }}</span>
                     </template>
-                    <template v-slot:item.updated_at="{ item }">
-                        {{ formatDateTime(item.updated_at) }}
+                    <template v-slot:item.created_at="{ item }">
+                        {{ formatDateTime(item.created_at) }}
+                    </template>
+                    <template v-slot:item.deadline="{ item }">
+                        {{ formatDateTime(item.deadline) }}
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-btn v-if="item.status === 'pending' || item.status === 'accepted' "
@@ -67,11 +67,11 @@ export default {
             headers: [
                 { title: 'Product', align: 'center', value: 'product.product_name' },
                 { title: 'Brand', align: 'center', value: 'product.supplier' },
-                { title: 'Pickup Date', align: 'center', value: 'picked_up_date' },
                 { title: 'Color', align: 'center', value: 'color' },
                 { title: 'Status', align: 'center', value: 'status' },
                 { title: 'Quantity', align: 'center', value: 'quantity' },
-                { title: 'Date Updated', align: 'center', value: 'updated_at'},
+                { title: 'Reservation Date', align: 'center', value: 'created_at'},
+                { title: 'Reservation Due', align: 'center', value: 'deadline' },
                 { title: 'Actions', align: 'center', value: 'actions' }
             ]
         };
